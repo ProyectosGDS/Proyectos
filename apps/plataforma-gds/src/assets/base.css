@@ -1,0 +1,62 @@
+@layer base {
+    html {
+        background-color: #f4f5f7;
+    }
+
+    @font-face {
+        font-family: 'Jost';
+        src: url('./font/Jost/Jost-VariableFont_wght.ttf') format('woff2');
+    }
+}
+/* Buttons colors */
+
+.btn-primary {
+    @apply bg-color-1 border-blue-900 text-blue-100;
+}
+
+.btn-secondary {
+    @apply bg-color-4 border-blue-400 text-blue-50;
+}
+
+.btn-success {
+    @apply bg-green-600 border-green-700 text-green-50;
+}
+
+.btn-danger {
+    @apply bg-red-500 border-red-600 text-red-50;
+}
+
+.btn-warning {
+    @apply bg-yellow-600 border-yellow-700 text-yellow-50;
+}
+
+
+.btn-dark {
+    @apply bg-gray-600 border-gray-700 text-gray-50;
+}
+
+.input {
+    @apply border px-3  rounded w-full focus-within:border-color-5 border-color-4 disabled:bg-gray-50;
+}
+
+.btn {
+    @apply  text-lg rounded-full bg-opacity-90 hover:bg-opacity-100 focus:bg-opacity-100 font-medium active:scale-95 disabled:bg-gray-400 disabled:shadow-black disabled:border-gray-600 disabled:text-gray-500 disabled:scale-100 disabled:cursor-not-allowed;
+}
+
+.icon-button {
+    @apply h-3 w-3 p-1 text-white rounded-full cursor-pointer hover:scale-110;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+
+.no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.form-control {
+    @apply py-1.5 px-2 text-gray-700 bg-white border-2 shadow-lg border-gray-200 rounded placeholder-gray-400/70 focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40;
+}
