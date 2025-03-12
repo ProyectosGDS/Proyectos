@@ -51,7 +51,7 @@ class horarios extends Model
             return !is_null($dia) && $dia !== '';
         });
 
-        return implode(' ', $dias);
+        return implode(', ', $dias);
     }
 
     public function getNombreCompletoAttribute() {

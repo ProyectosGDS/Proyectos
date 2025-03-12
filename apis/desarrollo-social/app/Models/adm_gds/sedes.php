@@ -34,8 +34,8 @@ class sedes extends Model
     public function getNombreCompletoAttribute() {
         $nombres = [
             $this->nombre,
-            $this->zona->descripcion,
-            $this->distrito->nombre,
+            $this->zona->descripcion ?? null,
+            $this->distrito->nombre ?? null,
             $this->direccion
         ];
 

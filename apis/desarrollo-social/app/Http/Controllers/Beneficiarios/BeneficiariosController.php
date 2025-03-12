@@ -28,7 +28,7 @@ class BeneficiariosController extends Controller
             $beneficiarios = beneficiarios::where(function ($query) use ($search) {
                 $query->where('cui','LIKE','%'.$search.'%')
                     ->orWhereRaw(
-                        "LOWER(CONCAT(PRIMER_NOMBRE,' ',SEGUNDO_NOMBRE,' ',PRIMER_APELLIDO,' ',SEGUNDO_APELLIDO)) LIKE ?",
+                        "LOWER(CONCATENARNOMBRES(PRIMER_NOMBRE,SEGUNDO_NOMBRE,PRIMER_APELLIDO,SEGUNDO_APELLIDO)) LIKE ?",
                         ["%" . strtolower($search) . "%"]
                     )
                     ->orWhere('celular','LIKE','%'. $search .'%')

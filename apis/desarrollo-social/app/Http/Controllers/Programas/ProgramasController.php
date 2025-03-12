@@ -112,43 +112,44 @@ class ProgramasController extends Controller
 
             $query = "
                 SELECT
-                    dc.id,
-                    p.nombre programa,
-                    c.nombre curso,
-                    dc.seccion,
-                    i.nombre instructor,
-                    UPPER(CONCAT(s.nombre,' ',z.descripcion,' ',d.nombre,' ',s.direccion)) sede,
-                    UPPER(CONCAT(h.hora_inicial,' a ',h.hora_final,' - ',h.lun,' ',h.mar,' ',h.mie,' ',h.jue )) horario,
-                    t.nombre temporalidad,
-                    dc.modalidad,
-                    dc.capacidad,
-                    dc.fecha_inicial,
-                    dc.fecha_final,
-                    dc.publico,
-                    dc.estado,
-                    p.dependencia_id
-                FROM detalles_cursos dc
-                LEFT JOIN cursos_modulos cm
-                    ON dc.id = cm.detalle_curso_id
-                    INNER JOIN programas p
-                        ON dc.programa_id = p.id
-                    INNER JOIN cursos c
-                        ON dc.curso_id = c.id
-                    INNER JOIN instructores i
-                        ON dc.instructor_id = i.id
-                    INNER JOIN sedes s
-                        ON dc.sede_id = s.id
-                        INNER JOIN zonas z
-                            ON s.zona_id = z.id
-                        INNER JOIN distritos d
-                            ON s.distrito_id = d.id
-                    INNER JOIN horarios h
-                        ON dc.horario_id = h.id 
-                    INNER JOIN temporalidades t
-                        ON dc.temporalidad_id = t.id
-                WHERE cm.modulo_id IS NULL
-                AND dc.programa_id = ?
-                ORDER BY dc.id DESC
+                    DC.*,
+                    DC.ID,
+                    P.NOMBRE PROGRAMA,
+                    C.NOMBRE CURSO,
+                    DC.SECCION,
+                    I.NOMBRE INSTRUCTOR,
+                    UPPER(S.NOMBRE||' '||Z.DESCRIPCION||' '||D.NOMBRE||' '||S.DIRECCION) SEDE,
+                    UPPER(H.HORA_INICIAL||' A '||H.HORA_FINAL||' - '||CONCATENARDIAS(H.LUN,H.MAR,H.MIE,H.JUE,H.VIE,H.SAB,H.DOM)) HORARIO,
+                    T.NOMBRE TEMPORALIDAD,
+                    DC.MODALIDAD,
+                    DC.CAPACIDAD,
+                    DC.FECHA_INICIAL,
+                    DC.FECHA_FINAL,
+                    DC.PUBLICO,
+                    DC.ESTADO,
+                    P.DEPENDENCIA_ID
+                FROM DETALLES_CURSOS DC
+                LEFT JOIN CURSOS_MODULOS CM
+                    ON DC.ID = CM.DETALLE_CURSO_ID
+                    INNER JOIN PROGRAMAS P
+                        ON DC.PROGRAMA_ID = P.ID
+                    INNER JOIN CURSOS C
+                        ON DC.CURSO_ID = C.ID
+                    INNER JOIN INSTRUCTORES I
+                        ON DC.INSTRUCTOR_ID = I.ID
+                    INNER JOIN SEDES S
+                        ON DC.SEDE_ID = S.ID
+                            INNER JOIN ZONAS Z
+                                ON S.ZONA_ID = Z.ID
+                            LEFT JOIN DISTRITOS D
+                                ON S.DISTRITO_ID = D.ID
+                    INNER JOIN HORARIOS H
+                        ON DC.HORARIO_ID = H.ID 
+                    INNER JOIN TEMPORALIDADES T
+                        ON DC.TEMPORALIDAD_ID = T.ID
+                WHERE CM.MODULO_ID IS NULL
+                AND DC.PROGRAMA_ID = ?
+                ORDER BY DC.ID DESC
             ";
 
             $cursos_programa = DB::connection('gds')->select($query,[$programa_id]);

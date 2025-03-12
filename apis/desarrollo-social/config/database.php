@@ -43,7 +43,7 @@ return [
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
 
-        'gds' => [
+        'mariaDB_gds' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
@@ -92,7 +92,7 @@ return [
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
-        'oracle_gds' => [
+        'gds' => [
             'driver'         => 'oracle',
             'tns'            => env('DB_TNS', ''),
             'host'           => env('DB_HOST', '172.23.50.149'),
