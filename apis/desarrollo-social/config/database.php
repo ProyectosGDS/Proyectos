@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'gds'),
+    'default' => env('DB_CONNECTION', ''),
 
     /*
     |--------------------------------------------------------------------------
@@ -95,12 +95,12 @@ return [
         'gds' => [
             'driver'         => 'oracle',
             'tns'            => env('DB_TNS', ''),
-            'host'           => env('DB_HOST', '172.23.50.149'),
+            'host'           => env('DB_HOST', ''),
             'port'           => env('DB_PORT', '1521'),
-            'service_name'   => env('DB_SERVICE_NAME','bdsal19_pdb1'),
+            'service_name'   => env('DB_SERVICE_NAME',''),
             'database'       => env('DB_DATABASE', 'xe'),
-            'username'       => env('DB_USERNAME', 'adm_gds'),
-            'password'       => env('DB_PASSWORD', 'v7gekspn'),
+            'username'       => env('DB_USERNAME', ''),
+            'password'       => env('DB_PASSWORD', ''),
             'charset'        => env('DB_CHARSET', 'AL32UTF8'),
             'prefix'         => env('DB_PREFIX', ''),
             'prefix_schema'  => env('DB_SCHEMA_PREFIX', ''),
@@ -110,16 +110,16 @@ return [
         'oracle_back_up' => [
             'driver'         => 'oracle',
             'tns'            => env('DB_TNS', ''),
-            'host'           => env('DB_HOST', 'muniscan.muni'),
-            'port'           => env('DB_PORT', '1521'),
-            'database'       => env('DB_DATABASE', 'MUNI'),
-            'username'       => env('DB_USERNAME', 'jgutierrez'),
-            'password'       => env('DB_PASSWORD', 'v7gekspn'),
-            'charset'        => env('DB_CHARSET', 'AL32UTF8'),
-            'prefix'         => env('DB_PREFIX', ''),
-            'prefix_schema'  => env('DB_SCHEMA_PREFIX', ''),
-            'edition'        => env('DB_EDITION', 'ora$base'),
-            'server_version' => env('DB_SERVER_VERSION', '19c'),
+            'host'           => env('DB_BK_HOST', ''),
+            'port'           => env('DB_BK_PORT', '1521'),
+            'database'       => env('DB_BK_DATABASE', ''),
+            'username'       => env('DB_BK_USERNAME', ''),
+            'password'       => env('DB_BK_PASSWORD', ''),
+            'charset'        => env('DB_BK_CHARSET', 'AL32UTF8'),
+            'prefix'         => env('DB_BK_PREFIX', ''),
+            'prefix_schema'  => env('DB_BK_SCHEMA_PREFIX', ''),
+            'edition'        => env('DB_BK_EDITION', 'ora$base'),
+            'server_version' => env('DB_BK_SERVER_VERSION', '19c'),
         ],
     ],
 
