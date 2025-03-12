@@ -44,6 +44,43 @@ Para utilizar el proyecto en producción, se deben ejecutar los siguientes coman
     composer install
 Instala todas las librerias del archivo composer.json
 
+## Variables de entorno
+Se crear archivo un `.env` que puede ser una copia del archivo llamado .env.example que viene en el proyecto en el cual modificaremos las siguientes variables de entrono.
+
+    APP_DEBUG=false
+Esta varible colocarla en false para que no muestre los errores de forma detallada al momento de estar en produccion.
+
+    APP_URL=https://{hostname}/{ubicacion-del-proyecto}/public
+En esta variable se coloca el hostname y la ubicacion del proyecto dentro del servidor ejemplo: https://gds.muniguate.com/desarrollo-social/public, esta misma url servira a los clientes front-ends para saber a donde a puntar para recibir los datos del API.
+
+    JWT_SECRET={palabra-secreta}
+Para la validación de los token de sesion se requiere de la palabra secreta que es la misma con la que se creo la llave privada y publica.
+
+    JWT_EXPIRED_TOKEN=480
+Este es el timpo en el que se expira el token de forma automatica en este caso 480 minutos u 8 horas.
+
+    PRINCIPAL_HOST_NAME_RECEIVER=https://{hostname}
+El api restrigue los clientes front-ends que se conecten a menos que se encuentren en una lista dentro de las configuraciones del proyecto en el archivo jwt dentro de la carpeta de config, lo que signfica que si el cliente esta en el mismo servidor que el api entonces se coloca el host del servidor ejemplo: https://gds.muniguate.com/, para esto se utiliza esta variable de entorno en el caso en que todos los clientes provengan del mismo hostname, de lo contrario colocar la lista de host de donde provengan los clientes en el archivo de configuración antes mencionado.
+
+    DB_CONNECTION=gds
+Esta variable de entorno nos permite saber cual es la conexion por defecto que tomara el api en este caso sera la que tenga el nombre `gds`
+
+### Uso de multimples base de datos
+Las variables con el prefijo `DB_BK_...` pertenecen a una base de datos de consulta dentro de las cuales tendremos:
+
+- `DB_BK_HOST={HOST DE LA DB}`
+- `DB_BK_DATABASE={NOMBRE DE LA DB O SERVICIO}`
+- `DB_BK_USERNAME={USUARIO DE LA DB}`
+- `DB_BK_PASSWORD={CONTRASEÑA DE LA DB}`
+
+La datos de conexion de la base de datos por defecto `gds`
+
+- `DB_HOST={HOST DE LA DB}`
+- `DB_SERVICE_NAME={NOMBRE DEL SERVICIO}`
+- `DB_DATABASE={NOMBRE DE LA DB}`
+- `DB_USERNAME={USUARIO DE DB}`
+- `DB_PASSWORD={CONTRASEÑA DB}`
+
     php artisan key:generate
 Genear auna nueva clave con la que se encripta el proyecto y modifica la variable de entorno `APP_KEY`
 
@@ -70,43 +107,6 @@ Al proyecto se le dan permisos de lectura y escritura a las carpetas
 
 - `bootstrap y subdirectorios`
 - `storage/logs/`
-
-## Variables de entorno
-Se crear archivo un `.env` que puede ser una copia del archivo llamado .env.example que viene en el proyecto en el cual modificaremos las siguientes variables de entrono.
-
-    APP_DEBUG=false
-Esta varible colocarla en false para que no muestre los errores de forma detallada al momento de estar en produccion.
-
-    APP_URL=https://{hostname}/{ubicacion-del-proyecto}/public
-En esta variable se coloca el hostname y la ubicacion del proyecto dentro del servidor ejemplo: https://gds.muniguate.com/desarrollo-social/public, esta misma url servira a los clientes front-ends para saber a donde a puntar para recibir los datos del API.
-
-    JWT_SECRET={palabra-secreta}
-Para la validación de los token de sesion se requiere de la palabra secreta que es la misma con la que se creo la llave privada y publica.
-
-    JWT_EXPIRED_TOKEN=480
-Este es el timpo en el que se expira el token de forma automatica en este caso 480 minutos u 8 horas.
-
-    PRINCIPAL_HOST_NAME_RECEIVER=https://{hostname}
-El api restrigue los clientes front-ends que se conecten a menos que se encuentren en una lista dentro de las configuraciones del proyecto en el archivo jwt dentro de la carpeta de config, lo que signfica que si el cliente esta en el mismo servidor que el api entonces se coloca el host del servidor ejemplo: https://gds.muniguate.com/, para esto se utiliza esta variable de entorno en el caso en que todos los clientes provengan del mismo hostname, de lo contrario colocar la lista de host de donde provengan los clientes en el archivo de configuración antes mencionado.
-
-    DB_CONNECTION=gds
-Esta variable de entorno nos permite saber cual es la conexion por defecto que tomara el api en este caso sera la que tenga el nombre `gds`
-
-### USO DE MULTIMPLES BASE DE DATOS
-Las variables con el prefijo `DB_BK_...` pertenecen a una base de datos de consulta dentro de las cuales tendremos:
-
-- `DB_BK_HOST={HOST DE LA DB}`
-- `DB_BK_DATABASE={NOMBRE DE LA DB O SERVICIO}`
-- `DB_BK_USERNAME={USUARIO DE LA DB}`
-- `DB_BK_PASSWORD={CONTRASEÑA DE LA DB}`
-
-La datos de conexion de la base de datos por defecto `gds`
-
-- `DB_HOST={HOST DE LA DB}`
-- `DB_SERVICE_NAME={NOMBRE DEL SERVICIO}`
-- `DB_DATABASE={NOMBRE DE LA DB}`
-- `DB_USERNAME={USUARIO DE DB}`
-- `DB_PASSWORD={CONTRASEÑA DB}`
 
 
 
