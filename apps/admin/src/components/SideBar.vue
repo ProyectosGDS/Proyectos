@@ -95,8 +95,8 @@
                                 <ul v-if="menu.active" class="ml-3 hidden group-hover/principal:block">
                                     <template v-for="sub in menu.subMenu">
                                         <a :href="sub.link" @click="toggleActive(sub.id)">
-                                            <li class="flex items-center hover:bg-blue-800 hover:text-white hover:font-bold cursor-pointer p-2 rounded-lg mt-1"
-                                                :class="{ 'bg-blue-800 text-white font-bold' :  sub.active }">
+                                            <li class="flex items-center hover:bg-blue-800 hover:text-white cursor-pointer p-2 rounded-lg mt-1"
+                                                :class="{ 'bg-blue-800 text-white ' :  sub.active }">
                                                 <Icon :icon="sub.icon" class="h-5 w-5"/>
                                                 <span class="pl-6 group-hover/principal:pl-2 transition-all">
                                                     {{ sub.titulo }}
