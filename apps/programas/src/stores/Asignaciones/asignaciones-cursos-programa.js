@@ -156,6 +156,31 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
         modal.value.delete = true
     }
 
+    const validateDuplicateCourseList = () => {
+
+        let error = false
+
+        cursos.value.forEach(item => {
+            if(
+                item.curso_id == curso.value.curso_id && 
+                item.sede_id == curso.value.sede_id &&
+                item.instructor_id == curso.value.instructor_id &&
+                item.horario_id == curso.value.horario_id &&
+                item.id != curso.value.id
+            ) {
+                errors.value = { detalles: ['El curso: '+item.curso+' ya existen en el listado'] }
+                error = true
+                return
+            }
+        })
+
+        if(error) {
+            return
+        }
+        
+        update()
+    }
+
     const resetData = () => {
         curso.value = {}
         copy_curso.value = {}
@@ -221,6 +246,7 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
         destroy,
         disabledCurso,
         disabled,
+        validateDuplicateCourseList,
         exportExcel,
         resetData
     }

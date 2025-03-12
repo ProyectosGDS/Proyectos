@@ -23,7 +23,8 @@ export const useCursosProgramaStore = defineStore('cursos-programa', () => {
         instructor: {},
         sede: {},
         horario: {},
-        publico: 'S'
+        publico: 'S',
+        seccion : null,
     })
 
     const detalles = ref({
@@ -62,11 +63,11 @@ export const useCursosProgramaStore = defineStore('cursos-programa', () => {
 
             const new_curso = asignaciones.cursos.filter( item => {
                 return (
-                    item.curso == curso.value.curso.nombre &&
+                    item.curso_id == curso.value.curso.id &&
                     item.seccion == curso.value.seccion &&
-                    item.instructor == curso.value.instructor.nombre &&
-                    item.sede == curso.value.sede.nombre_completo &&
-                    item.horario == curso.value.horario.nombre_completo
+                    item.instructor_id == curso.value.instructor.id &&
+                    item.sede_id == curso.value.sede.id &&
+                    item.horario_id == curso.value.horario.id
                 )
             })
 

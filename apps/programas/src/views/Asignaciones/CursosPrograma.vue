@@ -323,10 +323,17 @@
                 </label>
             </div>
         </div>
+        <pre>
+            {{ asignaciones.curso }}
+        </pre>
+        <hr>
+        <pre>
+            {{ asignaciones.cursos }}
+        </pre>
         <Validate-Errors :errors="asignaciones.errors" v-if="asignaciones.errors != 0" />
         <template #footer>
             <Button @click="asignaciones.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
-            <Button @click="asignaciones.update" text="Actualizar" icon="fas fa-arrows-rotate" class="btn-primary" :loading="asignaciones.loading.update" />
+            <Button @click="asignaciones.validateDuplicateCourseList" text="Actualizar" icon="fas fa-arrows-rotate" class="btn-primary" :loading="asignaciones.loading.update" />
         </template>
     </Modal>
 
