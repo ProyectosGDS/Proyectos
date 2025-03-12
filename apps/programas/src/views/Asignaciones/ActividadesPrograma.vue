@@ -260,6 +260,13 @@
                 <option v-for="estado in catalogos.catalogos_actividad.estados_actividades" :value="estado.id">{{ estado.nombre }}</option>
             </Input>
         </div>
+        <pre>
+            {{ asignaciones.actividad }}
+        </pre>
+        <hr>
+        <pre>
+            {{ asignaciones.actividades }}
+        </pre>
         <Validate-Errors :errors="asignaciones.errors" v-if="asignaciones.errors != 0" />
         <template #footer>
             <Button @click="asignaciones.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />

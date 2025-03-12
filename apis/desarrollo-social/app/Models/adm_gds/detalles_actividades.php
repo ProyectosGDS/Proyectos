@@ -11,6 +11,11 @@ class detalles_actividades extends Model
     public $timestamps = false;
     protected $appends = ['horario','fechas'];
 
+    protected $casts = [
+        'fecha_inicial' => 'datetime:Y-m-d',
+        'fecha_final' => 'datetime:Y-m-d',
+    ];
+
     protected $fillable = [
         'responsable',
         'direccion',

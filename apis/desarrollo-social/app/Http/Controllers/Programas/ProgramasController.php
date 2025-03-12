@@ -204,115 +204,115 @@ class ProgramasController extends Controller
             
             $query = "
                 SELECT
-                    bm.id inscripcion_id,
-                    b.cui,
-                    CONCAT(b.primer_nombre,' ',b.primer_apellido) AS beneficiario,
-                    p.nombre programa,
-                    m.nombre modulo_curso,
-                    bm.created_at fecha_inscripcion,
-                    bm.estado,
-                    'MODULO' tipo
-                FROM beneficiarios_modulos bm
-                INNER JOIN beneficiarios b
-                    ON bm.beneficiario_id = b.id
-                INNER JOIN modulos m
-                    ON bm.modulo_id = m.id
-                INNER JOIN programas p
-                    ON m.programa_id = p.id
-                WHERE p.id = ?
-                AND YEAR(bm.created_at) = ?
-                
-                UNION ALL
-                    
-                SELECT
-                    bc.id inscripcion_id,
-                    b.cui,
-                    CONCAT(b.primer_nombre,' ',b.primer_apellido) AS beneficiario,
-                    p.nombre programa,
-                    c.nombre modulo_curso,
-                    bc.created_at fecha_inscripcion,
-                    bc.estado,
-                    'CURSO' tipo
-                FROM beneficiarios_cursos bc
-                INNER JOIN beneficiarios b
-                    ON bc.beneficiario_id = b.id
-                INNER JOIN detalles_cursos dc
-                    ON bc.detalle_curso_id = dc.id
-                INNER JOIN cursos c
-                    ON dc.curso_id = c.id
-                INNER JOIN programas p
-                    ON dc.programa_id = p.id
-                WHERE p.id = ?
-                AND YEAR(bc.created_at) = ?
+                    BM.ID INSCRIPCION_ID,
+                    B.CUI,
+                    CONCATENARNOMBRES(B.PRIMER_NOMBRE,B.SEGUNDO_NOMBRE,B.PRIMER_APELLIDO,B.SEGUNDO_APELLIDO) AS BENEFICIARIO,
+                    P.NOMBRE PROGRAMA,
+                    M.NOMBRE MODULO_CURSO,
+                    BM.CREATED_AT FECHA_INSCRIPCION,
+                    BM.ESTADO,
+                    CAST('MODULO' AS VARCHAR2(50)) TIPO
+                FROM BENEFICIARIOS_MODULOS BM
+                INNER JOIN BENEFICIARIOS B
+                    ON BM.BENEFICIARIO_ID = B.ID
+                INNER JOIN MODULOS M
+                    ON BM.MODULO_ID = M.ID
+                INNER JOIN PROGRAMAS P
+                    ON M.PROGRAMA_ID = P.ID
+                WHERE P.ID = ?
+                AND EXTRACT(YEAR FROM BM.CREATED_AT) = ?
 
                 UNION ALL
+                        
+                SELECT
+                    BC.ID INSCRIPCION_ID,
+                    B.CUI,
+                    CONCATENARNOMBRES(B.PRIMER_NOMBRE,B.SEGUNDO_NOMBRE,B.PRIMER_APELLIDO,B.SEGUNDO_APELLIDO) AS BENEFICIARIO,
+                    P.NOMBRE PROGRAMA,
+                    C.NOMBRE MODULO_CURSO,
+                    BC.CREATED_AT FECHA_INSCRIPCION,
+                    BC.ESTADO,
+                    CAST('CURSO' AS VARCHAR2(50)) TIPO
+                FROM BENEFICIARIOS_CURSOS BC
+                INNER JOIN BENEFICIARIOS B
+                    ON BC.BENEFICIARIO_ID = B.ID
+                INNER JOIN DETALLES_CURSOS DC
+                    ON BC.DETALLE_CURSO_ID = DC.ID
+                INNER JOIN CURSOS C
+                    ON DC.CURSO_ID = C.ID
+                INNER JOIN PROGRAMAS P
+                    ON DC.PROGRAMA_ID = P.ID
+                WHERE P.ID = ?
+                AND EXTRACT(YEAR FROM BC.CREATED_AT) = ?
+
+                UNION ALL
 
                 SELECT
-                    ba.id inscripcion_id,
-                    b.cui,
-                    CONCAT(b.primer_nombre,' ',b.primer_apellido) AS beneficiario,
-                    p.nombre programa,
-                    a.nombre modulo_curso,
-                    ba.created_at fecha_inscripcion,
-                    ba.estado,
-                    ta.nombre
-                FROM beneficiarios_actividades ba
-                INNER JOIN beneficiarios b
-                    ON ba.beneficiario_id = b.id
-                INNER JOIN detalles_actividades da
-                    ON ba.detalle_actividad_id = da.id
-                INNER JOIN actividades a
-                    ON da.actividad_id = a.id
-                INNER JOIN tipos_actividades ta
-                    ON da.tipo_actividad_id = ta.id
-                INNER JOIN programas p
-                        ON da.programa_id = p.id
-                WHERE p.id = ?
-                AND YEAR(ba.created_at) = ?
+                    BA.ID INSCRIPCION_ID,
+                    B.CUI,
+                    CONCATENARNOMBRES(B.PRIMER_NOMBRE,B.SEGUNDO_NOMBRE,B.PRIMER_APELLIDO,B.SEGUNDO_APELLIDO) AS BENEFICIARIO,
+                    P.NOMBRE PROGRAMA,
+                    A.NOMBRE MODULO_CURSO,
+                    BA.CREATED_AT FECHA_INSCRIPCION,
+                    BA.ESTADO,
+                    CAST(TA.NOMBRE AS VARCHAR2(50)) TIPO
+                FROM BENEFICIARIOS_ACTIVIDADES BA
+                INNER JOIN BENEFICIARIOS B
+                    ON BA.BENEFICIARIO_ID = B.ID
+                INNER JOIN DETALLES_ACTIVIDADES DA
+                    ON BA.DETALLE_ACTIVIDAD_ID = DA.ID
+                INNER JOIN ACTIVIDADES A
+                    ON DA.ACTIVIDAD_ID = A.ID
+                INNER JOIN TIPOS_ACTIVIDADES TA
+                    ON DA.TIPO_ACTIVIDAD_ID = TA.ID
+                INNER JOIN PROGRAMAS P
+                    ON DA.PROGRAMA_ID = P.ID
+                WHERE P.ID = ?
+                AND EXTRACT(YEAR FROM BA.CREATED_AT) = ?
 
-                ORDER BY beneficiario
+                ORDER BY BENEFICIARIO
             ";
 
             $queryTotal = "
                 SELECT DISTINCT
-                    b.cui
-                FROM beneficiarios_modulos bm
-                INNER JOIN beneficiarios b
-                        ON bm.beneficiario_id = b.id
-                INNER JOIN modulos m
-                        ON bm.modulo_id = m.id
-                INNER JOIN programas p
-                        ON m.programa_id = p.id
-                WHERE p.id = ?
-                AND YEAR(bm.created_at) = ?
+                    B.CUI
+                FROM BENEFICIARIOS_MODULOS BM
+                INNER JOIN BENEFICIARIOS B
+                    ON BM.BENEFICIARIO_ID = B.ID
+                INNER JOIN MODULOS M
+                    ON BM.MODULO_ID = M.ID
+                INNER JOIN PROGRAMAS P
+                    ON M.PROGRAMA_ID = P.ID
+                WHERE P.ID = ?
+                AND EXTRACT(YEAR FROM BM.CREATED_AT) = ?
 
                 UNION
-                        
+                                
                 SELECT DISTINCT
-                    b.cui
-                FROM beneficiarios_cursos bc
-                INNER JOIN beneficiarios b
-                        ON bc.beneficiario_id = b.id
-                INNER JOIN detalles_cursos dc
-                        ON bc.detalle_curso_id = dc.id
-                INNER JOIN programas p
-                        ON dc.programa_id = p.id
-                WHERE p.id = ?
-                AND YEAR(bc.created_at) = ?
+                    B.CUI
+                FROM BENEFICIARIOS_CURSOS BC
+                INNER JOIN BENEFICIARIOS B
+                    ON BC.BENEFICIARIO_ID = B.ID
+                INNER JOIN DETALLES_CURSOS DC
+                    ON BC.DETALLE_CURSO_ID = DC.ID
+                INNER JOIN PROGRAMAS P
+                    ON DC.PROGRAMA_ID = P.ID
+                WHERE P.ID = ?
+                AND EXTRACT(YEAR FROM BC.CREATED_AT) = ?
 
                 UNION
 
                 SELECT DISTINCT
-                        b.cui
-                FROM beneficiarios_actividades ba
-                INNER JOIN beneficiarios b
-                                ON ba.beneficiario_id = b.id
-                INNER JOIN detalles_actividades da
-                                ON ba.detalle_actividad_id = da.id
-                INNER JOIN programas p
-                                ON da.programa_id = p.id
-                WHERE p.id = ?
-                AND YEAR(ba.created_at) = ?
+                    B.CUI
+                FROM BENEFICIARIOS_ACTIVIDADES BA
+                INNER JOIN BENEFICIARIOS B
+                    ON BA.BENEFICIARIO_ID = B.ID
+                INNER JOIN DETALLES_ACTIVIDADES DA
+                    ON BA.DETALLE_ACTIVIDAD_ID = DA.ID
+                INNER JOIN PROGRAMAS P
+                    ON DA.PROGRAMA_ID = P.ID
+                WHERE P.ID = ?
+                AND EXTRACT(YEAR FROM BA.CREATED_AT) = ?
             ";
 
             $beneficiarios_inscritos = DB::connection('gds')->select($query,[$programa,$year,$programa,$year,$programa,$year]);
@@ -334,35 +334,31 @@ class ProgramasController extends Controller
 
             $query = "
                 SELECT
-                    da.*,
-                    p.nombre programa,
-                    a.nombre actividad,
-                    da.responsable,
-                    z.descripcion zona,
-                    d.nombre distrito,
-                    da.direccion,
-                    da.coordenadas,
-                    CONCAT(da.hora_inicio,' A ',da.hora_final) horario,
-                    CONCAT(da.fecha_inicial,' - ',da.fecha_final) fechas,
-                    ta.nombre tipo,
-                    ea.nombre estado,
-                    da.estado_actividad_id
-                FROM detalles_actividades da
-                    INNER JOIN programas p
-                        ON da.programa_id = p.id
-                    LEFT JOIN zonas z
-                        ON da.zona_id = z.id
-                    LEFT JOIN distritos d
-                        ON da.distrito_id = d.id
-                    INNER JOIN actividades a
-                        ON da.actividad_id = a.id
-                    LEFT JOIN tipos_actividades ta
-                        ON da.tipo_actividad_id = ta.id
-                    LEFT JOIN estados_actividades ea
-                        ON da.estado_actividad_id = ea.id
-                    WHERE YEAR(da.fecha_inicial) = ?
-                    AND da.programa_id = ?
-                    ORDER BY da.id DESC        
+                    DA.*,
+                    P.NOMBRE PROGRAMA,
+                    A.NOMBRE ACTIVIDAD,
+                    Z.DESCRIPCION ZONA,
+                    D.NOMBRE DISTRITO,
+                    DA.HORA_INICIO ||' A '|| DA.HORA_FINAL HORARIO,
+                    TO_CHAR(DA.FECHA_INICIAL,'YYYY-MM-DD') ||' - '|| TO_CHAR(DA.FECHA_FINAL,'YYYY-MM-DD') FECHAS,
+                    TA.NOMBRE TIPO,
+                    EA.NOMBRE ESTADO
+                FROM DETALLES_ACTIVIDADES DA
+                    INNER JOIN PROGRAMAS P
+                            ON DA.PROGRAMA_ID = P.ID
+                    LEFT JOIN ZONAS Z
+                            ON DA.ZONA_ID = Z.ID
+                    LEFT JOIN DISTRITOS D
+                            ON DA.DISTRITO_ID = D.ID
+                    INNER JOIN ACTIVIDADES A
+                            ON DA.ACTIVIDAD_ID = A.ID
+                    LEFT JOIN TIPOS_ACTIVIDADES TA
+                            ON DA.TIPO_ACTIVIDAD_ID = TA.ID
+                    LEFT JOIN ESTADOS_ACTIVIDADES EA
+                            ON DA.ESTADO_ACTIVIDAD_ID = EA.ID
+                WHERE EXTRACT(YEAR FROM DA.FECHA_INICIAL) = ?
+                AND DA.PROGRAMA_ID = ?
+                ORDER BY DA.ID DESC         
             ";
 
             $actividades_programa = DB::connection('gds')->select($query,[$year,$programa_id]);

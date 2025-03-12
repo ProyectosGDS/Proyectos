@@ -12,7 +12,7 @@ export const useBeneficiariosProgramaStore = defineStore('beneficiarios-programa
         { title : 'cui', key : 'cui' },
         { title : 'beneficiario', key : 'beneficiario' },
         { title : 'programa', key : 'programa' },
-        { title : 'módulo/curso', key : 'modulo_curso' },
+        { title : 'módulo/curso/actividad', key : 'modulo_curso' },
         { title : 'fecha inscripcion', key : 'fecha_inscripcion', type : 'date', width :'10px', align : 'center' },
         { title : 'tipo', key : 'tipo' },
         { title : 'estado', key : 'estado', width :'10px', align : 'center' },

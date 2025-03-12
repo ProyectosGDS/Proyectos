@@ -146,19 +146,19 @@ class DetallesActividadesController extends Controller
         ]);
 
         try {
-                $actividad->responsable =$request->responsable ?? null;
-                $actividad->direccion =$request->direccion ?? null;
-                $actividad->hora_inicio =$request->hora_inicio ?? null;
-                $actividad->hora_final =$request->hora_final ?? null;
-                $actividad->fecha_inicial =$request->fecha_inicial ?? null;
-                $actividad->fecha_final =$request->fecha_final ?? null;
-                $actividad->coordenadas =$request->coordenadas ?? null;
-                $actividad->zona_id =$request->zona_id ?? null;
-                $actividad->distrito_id =$request->distrito_id ?? null;
-                $actividad->actividad_id =$request->actividad_id;
-                $actividad->tipo_actividad_id =$request->tipo_actividad_id;
-                $actividad->estado_actividad_id =$request->estado_actividad_id;
-                $actividad->programa_id =$request->programa_id;
+                $actividad->responsable = $request->responsable ? mb_strtoupper($request->responsable) : null;
+                $actividad->direccion = $request->direccion ?? null;
+                $actividad->hora_inicio = $request->hora_inicio ?? null;
+                $actividad->hora_final = $request->hora_final ?? null;
+                $actividad->fecha_inicial = $request->fecha_inicial ?? null;
+                $actividad->fecha_final = $request->fecha_final ?? null;
+                $actividad->coordenadas = $request->coordenadas ?? null;
+                $actividad->zona_id = $request->zona_id ?? null;
+                $actividad->distrito_id = $request->distrito_id ?? null;
+                $actividad->actividad_id = $request->actividad_id;
+                $actividad->tipo_actividad_id = $request->tipo_actividad_id;
+                $actividad->estado_actividad_id = $request->estado_actividad_id;
+                $actividad->programa_id = $request->programa_id;
                 $actividad->save();
 
             return response('Actividad modificada correctamente');  

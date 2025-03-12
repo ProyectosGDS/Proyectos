@@ -162,14 +162,12 @@ export const useAsignacionesActividadesProgramaStore = defineStore('asignaciones
             if(
                 item.programa_id == actividad.value.programa_id && 
                 item.actividad_id == actividad.value.actividad_id && 
-                item.responsable == actividad.value.responsable && 
                 item.zona_id == actividad.value.zona_id && 
                 item.distrito_id == actividad.value.distrito_id && 
-                item.direccion == actividad.value.direccion && 
-                item.coordenadas == actividad.value.coordenadas && 
+                item.direccion.toUpperCase() == actividad.value.direccion.toUpperCase() && 
                 item.hora_inicio == actividad.value.hora_inicio && 
-                item.fecha_inicial == actividad.value.fecha_inicial && 
-                item.fecha_final == actividad.value.fecha_final && 
+                item.fecha_inicial == actividad.value.fecha_inicial+' 00:00:00' && 
+                item.fecha_final == actividad.value.fecha_final+' 00:00:00' && 
                 item.tipo_actividad_id == actividad.value.tipo_actividad_id &&
                 item.id != actividad.value.id
             ) {
