@@ -30,8 +30,8 @@ Las extensiones tienen que ser de la misma version del lenguaje.
 
 ## Dependencias adicionales
 
-- **Composer** v2.8.5 o superior: Para el manejo de paquetes.
-- **Oracle Instant Client** v23: Para la conexión con la base de datos.
+- **Composer** v2.4.1 o superior: Para el manejo de paquetes.
+- **Oracle Instant Client** v23: Para la conexión con la base de datos oracle.
 
 ---
 
@@ -87,7 +87,26 @@ Para la validación de los token de sesion se requiere de la palabra secreta que
 Este es el timpo en el que se expira el token de forma automatica en este caso 480 minutos u 8 horas.
 
     PRINCIPAL_HOST_NAME_RECEIVER=https://{hostname}
-El api restrigue los clientes front-ends que se conecten a menos que se encuentren en una lista dentro de las configuraciones del proyecto en el archivo jwt, lo que signfica que si el front-end esta en el mismo servidor que el api entonces se coloca el host del servidor ejemplo: https://gds.muniguate.com/, para esto se utiliza esta variable de entorno en el caso en que todos los clientes provengan del mismo hostname.
+El api restrigue los clientes front-ends que se conecten a menos que se encuentren en una lista dentro de las configuraciones del proyecto en el archivo jwt dentro de la carpeta de config, lo que signfica que si el cliente esta en el mismo servidor que el api entonces se coloca el host del servidor ejemplo: https://gds.muniguate.com/, para esto se utiliza esta variable de entorno en el caso en que todos los clientes provengan del mismo hostname, de lo contrario colocar la lista de host de donde provengan los clientes en el archivo de configuración antes mencionado.
+
+    DB_CONNECTION=gds
+Esta variable de entorno nos permite saber cual es la conexion por defecto que tomara el api en este caso sera la que tenga el nombre `gds`
+
+### USO DE MULTIMPLES BASE DE DATOS
+Las variables con el prefijo `DB_BK_...` pertenecen a una base de datos de consulta dentro de las cuales tendremos:
+
+- `DB_BK_HOST={HOST DE LA DB}`
+- `DB_BK_DATABASE={NOMBRE DE LA DB O SERVICIO}`
+- `DB_BK_USERNAME={USUARIO DE LA DB}`
+- `DB_BK_PASSWORD={CONTRASEÑA DE LA DB}`
+
+La datos de conexion de la base de datos por defecto `gds`
+
+- `DB_HOST={HOST DE LA DB}`
+- `DB_SERVICE_NAME={NOMBRE DEL SERVICIO}`
+- `DB_DATABASE={NOMBRE DE LA DB}`
+- `DB_USERNAME={USUARIO DE DB}`
+- `DB_PASSWORD={CONTRASEÑA DB}`
 
 
 

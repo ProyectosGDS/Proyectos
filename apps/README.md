@@ -8,56 +8,59 @@ Todos los proyectos estan echos usando tecnologias frameworks de front-end:
 - `Tailwind Css`
 - `Vite`
 
-Y requiere para funcionar `node JS 23.0.0 y npm 10.9.0` instalado en el servidor, en el caso del npm ya viene por defecto en esta version de node.
+Y requiere para funcionar `node JS 23.0.0 y npm 11.1.0` instalado en el servidor, en el caso del npm ya viene por defecto en esta version de node solo se actualza a la version con el siguiente comando:
 
-La **`plataforma-gds`** es un conjunto de proyectos de forma modular que pemirte el crear proyectos y que estos funciones como módulos de un solo proyecto. El proyecto tiene la siguiente arquitectura de directorios:
+    npm install -g npm@11.1.0
+
+La `plataforma-gds` es un conjunto de proyectos de forma modular que pemirte el crear proyectos y que estos funciones como módulos de un solo proyecto principal. Una vez `empaquetados` los proyectos deberan tener la siguiente arquitectura de directorios:
 
 ### Arquitectura de directorios
 
 ```
-|-plataforma-gds
-    |-apps
-        |-{proyecto-modulo 1}
-            |-assets
-            |-docs
-            |-img
-            |-favicon.ico
-            |-index.html
-            |-.htaccess
-        |-{proyecto-modulo 2}
-            |-assets
-            |-docs
-            |-img
-            |-favicon.ico
-            |-index.html
-            |-.htaccess
-    |-assets
-    |-docs
-    |-img
-    |-favicon.ico
-    |-index.html
-    |-.htaccess
+|- plataforma-gds
+    |- apps
+        |- {proyecto-módulo 1}
+            |- assets
+            |- docs
+            |- img
+            |- favicon.ico
+            |- index.html
+            |- .htaccess
+
+        |- {proyecto-módulo 2}
+            |- assets
+            |- docs
+            |- img
+            |- favicon.ico
+            |- index.html
+            |- .htaccess
+
+    |- assets
+    |- docs
+    |- img
+    |- favicon.ico
+    |- index.html
+    |- .htaccess
 ```
-El proyecto principal (plataforma-gds) tiene una carpeta llamada apps donde almacena los diferentes proyectos que conforman los módulos.
+El proyecto principal `plataforma-gds` tiene una carpeta llamada apps donde almacena los diferentes proyectos que conforman los módulos.
 
 Los proyectos que conforman la plataforma-gds son:
 
     |- plataforma-gds //proyecto base
         |- apps
             |- admin // módulos
-            |- cursos // módulos
+            |- programas // módulos
             |- beneficiarios // módulos
-            |- eventos // módulos
 
-    |- participacion-ciudadana //este es otro proyecto base pero no tiene modulos
+    |- participacion-ciudadana //este es otro proyecto base pero no tiene módulos
 
 ### .htaccess
-Cada proyecto o modulo de forma individual contiene un archivo .htaccess que permite el manejo de a las rutas interanas de cada proyecto o modulo. Las dos lineas que se modifican dependiendo de la localizacion del proyecto dentro del servidor.
+Cada proyecto o módulo de forma individual contiene un archivo .htaccess que permite el manejo de a las rutas interanas de cada proyecto o módulo. Las dos lineas que se modifican dependiendo de la localizacion del proyecto dentro del servidor.
 
     RewriteBase /plataforma-gds/
     RewriteRule . /plataforma-gds/index.html [L]
 
-En este ejemplo podemos ver que el proyecto esta en la carpeta raiz ( / ) del servidor web si se utiliza apache usualmente en /var/www/html/ donde este directorio representa el directorio raiz del servicio web. en el caso del proyecto principal es `/plataforma-gds/` y en el caso de los proyectos que fungen como módulos es : `/plataforma-gds/apps/{nombre del modulo}`
+En este ejemplo podemos ver que el proyecto esta en la carpeta raiz ( / ) del servidor web si se utiliza `apache` usualmente en ***/var/www/html/*** donde este directorio representa el directorio raiz del servicio web. en el caso del proyecto principal es `/plataforma-gds/` y en el caso de los proyectos que fungen como módulos es : `/plataforma-gds/apps/{nombre del módulo}`
 
 ### Variables de entorno produccion ( .env.production )
 
@@ -87,12 +90,12 @@ En el archivo `vite.config.js` en la propiedad `build` se agrega el valor `outDi
         outDir: 'C:/laragon/www/{nombre del proyecto principal}/apps/eventos',
     },
 
-y este el valor que es un path donde se quiere que el proyecto sea empaquetado. para efectos practicos y de colocarlos en produccion, esto puede ser comentariado o eliminado y que el proyecto utilice el path por defecto para empaquetarse que es dentro del mismo proyecto en la carpeta `dist` la cual puede ser movida hacia donde funcionara los proyectos o modulos y renombrada con el nombre del proyecto o módulo. Hay que recordar si es el proyecto base este ira en la raiz del servidor web y si es un módulo este ira dentro de del proyecto base en una carpeta llamada apps y dentro iran los proyectos empaquetados que funcionan como modulos. (ver arquitectura de directorios)
+y este el valor que es un path donde se quiere que el proyecto sea empaquetado. para efectos practicos y de colocarlos en produccion, esto puede ser comentariado o eliminado y que el proyecto utilice el path por defecto para empaquetarse que es dentro del mismo proyecto en la carpeta `dist` la cual puede ser movida hacia donde funcionara los proyectos o módulos y renombrada con el nombre del proyecto o módulo. Hay que recordar si es el proyecto base este ira en la raiz del servidor web y si es un módulo este ira dentro de del proyecto base en una carpeta llamada apps y dentro iran los proyectos empaquetados que funcionan como módulos. (ver arquitectura de directorios)
 
     base : '/plataforma-gds/apps/eventos'
 
 Esta propiedad el permite crearle una url al proyecto de forma interna 
-al momento de empaquetarlo por lo cual obedece a la misma para funcionar. En el caso de ser un proyecto principal esta quedaria como  `/plataforma-gds`. en el caso de ser un proyecto módulo quedaria de la siguiente manera `/plataforma-gds/apps/{nombre del modulo}`
+al momento de empaquetarlo por lo cual obedece a la misma para funcionar. En el caso de ser un proyecto principal esta quedaria como  `/plataforma-gds`. en el caso de ser un proyecto módulo quedaria de la siguiente manera `/plataforma-gds/apps/{nombre del módulo}`
 
 ### Empaquetado
 Una vez configurado el proyecto de manera correcta procedemos a ejecutar el siguiente comando de terminal dentro del proyecto.
