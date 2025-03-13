@@ -66,10 +66,7 @@ export const useAsignacionesActividadesProgramaStore = defineStore('asignaciones
             const response = await axios.get('detalles-actividades/' + item.id)
             actividad.value = response.data
             actividad.value.zona = response.data.zona == null ? {} : response.data.zona
-            actividad.value.distrito = response.data.distrito == null ? {} : response.data.distrito
-
-            console.log(actividad.value)
-            
+            actividad.value.distrito = response.data.distrito == null ? {} : response.data.distrito      
             copy_actividad.value = JSON.parse(JSON.stringify(actividad.value))
             modal.value.show = true
         } catch (error) {
@@ -220,7 +217,7 @@ export const useAsignacionesActividadesProgramaStore = defineStore('asignaciones
             loading.value.excel = false
         }
     }
-    
+
     return {
         headers,
         indice,

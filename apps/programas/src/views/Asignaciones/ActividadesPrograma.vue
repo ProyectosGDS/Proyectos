@@ -1,5 +1,5 @@
 <script setup>
-    import { computed, onBeforeMount } from 'vue'
+    import { computed, onBeforeMount, watchEffect } from 'vue'
 
     import { useProgramasStore } from '@/stores/Catalogos/programas'
     import { useActividadesProgramaStore } from '@/stores/Asignaciones/actividades-programa'
@@ -51,6 +51,21 @@
         return yearsList
     })
 
+    const verificationFilledFields = () => {
+        const requiredFields = [
+            asignaciones.actividad.responsable,
+            asignaciones.actividad.zona_id,
+            asignaciones.actividad.direccion,
+            asignaciones.actividad.hora_inicio,
+            asignaciones.actividad.hora_final
+        ];
+
+        return requiredFields.every(field => field !== '' && field != null);
+    }
+
+    watchEffect(() => {
+        verificationFilledFields()
+    })
     
     onBeforeMount(() => {
         const year = new Date()
@@ -255,18 +270,13 @@
                 <Input v-model="asignaciones.actividad.fecha_inicial" option="label" title="*inicia" type="date" :error="asignaciones.errors.hasOwnProperty('fecha_inicial')" />
                 <Input v-model="asignaciones.actividad.fecha_final" option="label" title="*termina" type="date" :error="asignaciones.errors.hasOwnProperty('fecha_final')" />
             </div>
-            <Input v-if="asignaciones.actividad.hasOwnProperty('id')" v-model="asignaciones.actividad.estado_actividad_id" option="select" title="*seleccione estado" :error="store.errors.hasOwnProperty('estado_actividad_id')">
-                <option value=""></option>
-                <option v-for="estado in catalogos.catalogos_actividad.estados_actividades" :value="estado.id">{{ estado.nombre }}</option>
-            </Input>
+            <template v-if="verificationFilledFields()">
+                <Input v-if="asignaciones.actividad.hasOwnProperty('id')" v-model="asignaciones.actividad.estado_actividad_id" option="select" title="*seleccione estado" :error="store.errors.hasOwnProperty('estado_actividad_id')">
+                    <option value=""></option>
+                    <option v-for="estado in catalogos.catalogos_actividad.estados_actividades" :value="estado.id">{{ estado.nombre }}</option>
+                </Input>
+            </template>
         </div>
-        <pre>
-            {{ asignaciones.actividad }}
-        </pre>
-        <hr>
-        <pre>
-            {{ asignaciones.actividades }}
-        </pre>
         <Validate-Errors :errors="asignaciones.errors" v-if="asignaciones.errors != 0" />
         <template #footer>
             <Button @click="asignaciones.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
@@ -275,4 +285,3 @@
     </Modal>
 
 </template>
-
