@@ -323,13 +323,6 @@
                 </label>
             </div>
         </div>
-        <pre>
-            {{ asignaciones.curso }}
-        </pre>
-        <hr>
-        <pre>
-            {{ asignaciones.cursos }}
-        </pre>
         <Validate-Errors :errors="asignaciones.errors" v-if="asignaciones.errors != 0" />
         <template #footer>
             <Button @click="asignaciones.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />

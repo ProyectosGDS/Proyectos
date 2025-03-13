@@ -15,7 +15,6 @@ export const useAsignacionesActividadesProgramaStore = defineStore('asignaciones
         { title : 'zona', key : 'zona' },
         { title : 'distrito', key : 'distrito' },
         { title : 'direccion', key : 'direccion' },
-        { title : 'coordenadas', key : 'coordenadas' },
         { title : 'horario', key : 'horario' },
         { title : 'fechas', key : 'fechas' },
         { title : 'tipo', key : 'tipo' },
