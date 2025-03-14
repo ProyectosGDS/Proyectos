@@ -8,17 +8,25 @@ use Illuminate\Http\Request;
 
 class EventosController extends Controller
 {
-    public function index() {
+    public function index(Request $request) {
+
+        $year = $request->input('year',date('Y'));
+
         try {
+
             $eventos = eventos::with([
-                'tipo_evento',
-                'estado_evento',
+                'tipo',
+                'estado',
                 'dependencia',
-                'creado_por',
-            ])->latest('id_evento')->get();
+                'usuario',
+            ])->whereYear('fecha_inicial',$year)
+            ->latest('id')
+            ->get();
+
             return response($eventos);
+
         } catch (\Throwable $th) {
-            return response($th->getMessage(),422);
+            return response($th->getMessage());
         }
     }
 
@@ -26,7 +34,7 @@ class EventosController extends Controller
         try {
             return response($evento);
         } catch (\Throwable $th) {
-            return response($th->getMessage(),422);
+            return response($th->getMessage());
         }
     }
 
@@ -35,39 +43,38 @@ class EventosController extends Controller
         $firstDayYear = date('Y').'-01-01';
         
         $request->validate([
-            'titulo' => 'required|string|max:100',
+            'nombre' => 'required|string|max:100',
             'descripcion' => 'required|string|max:500',
             'ubicacion' => 'required|string|max:500',
-            'fecha_ini' => 'required|date|date_format:Y-m-d|after:'.$firstDayYear,
-            'fecha_fin' => 'required|date|date_format:Y-m-d|after_or_equal:fecha_ini',
-            'hora_ini' => 'required|date_format:H:i',
-            'hora_fin' => 'required|date_format:H:i|after_or_equal:hora_ini',
-            'responsable' => 'required|string',
-            'id_tipo_evento' => 'required',
+            'fecha_inicial' => 'required|date|date_format:Y-m-d|after:'.$firstDayYear,
+            'fecha_final' => 'required|date|date_format:Y-m-d|after_or_equal:fecha_inicial',
+            'hora_inicial' => 'required|date_format:H:i',
+            'hora_final' => 'required|date_format:H:i|after_or_equal:hora_inicial',
+            'responsable' => 'required|string|max:100',
+            'tipo_evento_id' => 'required',
         ]);
 
         try {
 
             eventos::create([
-                'titulo' => mb_strtoupper($request->titulo),
+                'nombre' => mb_strtoupper($request->nombre),
                 'descripcion' => mb_strtoupper($request->descripcion),
                 'ubicacion' => mb_strtoupper($request->ubicacion),
-                'fecha_ini' => $request->fecha_ini,
-                'fecha_fin' => $request->fecha_fin,
-                'hora_ini' => $request->hora_ini,
-                'hora_fin' => $request->hora_fin,
+                'fecha_inicial' => $request->fecha_inicial,
+                'fecha_final' => $request->fecha_final,
+                'hora_inicial' => $request->hora_inicial,
+                'hora_final' => $request->hora_final,
                 'responsable' => mb_strtoupper($request->responsable),
                 'duracion' => $request->duracion ?? null,
-                'usuario' => auth()->user()->cui,
-                'fechau' => now(),
-                'id_estatus' => 2,
-                'id_tipo_evento' => $request->id_tipo_evento,
-                'id_dependencia' => $request->id_dependencia ?? auth()->user()->id_dependencia,
+                'estado_evento_id' => 2,
+                'tipo_evento_id' => $request->tipo_evento_id,
+                'dependencia_id' => $request->dependencia_id ?? auth()->user()->dependencia_id,
+                'usuario_id' => auth()->user()->id
             ]);
 
             return response('Evento creado exitosamente.');
         } catch (\Throwable $th) {
-            return response($th->getMessage(),422);
+            return response($th->getMessage());
         }
     }
 
@@ -76,55 +83,47 @@ class EventosController extends Controller
         $firstDayYear = date('Y').'-01-01';
         
         $request->validate([
-            'titulo' => 'required|string|max:100',
+            'nombre' => 'required|string|max:100',
             'descripcion' => 'required|string|max:500',
             'ubicacion' => 'required|string|max:500',
-            'fecha_ini' => 'required|date|date_format:Y-m-d|after:'.$firstDayYear,
-            'fecha_fin' => 'required|date|date_format:Y-m-d|after_or_equal:fecha_ini',
-            'hora_ini' => 'required|date_format:H:i',
-            'hora_fin' => 'required|date_format:H:i|after_or_equal:hora_ini',
-            'responsable' => 'required|string',
-            'id_estatus' => 'required',
-            'id_tipo_evento' => 'required',
+            'fecha_inicial' => 'required|date|date_format:Y-m-d|after:'.$firstDayYear,
+            'fecha_final' => 'required|date|date_format:Y-m-d|after_or_equal:fecha_inicial',
+            'hora_inicial' => 'required|date_format:H:i',
+            'hora_final' => 'required|date_format:H:i|after_or_equal:hora_inicial',
+            'responsable' => 'required|string|max:100',
+            'estado_evento_id' => 'required',
+            'tipo_evento_id' => 'required',
         ]);
 
         try {
 
-            
-                $evento->titulo = mb_strtoupper($request->titulo);
-                $evento->descripcion = mb_strtoupper($request->descripcion);
-                $evento->ubicacion = mb_strtoupper($request->ubicacion);
-                $evento->fecha_ini = $request->fecha_ini;
-                $evento->fecha_fin = $request->fecha_fin;
-                $evento->hora_ini = $request->hora_ini;
-                $evento->hora_fin = $request->hora_fin;
-                $evento->responsable = mb_strtoupper($request->responsable);
-                $evento->duracion = $request->duracion ?? null;
-                $evento->id_estatus = $request->id_estatus;
-                $evento->id_tipo_evento = $request->id_tipo_evento;
-                $evento->id_dependencia = $request->id_dependencia ?? auth()->user()->id_dependencia;
-                $evento->save();
+            $evento->nombre = mb_strtoupper($request->nombre);
+            $evento->descripcion = mb_strtoupper($request->descripcion);
+            $evento->ubicacion = mb_strtoupper($request->ubicacion);
+            $evento->fecha_inicial = $request->fecha_inicial;
+            $evento->fecha_final = $request->fecha_final;
+            $evento->hora_inicial = $request->hora_inicial;
+            $evento->hora_final = $request->hora_final;
+            $evento->responsable = mb_strtoupper($request->responsable);
+            $evento->duracion = $request->duracion ?? null;
+            $evento->estado_evento_id = $request->estado_evento_id;
+            $evento->tipo_evento_id = $request->tipo_evento_id;
+            $evento->dependencia_id = $request->dependencia_id ?? auth()->user()->dependencia_id;
+            $evento->save();
 
             return response('Evento modificado exitosamente.');
 
         } catch (\Throwable $th) {
-            return response($th->getMessage(),422);
+            return response($th->getMessage());
         }
     }
 
-    public function changeStatus(Request $request, eventos $evento) {
-        $request->validate([
-            'id_estatus' => 'required'
-        ]);
-
+    public function destroy(eventos $evento) {
         try {
-            
-            $evento->id_estatus = $request->id_estatus;
-            $evento->save();
-            return response('Estatus del evento cambiado exitosamente');
-
+            $evento->delete();
+            return response('Evento eliminado exitosamente');   
         } catch (\Throwable $th) {
-            return response($th->getMessage(),422);
+            return response($th->getMessage());
         }
     }
 }

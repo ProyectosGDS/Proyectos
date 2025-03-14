@@ -62,7 +62,7 @@ class detalles_cursos extends Model
     }
 
     public function beneficiarios() {
-        return $this->belongsToMany(beneficiarios::class,'beneficiarios_cursos','detalle_curso_id','beneficiario_id');
+        return $this->belongsToMany(beneficiarios::class,'beneficiarios_cursos','detalle_curso_id','beneficiario_id')->where('BENEFICIARIOS_CURSOS.estado','A');
     }
 
 }

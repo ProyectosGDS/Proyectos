@@ -10,12 +10,15 @@ class EventosController extends Controller
     public function index() {
         try {
             $eventos = eventos::with([
-                'tipo_evento',
-                'estado_evento',
+                'tipo',
+                'estado',
                 'dependencia',
-                'creado_por',
-            ])->where('id_estatus',1)
-            ->latest('id_evento')->get();
+                'usuario',
+            ])
+            ->where('estado_evento_id',1)
+            ->whereYear('fecha_inicial',date('Y'))
+            ->latest('id')
+            ->get();
 
             $eventos = $eventos->map(function($evento){
                 return [
@@ -24,19 +27,19 @@ class EventosController extends Controller
                     'fecha' => $evento->fecha,
                     'hora' => $evento->hora,
                     'date' => [
-                        'start' => $evento->fecha_ini,
-                        'end' => $evento->fecha_fin
+                        'start' => $evento->fecha_inicial,
+                        'end' => $evento->fecha_final
                     ],
                     'time' => [
-                        'start' => $evento->hora_ini,
-                        'end' => $evento->hora_fin,
+                        'start' => $evento->hora_inicial,
+                        'end' => $evento->hora_final,
                     ]
                 ];
             })->values();
 
             return response($eventos);
         } catch (\Throwable $th) {
-            return response($th->getMessage(),422);
+            return response($th->getMessage());
         }
     }
 }

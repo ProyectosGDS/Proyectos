@@ -1,12 +1,23 @@
 <?php
 
-use App\Http\Controllers\Eventos\EstatusEventoController;
 use App\Http\Controllers\Eventos\EventosController;
-use App\Http\Controllers\Eventos\TipoEventoController;
+use App\Models\adm_gds\estados_eventos;
+use App\Models\adm_gds\tipos_eventos;
 use Illuminate\Support\Facades\Route;
 
-Route::put('eventos/cambiar-status-evento/{evento}',[EventosController::class,'changeStatus']);
-Route::apiResource('eventos',EventosController::class)->except(['destroy']);
+Route::apiResource('eventos',EventosController::class);
 
-Route::get('tipos-eventos',[TipoEventoController::class,'index']);
-Route::get('estatus-eventos',[EstatusEventoController::class,'index']);
+Route::get('catalogos-evento',function(){
+    try {
+        
+        $catalogos = [
+            'tipos_eventos' => tipos_eventos::all(),
+            'estados_eventos' => estados_eventos::all(),
+        ];
+
+        return response($catalogos);
+
+    } catch (\Throwable $th) {
+        return response($th->getMessage());
+    }
+});

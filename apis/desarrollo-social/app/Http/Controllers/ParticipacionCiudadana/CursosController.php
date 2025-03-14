@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\ParticipacionCiudadana;
 
 use App\Http\Controllers\Controller;
-use App\Models\adm_gds\clases_x_cusos;
+use App\Models\adm_gds\detalles_cursos;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -14,38 +14,39 @@ class CursosController extends Controller
             
             $query = "
                 SELECT
-                    CC.ID_CLASE,
+                    DC.ID,
                     I.NOMBRE INSTRUCTOR,
-                    T.DESCRIPCION TEMPORALIDAD,
-                    S.DESCRIPCION SEDE,
+                    T.NOMBRE TEMPORALIDAD,
+                    S.NOMBRE SEDE,
                     C.NOMBRE CURSO,
                     P.NOMBRE PROGRAMA,
-                    N.DESCRIPCION NIVEL,
-                    CC.MODALIDAD,
-                    CC.SECCION,
-                    CC.CAPACIDAD,
-                    CC.ESTATUS,
-                    CC.FECHAU,
-                    H.HORA_INI||' A '||H.HORA_FIN ||' '|| ConcatenarDias(LUN, MAR, MIE, JUE, VIE, SAB, DOM) AS FULL
-                FROM CLASES_X_CURSO CC
+                    H.HORA_INICIAL||' A '||H.HORA_FINAL HORARIO,
+                    ConcatenarDias(LUN, MAR, MIE, JUE, VIE, SAB, DOM) DIAS,
+                    TO_CHAR(DC.FECHA_INICIAL,'DD-MM-YYYY')||' - '||TO_CHAR(DC.FECHA_FINAL,'DD-MM-YYYY') FECHAS,
+                    DC.MODALIDAD,
+                    DC.SECCION,
+                    DC.CAPACIDAD,
+                    DC.ESTADO,
+                    DC.PUBLICO
+                FROM DETALLES_CURSOS DC
                     INNER JOIN INSTRUCTORES I
-                        ON I.ID_INSTRUCTOR = CC.ID_INSTRUCTOR
-                    INNER JOIN TEMPORALIDAD T
-                        ON T.ID_TEMPORALIDAD = CC.ID_TEMPORALIDAD
+                        ON I.ID = DC.INSTRUCTOR_ID
+                    INNER JOIN TEMPORALIDADES T
+                        ON T.ID = DC.TEMPORALIDAD_ID
                     INNER JOIN SEDES S
-                        ON S.ID_SEDE = CC.ID_SEDE
+                        ON S.ID = DC.SEDE_ID
                     INNER JOIN HORARIOS H
-                        ON H.ID_HORARIO = CC.ID_HORARIO
+                        ON H.ID = DC.HORARIO_ID
                     INNER JOIN CURSOS C
-                        ON C.ID_CURSO = CC.ID_CURSO
+                        ON C.ID = DC.CURSO_ID
                     INNER JOIN PROGRAMAS P
-                        ON P.ID_PROGRAMA = CC.ID_PROGRAMA
-                    INNER JOIN NIVELES N
-                        ON N.ID_NIVEL = CC.ID_NIVEL
-                WHERE CC.ESTATUS = ?
+                        ON P.ID = DC.PROGRAMA_ID
+                WHERE DC.ESTADO = 'A'
+                AND DC.PUBLICO = 'S'
+                AND EXTRACT(YEAR FROM DC.FECHA_INICIAL) = ?
             ";
 
-            $cursos = DB::connection('oracle_gds')->select($query,['A']);
+            $cursos = DB::connection('gds')->select($query,[date('Y')]);
 
             return response($cursos);
 
@@ -54,17 +55,16 @@ class CursosController extends Controller
         }
     }
 
-    public function show (clases_x_cusos $clase) {
+    public function show (detalles_cursos $curso) {
         try {
-            return response($clase->load([
+            return response($curso->load([
                 'programa',
-                'nivel',
-                'curso.requisitos',
+                'curso',
                 'instructor',
                 'temporalidad',
                 'horario',
                 'sede.zona',
-            ])->loadCount('personas_asignadas'));
+            ])->loadCount('beneficiarios'));
 
         } catch (\Throwable $th) {
             return response($th->getMessage(),422);
