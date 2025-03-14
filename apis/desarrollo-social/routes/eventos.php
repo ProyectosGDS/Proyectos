@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Eventos\EventosController;
+use App\Models\adm_gds\dependencias;
 use App\Models\adm_gds\estados_eventos;
 use App\Models\adm_gds\tipos_eventos;
 use Illuminate\Support\Facades\Route;

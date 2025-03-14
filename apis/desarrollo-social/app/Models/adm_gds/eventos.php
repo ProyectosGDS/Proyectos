@@ -51,7 +51,7 @@ class eventos extends Model
     // MUTADORES
 
     public function getFechasAttribute() {
-        return date('Y-m-d',strtotime($this->fecha_inicial)).' - '.date('Y-m-d',strtotime($this->fecha_final));
+        return date('d-m-Y',strtotime($this->fecha_inicial)).' - '.date('d-m-Y',strtotime($this->fecha_final));
     }
 
     public function getHorarioAttribute() {

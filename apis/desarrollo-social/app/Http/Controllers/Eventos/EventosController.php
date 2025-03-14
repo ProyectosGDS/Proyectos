@@ -5,25 +5,56 @@ namespace App\Http\Controllers\Eventos;
 use App\Http\Controllers\Controller;
 use App\Models\adm_gds\eventos;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class EventosController extends Controller
 {
     public function index(Request $request) {
 
         $year = $request->input('year',date('Y'));
+        $profile = mb_strtoupper(auth()->user()->perfil->nombre);
 
         try {
 
-            $eventos = eventos::with([
-                'tipo',
-                'estado',
-                'dependencia',
-                'usuario',
-            ])->whereYear('fecha_inicial',$year)
-            ->latest('id')
-            ->get();
+            $query = "
+                    SELECT
+                        E.ID,
+                        E.NOMBRE,
+                        E.DESCRIPCION,
+                        E.UBICACION,
+                        E.FECHA_INICIAL,
+                        E.FECHA_FINAL,
+                        E.HORA_INICIAL||' A '||E.HORA_FINAL HORARIO,
+                        E.RESPONSABLE,
+                        E.DURACION,
+                        TE.NOMBRE TIPO,
+                        EE.NOMBRE ESTADO,
+                        D.NOMBRE DEPENDENCIA,
+                        U.NOMBRE USUARIO
+                    FROM EVENTOS E
+                        INNER JOIN TIPOS_EVENTOS TE
+                            ON E.TIPO_EVENTO_ID = TE.ID
+                        INNER JOIN ESTADOS_EVENTOS EE
+                            ON E.ESTADO_EVENTO_ID = EE.ID
+                        INNER JOIN DEPENDENCIAS D
+                            ON E.DEPENDENCIA_ID = D.ID
+                        INNER JOIN USUARIOS U
+                            ON E.USUARIO_ID = U.ID 
+                    WHERE EXTRACT(YEAR FROM E.FECHA_INICIAL) = ?
+                ";
 
-            return response($eventos);
+            if($profile == 'SYSADMIN') {
+                $query.=" ORDER BY E.ID DESC";
+                $eventos = DB::connection('gds')->select($query,[$year]);
+                return response($eventos);
+
+            }else{
+
+                $query.=" AND E.DEPENDENCIA_ID = ? ORDER BY E.ID DESC";
+                $eventos = DB::connection('gds')->select($query,[$year,auth()->user()->dependencia_id]);
+                return response($eventos);
+            }
+
 
         } catch (\Throwable $th) {
             return response($th->getMessage());
@@ -32,7 +63,12 @@ class EventosController extends Controller
 
     public function show(eventos $evento) {
         try {
-            return response($evento);
+            return response($evento->load([
+                'tipo',
+                'estado',
+                'dependencia',
+                'usuario'
+            ]));
         } catch (\Throwable $th) {
             return response($th->getMessage());
         }
@@ -40,13 +76,13 @@ class EventosController extends Controller
 
     public function store(Request $request) {
         
-        $firstDayYear = date('Y').'-01-01';
+        $now = date('Y-m-d');
         
         $request->validate([
             'nombre' => 'required|string|max:100',
             'descripcion' => 'required|string|max:500',
             'ubicacion' => 'required|string|max:500',
-            'fecha_inicial' => 'required|date|date_format:Y-m-d|after:'.$firstDayYear,
+            'fecha_inicial' => 'required|date|date_format:Y-m-d|after_or_equal:'.$now,
             'fecha_final' => 'required|date|date_format:Y-m-d|after_or_equal:fecha_inicial',
             'hora_inicial' => 'required|date_format:H:i',
             'hora_final' => 'required|date_format:H:i|after_or_equal:hora_inicial',
@@ -58,7 +94,7 @@ class EventosController extends Controller
 
             eventos::create([
                 'nombre' => mb_strtoupper($request->nombre),
-                'descripcion' => mb_strtoupper($request->descripcion),
+                'descripcion' => $request->descripcion,
                 'ubicacion' => mb_strtoupper($request->ubicacion),
                 'fecha_inicial' => $request->fecha_inicial,
                 'fecha_final' => $request->fecha_final,
@@ -98,7 +134,7 @@ class EventosController extends Controller
         try {
 
             $evento->nombre = mb_strtoupper($request->nombre);
-            $evento->descripcion = mb_strtoupper($request->descripcion);
+            $evento->descripcion = $request->descripcion;
             $evento->ubicacion = mb_strtoupper($request->ubicacion);
             $evento->fecha_inicial = $request->fecha_inicial;
             $evento->fecha_final = $request->fecha_final;

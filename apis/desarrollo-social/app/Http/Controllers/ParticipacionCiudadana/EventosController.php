@@ -22,10 +22,10 @@ class EventosController extends Controller
 
             $eventos = $eventos->map(function($evento){
                 return [
-                    'title' => $evento->titulo,
+                    'title' => $evento->nombre,
                     'description' => $evento->descripcion,
-                    'fecha' => $evento->fecha,
-                    'hora' => $evento->hora,
+                    'fecha' => $evento->fechas,
+                    'hora' => $evento->horario,
                     'date' => [
                         'start' => $evento->fecha_inicial,
                         'end' => $evento->fecha_final
