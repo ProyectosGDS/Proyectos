@@ -8,7 +8,7 @@ Todos los proyectos estan echos usando tecnologias frameworks de front-end:
 - `Tailwind Css`
 - `Vite`
 
-Y requiere para funcionar `node JS 23.0.0 y npm 10.1.0` instalado en el servidor, en el caso del npm ya viene por defecto en esta version de node solo se actualza a la version con el siguiente comando:
+Y requiere para funcionar `node JS 23.0.0 y npm 11.1.0` instalado en el servidor, en el caso del npm ya viene por defecto en esta version de node pero la `version 10.1.0` solo se actualza a la version con el siguiente comando:
 
     npm install -g npm@11.1.0
 
