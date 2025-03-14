@@ -18,6 +18,20 @@
       return yearsList
     })
 
+    const estado = (state) => {
+        if(state == 'ACEPTADO') {
+            return 'green'
+        }
+
+        if(state == 'PENDIENTE') {
+            return 'orange'
+        }
+
+        if(state == 'RECHAZADO') {
+            return 'red'
+        }
+    }
+
     onBeforeMount(() => {
         catalogos.getCatalogos()
         const year = new Date()
@@ -40,16 +54,16 @@
                     <option v-for="year in years" :value="year">{{ year }}</option>
                 </Input>
             </div>
-            <Button text="Consultar" icon="search" class="btn-primary" />
+            <Button @click="store.fetch(store.year)" text="Consultar" icon="search" class="btn-primary" :loading="store.loading.fetch" />
         </div>
         <Data-Table v-if="auth.checkPermission('ver eventos')" :headers="store.headers" :data="store.eventos" :loading="store.loading.fetch" :excel="auth.checkPermission('exportar excel eventos')">
             <template #estado="{item}">
-                <Badge :color="item.estado == 'A' ? 'green' : 'red'" :text="item.estado == 'A' ? 'Activo' : 'Inactivo'" />
+                <Badge :color="estado(item.estado)" :text="item.estado"/>
             </template>
             <template #actions="{item}">
                 <Drop-Down-Button icon="fas fa-ellipsis-v" >
                     <ul>
-                        <li v-if="auth.checkPermission('editar evento')" @click="store.edit(item)" class="text-color-4">Editar</li>
+                        <li v-if="auth.checkPermission('editar evento')" @click="store.show(item.id)" class="text-color-4">Editar</li>
                         <li v-if="auth.checkPermission('eliminar evento')" @click="store.remove(item)" class="text-red-400">Eliminar</li>
                     </ul>
                 </Drop-Down-Button>

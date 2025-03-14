@@ -14,12 +14,13 @@ export const useEventosStore = defineStore('eventos', () => {
         { title : 'ubicacion', key : 'ubicacion' },
         { title : 'responsable', key : 'responsable' },
         { title : 'duracion', key : 'duracion' },
-        { title : 'fechas', key : 'fechas' },
+        { title : 'fecha inicial', key : 'fecha_inicial', type : 'date' },
+        { title : 'fecha final', key : 'fecha_final', type : 'date'},
         { title : 'horario', key : 'horario' },
-        { title : 'tipo', key : 'tipo.nombre' },
-        { title : 'estado', key : 'estado.nombre' },
-        { title : 'creado por', key : 'usuario.nombre' },
-        { title : 'dependencia', key : 'dependencia.nombre' },
+        { title : 'tipo', key : 'tipo' },
+        { title : 'estado', key : 'estado' },
+        { title : 'creado por', key : 'usuario' },
+        { title : 'dependencia', key : 'dependencia' },
         { title : '', key : 'actions', width : '10px', align : 'center' },
     ]
 
@@ -29,6 +30,7 @@ export const useEventosStore = defineStore('eventos', () => {
     const copy_evento = ref({})
     const loading = ref({
         fetch : false,
+        show : false,
         store : false,
         update : false,
         destroy : false,
@@ -78,6 +80,23 @@ export const useEventosStore = defineStore('eventos', () => {
         }
     }
 
+    const show = async (id) => {
+        loading.value.show = true
+        try {
+            const response = await axios.get('eventos/' + id)
+            evento.value = response.data
+            copy_evento.value = JSON.parse(JSON.stringify(response.data))
+            modal.value.edit = true
+        } catch (error) {
+            global.manejarError(error)
+            if(error.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.show = false
+        }
+    }
+
     const update = async () => {
         loading.value.update = true
         try {
@@ -115,12 +134,6 @@ export const useEventosStore = defineStore('eventos', () => {
         }
     }
 
-    const edit = (item) => {
-        evento.value = item
-        copy_evento.value = JSON.parse(JSON.stringify(item))
-        modal.value.edit = true
-    }
-
     const remove = (item) => {
         evento.value = item
         modal.value.delete = true
@@ -147,10 +160,10 @@ export const useEventosStore = defineStore('eventos', () => {
         modal,
         
         fetch,
+        show,
         store,
         update,
         destroy,
-        edit,
         remove,
         resetData
     }

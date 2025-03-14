@@ -13,7 +13,7 @@
 
 <template>
     <div class="text-xs px-1.5 py-0.5 rounded-full text-nowrap text-center" 
-        :class="`bg-${props.color}-100 text-${props.color}-500`">
+        :class="`bg-${props.color}-200 text-${props.color}-500`">
         {{ props.text }}
     </div>
 </template>
