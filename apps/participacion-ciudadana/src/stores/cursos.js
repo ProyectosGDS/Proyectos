@@ -9,7 +9,8 @@ export const useCursosStore = defineStore('cursos', () => {
 
     const headers = [
         { title : 'id', key : 'id', type : 'numeric' },
-        { title : 'curso', key : 'curso' },
+        { title : 'modulo/curso', key : 'modulo_curso' },
+        { title : 'tipo', key : 'tipo' },
         { title : 'sede', key : 'sede' },
         { title : 'temporalidad', key : 'temporalidad' },
         { title : 'modalidad', key : 'modalidad', width : '10px', align : 'center' },
@@ -19,6 +20,7 @@ export const useCursosStore = defineStore('cursos', () => {
     const categorias = ref([])
     const cursos = ref([])
     const curso = ref({})
+    const modulo = ref({})
     const loading = ref(false)
     const errors = ref([])
 
@@ -37,11 +39,24 @@ export const useCursosStore = defineStore('cursos', () => {
         }
     }
 
-    async function show(curso_id) {
+    async function show_curso(curso_id) {
         try {
             loading.value = true
-            const response = await axios.get('participacion-ciudadana/' + curso_id )
+            const response = await axios.get('participacion-ciudadana/curso/' + curso_id )
             curso.value = response.data
+        } catch (error) {
+            console.error(error)
+            errors.value = error
+        } finally {
+            loading.value = false
+        }
+    }
+
+    async function show_modulo(modulo_id) {
+        try {
+            loading.value = true
+            const response = await axios.get('participacion-ciudadana/modulo/' + modulo_id )
+            modulo.value = response.data
         } catch (error) {
             console.error(error)
             errors.value = error
@@ -52,6 +67,10 @@ export const useCursosStore = defineStore('cursos', () => {
 
     function detalleCurso (item) {
         router.push({ name : 'Detalle del curso', params : { curso_id : item.id } } )
+    }
+
+    function detalleModulo (item) {
+        router.push({ name : 'Detalle del módulo', params : { modulo_id : item.id } } )
     }
 
     function fetchCategorias () {
@@ -67,12 +86,15 @@ export const useCursosStore = defineStore('cursos', () => {
         categorias,
         cursos,
         curso,
+        modulo,
         loading,
         errors,
 
         fetch,
         fetchCategorias,
         detalleCurso,
-        show,
+        detalleModulo,
+        show_curso,
+        show_modulo,
     }
 })

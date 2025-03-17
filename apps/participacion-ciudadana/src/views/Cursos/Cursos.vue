@@ -14,9 +14,10 @@
     <div class="p-4">
         <Data-Table :headers="store.headers" :data="store.cursos" color="text-color-9">
             <template #tbody="{items}">
-                <tr v-for="item in items" @click="store.detalleCurso(item)" title="Click para mas detalles">
+                <tr v-for="item in items" @click="item.tipo == 'MODULO' ? store.detalleModulo(item) : store.detalleCurso(item)" title="Click para mas detalles">
                     <td>{{ item.id }}</td>
-                    <td>{{ item.curso }}</td>
+                    <td>{{ item.modulo_curso }}</td>
+                    <td>{{ item.tipo }}</td>
                     <td>{{ item.sede }}</td>
                     <td>{{ item.temporalidad }}</td>
                     <td>{{ item.modalidad }}</td>

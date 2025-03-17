@@ -6,7 +6,7 @@ export const useGlobalStore = defineStore('global', () => {
 
     // AÑOS
     //----------------------------------------
-    const year = new Date()
+    const date = new Date()
     //----------------------------------------
 
     // INICIO SIDEBAR
@@ -51,27 +51,67 @@ export const useGlobalStore = defineStore('global', () => {
 
 
     function getNestedValue(obj, key) {
-        const keys = key.split('.');
+        const keys = key.split('.')
         for (const innerKey of keys) {
             if (obj.hasOwnProperty(innerKey)) {
-                obj = obj[innerKey];
+                obj = obj[innerKey]
             } else {
-                return null;
+                return null
             }
         }
-        return obj;
+        return obj
     }
 
-
-    // HISTORIAL DE RUTAS
-    //-------------------------
-
-    const routesHistory = ref([])
+    function hasChanged(obj1, obj2) {
+        
+        if (obj1 === obj2) return false
+           
+        if (obj1 === null || typeof obj1 !== 'object' || obj2 === null || typeof obj2 !== 'object') {
+            return obj1 !== obj2
+        }
+        
+        const keys1 = Object.keys(obj1)
+        const keys2 = Object.keys(obj2)
+          
+        if (keys1.length !== keys2.length) return true
+           
+        for (let key of keys1) {
+            if (!keys2.includes(key) || hasChanged(obj1[key], obj2[key])) {
+                return true
+            }
+        }
     
-    const addRouteHistory = (route) => {
-        routesHistory.value.push(route)
+        return false
     }
 
+    function manejarError(error) {
+        if (error.response) {
+
+            const { status, data } = error.response
+    
+            if (status === 422) {
+                setAlert(data.message,'danger','ERROR DE VALIDACIÓN')
+                console.error('Error de validación:', data.errors)
+            } else if (status === 401) {
+                setAlert(data.message,'danger','NO AUTORIZADO')
+                console.error('No autorizado:', data.message)
+            } else if (status === 404) {
+                setAlert(data.message,'danger','RECURSO NO ENCONTRADO')
+                console.error('Recurso no encontrado:', data.message)
+            } else if (status >= 500) {
+                setAlert(data.message,'danger','ERROR DEL SERVIDOR')
+                console.error('Error del servidor:', data.message)
+            }
+        } else if (error.request) {
+            console.error('No se recibió respuesta del servidor:', error.request)
+        } else {
+            console.error('Error en la solicitud:', error.message)
+        }
+    }
+
+    function goHome() {
+        window.location.href = import.meta.env.VITE_MY_URL
+    }
 
     return {
         openSidebar,
@@ -83,11 +123,15 @@ export const useGlobalStore = defineStore('global', () => {
         toasts,
         setAlert,
 
-        year,
+        date,
 
         getNestedValue,
 
-        routesHistory,
-        addRouteHistory
+        goHome,
+        
+        hasChanged,
+
+        manejarError,
+
     }
 })

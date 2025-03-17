@@ -1,45 +1,30 @@
 <script setup>
-    import { useInscripcionStore } from '@/stores/inscripcion'
-    import { useCatalogosStore } from '@/stores/catalogos'
+    import { useBeneficiariosStore } from '@/stores/Inscripciones/beneficiarios'
+    import { useCatalogosStore } from '@/stores/Catalogos/catalogos'
 
-    const store = useInscripcionStore()
+    const store = useBeneficiariosStore()
     const catalogos = useCatalogosStore()
 
 </script>
 
 <template>
-    <details class="border p-4 rounded-lg border-color-4">
-        <summary class="cursor-pointer">INFORMACIÓN ACADEMICA </summary>
-        <br>
-
-        <div class="grid xl:flex gap-4">
-            <div class="grow">
-                <span class="uppercase">establecimiento educativo</span>
-                <input v-model="store.beneficiario.datos_academicos.establecimiento" type="text" maxlength="80" class="input focus:outline-none" :class="{'border-red-400':store.errors.hasOwnProperty('datos_academicos.establecimiento')}" >
-            </div>
-            <div class="grow">
-                <span class="text-red-500">*</span>
-                <span class="uppercase">escolaridad</span>
-                <select v-model="store.beneficiario.datos_academicos.id_escolaridad" class="input focus:outline-none uppercase" :class="{'border-red-400':store.errors.hasOwnProperty('datos_academicos.id_escolaridad')}">
-                    <option value=""> -- SELECCIONE -- </option>
-                    <option v-for="escolaridad in catalogos.catalogos.escolaridades" :value="escolaridad.id_escolaridad">{{ escolaridad.descripcion }}</option>
-                </select>
-            </div>
-        </div>
-        <div class="grid xl:flex gap-4 items-center">
-            <div class="grow">
-                <span class="uppercase">titulo o carrera</span>
-                <input v-model="store.beneficiario.datos_academicos.titulo" type="text" maxlength="80" class="input focus:outline-none" :class="{'border-red-400':store.errors.hasOwnProperty('datos_academicos.titulo')}" >
-            </div>
-            <div class="grow">
-                <span class="text-red-500">*</span>
-                <span class="uppercase">tipo de establecimiento</span>
-                <div class="flex items-center gap-3" :class="{'text-red-400' : store.errors.hasOwnProperty('datos_academicos.tipo_establecimiento')}">
-                    <span>PUBLICO</span>
-                    <Switch class="w-14 h-7 bg-blue-500" :values="['PU','PR']" v-model="store.beneficiario.datos_academicos.tipo_establecimiento" :error="store.errors.hasOwnProperty('datos_academicos.tipo_establecimiento')" />
+    <details class="border-t-2 py-4">
+        <summary class="text-color-4 text-lg mb-3 cursor-pointer hover:bg-gray-100 rounded-lg font-medium">INFORMACIÓN ACADÉMICA</summary>
+        <div class="grid lg:grid-cols-2 gap-4">
+            <Input v-model="store.beneficiario.datos_academicos.establecimiento" option="label" title="establecimiento" maxlength="100" :error="store.errors.hasOwnProperty('datos_academicos.establecimiento')"/>
+            <Input v-model="store.beneficiario.datos_academicos.escolaridad_id" option="select" title="seleccione escolaridad" :error="store.errors.hasOwnProperty('datos_academicos.escolaridad_id')">
+                <option value=""></option>
+                <option v-for="escolaridad in catalogos.catalogo_beneficiario.escolaridades" :value="escolaridad.id">{{ escolaridad.nombre }}</option>
+            </Input>
+            <Input v-model="store.beneficiario.datos_academicos.titulo_carrera" option="label" title="titulo ó carrera" maxlength="100" :error="store.errors.hasOwnProperty('datos_academicos.titulo_carrera')"/>
+            <div class="grid justify-items-center">
+                <h1 class="uppercase text-color-4 text-center">TIPO ESTABLECIMIENTO</h1>
+                <div class="flex items-center gap-1 text-gray-500">
+                    <span>PÚBLICO</span>
+                    <Switch class="w-auto h-6 bg-blue-500 has-[:checked]:bg-green-500" :values="['PU','PR']" v-model="store.beneficiario.datos_academicos.tipo" :error="store.errors.hasOwnProperty('datos_academicos.tipo')" />
                     <span>PRIVADO</span>
                 </div>
-            </div> 
+            </div>
         </div>
     </details>
 </template>

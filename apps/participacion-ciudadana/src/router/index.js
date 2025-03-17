@@ -27,27 +27,15 @@ const router = createRouter({
 							name: 'Detalle del curso',
 							component: () => import('@/views/Cursos/DetalleCurso.vue'),
 							props : true,
+						},
+						{
+							path: 'detalle-modulo/:modulo_id',
+							name: 'Detalle del módulo',
+							component: () => import('@/views/Cursos/DetalleModulo.vue'),
+							props : true,
 						}
 					]
 				},
-				// {
-				// 	path: 'carreras',
-				// 	name: 'Carreras',
-				// 	redirect : { name : 'Carreras1'},
-				// 	children : [
-				// 		{
-				// 			path : '',
-				// 			name : 'Carreras1',
-				// 			component: () => import('@/views/Carreras/Carreras.vue'),
-				// 		},
-				// 		{
-				// 			path : 'detalle-carrera/:programa_id',
-				// 			name : 'Detalle carrera',
-				// 			component : () => import('@/views/Carreras/Detalle.vue'),
-				// 			props : true,
-				// 		}	
-				// 	]
-				// },
 				{
 					path: 'eventos',
 					name: 'Eventos',

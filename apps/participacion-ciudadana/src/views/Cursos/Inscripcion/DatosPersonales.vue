@@ -1,9 +1,9 @@
 <script setup>
-    import { useInscripcionStore } from '@/stores/inscripcion'
-    import { useCatalogosStore } from '@/stores/catalogos'
-    import { watchEffect } from 'vue';
+    import {useBeneficiariosStore} from '@/stores/Inscripciones/beneficiarios'
+    import { useCatalogosStore } from '@/stores/Catalogos/catalogos'
+    import { watchEffect } from 'vue'
 
-    const store = useInscripcionStore()
+    const store = useBeneficiariosStore()
     const catalogos = useCatalogosStore()
 
     function calcularEdad() {
@@ -31,7 +31,89 @@
         }else {
             store.beneficiario.edad = 0
         }
+    }
 
+    function verifyCui () {
+        const cui = store.cui;
+        clearCui()
+        if(!cui){
+            store.messageCui = 'Ingrese cui'
+            store.success = false
+            return false 
+        }
+
+        if (cui.length !== 13 || !/^[0-9]{4}\s?[0-9]{5}\s?[0-9]{4}$/.test(cui)) {
+            store.messageCui = 'Cui invalido'
+            store.success = false
+            return false
+        }
+
+        const cleanCui = cui.replace(/\s/g, '');
+        const depto = parseInt(cleanCui.substring(9, 11), 10);
+        const muni = parseInt(cleanCui.substring(11, 13), 10);
+        const numero = cleanCui.substring(0, 8);
+        const verificador = parseInt(cleanCui.substring(8, 9), 10);
+
+        const munisPorDepto = [
+            { id: 1, cantidad: 17 }, { id: 2, cantidad: 8 }, { id: 3, cantidad: 16 },
+            { id: 4, cantidad: 16 }, { id: 5, cantidad: 13 }, { id: 6, cantidad: 14 },
+            { id: 7, cantidad: 19 }, { id: 8, cantidad: 8 }, { id: 9, cantidad: 24 },
+            { id: 10, cantidad: 21 }, { id: 11, cantidad: 9 }, { id: 12, cantidad: 30 },
+            { id: 13, cantidad: 32 }, { id: 14, cantidad: 21 }, { id: 15, cantidad: 8 },
+            { id: 16, cantidad: 17 }, { id: 17, cantidad: 14 }, { id: 18, cantidad: 5 },
+            { id: 19, cantidad: 11 }, { id: 20, cantidad: 11 }, { id: 21, cantidad: 7 },
+            { id: 22, cantidad: 17 }
+        ];
+
+        if (depto === 0 || muni === 0 || depto > munisPorDepto.length || muni > munisPorDepto[depto - 1].cantidad) {
+            store.messageCui = 'Cui invalido'
+            store.success = false
+            return false
+        }
+
+        const total = numero.split('').reduce((acc, digit, index) => acc + digit * (index + 2), 0)
+
+
+        if (total % 11 === verificador) {
+            store.beneficiario = {
+                sexo : 'M',
+                domicilio : {
+                    departamento_id : 7,
+                    grupo_zona : {},
+                },
+                datos_academicos : {},
+                datos_medicos : {},
+                responsable : {},
+                emergencia : {},
+                estado : 'V',
+            }
+            store.getBeneficiarioUnico(cleanCui)
+            store.beneficiario.cui = cleanCui    
+            return true
+        }
+
+        store.messageCui = 'Cui invalido'
+        store.success = false
+        return false
+    }
+
+    function clearCui() {
+        if(store.cui == '') {
+            store.nuevo_registro = false
+            store.errors = []
+            store.beneficiario = {
+                sexo : 'M',
+                domicilio : {
+                    departamento_id : 7,
+                    grupo_zona : {},
+                },
+                datos_academicos : {},
+                datos_medicos : {},
+                responsable : {},
+                emergencia : {},
+                estado : 'V',
+            }
+        }
     }
 
     watchEffect(() => {
@@ -41,128 +123,36 @@
 </script>
 
 <template>
-    <div>
-        <details :open="true" class="border p-4 rounded-lg border-color-4">
-            <summary class="cursor-pointer">DATOS GENERALES</summary>
-            <br>
-            <div class="flex flex-wrap gap-4">
-                <div class="grow">
-                    <span class="text-red-500">*</span>
-                    <span class="uppercase">cui</span>
-                    <input v-model="store.beneficiario.cui" type="text" maxlength="13" minlength="13" class="input focus:outline-none" :class="{'border-red-400':store.errors.hasOwnProperty('cui')}">
-                </div>
-                <div class="grow">
-                    <span class="uppercase">nit</span>
-                    <input v-model="store.beneficiario.nit" type="text" maxlength="13" minlength="13" class="input focus:outline-none">
-                </div>
-                <div class="grow">
-                    <span class="uppercase">pasaporte</span>
-                    <input v-model="store.beneficiario.pasaporte" type="text" maxlength="20" class="input focus:outline-none" >
-                </div>
-            </div>
-    
-            <div class="flex flex-wrap gap-4">
-                <div class="grow">
-                    <span class="text-red-500">*</span>
-                    <span class="uppercase">primer nombre</span>
-                    <input v-model="store.beneficiario.primer_nombre" type="text" maxlength="50" class="input focus:outline-none" :class="{'border-red-400':store.errors.hasOwnProperty('primer_nombre')}" >
-                </div>
-                <div class="grow">
-                    <span class="uppercase">segundo nombre</span>
-                    <input v-model="store.beneficiario.segundo_nombre" type="text" maxlength="50" class="input focus:outline-none" >
-                </div>
-                <div class="grow">
-                    <span class="uppercase">tercer nombre</span>
-                    <input v-model="store.beneficiario.tercer_nombre" type="text" maxlength="50" class="input focus:outline-none" >
-                </div>
-            </div>
-    
-            <div class="flex flex-wrap gap-4">
-                <div class="grow">
-                    <span class="text-red-500">*</span>
-                    <span class="uppercase">primer apellido</span>
-                    <input v-model="store.beneficiario.primer_apellido" type="text" maxlength="50" class="input focus:outline-none" :class="{'border-red-400':store.errors.hasOwnProperty('primer_apellido')}" >
-                </div>
-                <div class="grow">
-                    <span class="uppercase">segundo apellido</span>
-                    <input v-model="store.beneficiario.segundo_apellido" type="text" maxlength="50" class="input focus:outline-none" >
-                </div>
-                <div class="grow">
-                    <span class="uppercase">apellido de casada</span>
-                    <input v-model="store.beneficiario.apellido_casada" type="text" maxlength="50" class="input focus:outline-none" >
-                </div>
-            </div>
-    
-            <div class="flex flex-wrap gap-4">
-                <div class="grow">
-                    <span class="uppercase">sexo</span>
-                    <div class="flex items-center gap-3">
-                        <Icon icon="fas fa-person-dress" class="text-fuchsia-500 text-5xl" />
-                        <Switch class="w-14 h-7 bg-blue-500 has-[:checked]:bg-fuchsia-500" :values="['F','M']" v-model="store.beneficiario.sexo" :error="store.errors.hasOwnProperty('sexo')" />
-                        <Icon icon="fas fa-person" class="text-blue-500 text-5xl" />
+    <details :open="true" class="pb-4">
+        <summary class="text-color-4 text-lg mb-3 cursor-pointer hover:bg-gray-100 rounded-lg font-medium">DATOS PERSONALES</summary>
+        <div class="grid lg:grid-cols-2 gap-4">
+            <Input v-model="store.beneficiario.primer_nombre" option="label" title="*primer nombre" maxlength="45" :error="store.errors.hasOwnProperty('primer_nombre')" required />
+            <Input v-model="store.beneficiario.segundo_nombre" option="label" title="segundo nombre" maxlength="45" :error="store.errors.hasOwnProperty('segundo_nombre')" />
+            <Input v-model="store.beneficiario.primer_apellido" option="label" title="*primer apellido" maxlength="45" :error="store.errors.hasOwnProperty('primer_apellido')" required />
+            <Input v-model="store.beneficiario.segundo_apellido" option="label" title="segundo apellido" maxlength="45" :error="store.errors.hasOwnProperty('segundo_apellido')" />
+            <Input v-model="store.beneficiario.celular" type="tel" pattern="\d{8}" option="label" title="*celular"  maxlength="8" :error="store.errors.hasOwnProperty('celular')" required />
+            <Input v-model="store.beneficiario.correo" type="email" option="label" title="correo" :error="store.errors.hasOwnProperty('correo')" />
+            <Input v-model="store.beneficiario.fecha_nacimiento" type="date" option="label" title="*fecha nacimiento" :error="store.errors.hasOwnProperty('fecha_nacimiento')" />
+            <div class="flex gap-3">
+                <Input v-model="store.beneficiario.edad" type="number" min="0" option="label" title="edad" readonly :error="store.errors.hasOwnProperty('edad')"/>
+                <div>
+                    <h1 class="uppercase text-color-4 text-center">*sexo</h1>
+                    <div class="flex items-center gap-1">
+                        <Icon icon="fas fa-person-dress" class="text-fuchsia-500 text-2xl" />
+                        <Switch class="w-auto h-6 bg-blue-500 has-[:checked]:bg-fuchsia-500" :values="['F','M']" v-model="store.beneficiario.sexo" :error="store.errors.hasOwnProperty('sexo')" />
+                        <Icon icon="fas fa-person" class="text-blue-500 text-2xl" />
                     </div>
                 </div>
-                <div class="grow">
-                    <span class="text-red-500">*</span>
-                    <span class="uppercase">fecha nacimiento</span>
-                    <input v-model="store.beneficiario.fecha_nacimiento" type="date" class="input focus:outline-none" :class="{'border-red-400':store.errors.hasOwnProperty('fecha_nacimiento')}" >
-                </div>
-                <div class="grow">
-                    <span class="uppercase">edad</span>
-                    <input v-model="store.beneficiario.edad" type="number" class="input focus:outline-none" readonly>
-                </div>
-                <div class="grow">
-                    <span class="uppercase">etnia</span>
-                    <select v-model="store.beneficiario.id_etnia" class="input focus:outline-none uppercase" :class="{'border-red-400':store.errors.hasOwnProperty('id_etnia')}">
-                        <option value=""> -- SELECCIONE -- </option>
-                        <option v-for="etnia in catalogos.catalogos.etnias" :value="etnia.id_etnia">{{ etnia.descripcion }}</option>
-                    </select>
-                </div> 
             </div>
-            <div class="flex flex-wrap gap-4">
-                <div class="grow">
-                    <span class="uppercase">estado civil</span>
-                    <select v-model="store.beneficiario.id_estado" class="input focus:outline-none uppercase" :class="{'border-red-400':store.errors.hasOwnProperty('id_estado')}">
-                        <option value=""> -- SELECCIONE -- </option>
-                        <option v-for="estado in catalogos.catalogos.estado_civil" :value="estado.id_estado">{{ estado.descripcion }}</option>
-                    </select>
-                </div> 
-                <div class="grow">
-                    <span class="uppercase">lugar de nacimiento</span>
-                    <input v-model="store.beneficiario.lugar_nacimiento" type="text" maxlength="80" class="input focus:outline-none" >
-                </div>
-            </div>
-            <div class="flex flex-wrap gap-4">
-                <div class="grow">
-                    <span class="text-red-500">*</span>
-                    <span class="uppercase">celular</span>
-                    <input v-model="store.beneficiario.celular" type="number" maxlength="8" minlength="8" class="input focus:outline-none" :class="{'border-red-400':store.errors.hasOwnProperty('celular')}">
-                </div>
-                <div class="grow">
-                    <span class="uppercase">telefono</span>
-                    <input v-model="store.beneficiario.telefono" type="number" maxlength="8" minlength="8" class="input focus:outline-none" :class="{'border-red-400':store.errors.hasOwnProperty('telefono')}">
-                </div>
-                <div class="grow">
-                    <span class="text-red-500">*</span>
-                    <span class="uppercase">correo</span>
-                    <input v-model="store.beneficiario.email" type="email" class="input focus:outline-none" :class="{'border-red-400':store.errors.hasOwnProperty('email')}">
-                </div>
-            </div>
-            <div class="flex flex-wrap gap-4">
-                <div class="grow">
-                    <span class="uppercase">facebook</span>
-                    <input v-model="store.beneficiario.facebook" type="text" maxlength="100" class="input focus:outline-none">
-                </div>
-                <div class="grow">
-                    <span class="uppercase">tiktok</span>
-                    <input v-model="store.beneficiario.tiktok" type="text" maxlength="100" class="input focus:outline-none">
-                </div>
-                <div class="grow">
-                    <span class="uppercase">instagram</span>
-                    <input v-model="store.beneficiario.instagram" type="text" maxlength="100" class="input focus:outline-none" >
-                </div>
-            </div>
-        </details>
-
-    </div>
+            <Input v-model="store.beneficiario.estado_civil_id" option="select" title="seleccione estado civil" :error="store.errors.hasOwnProperty('estado_civil_id')">
+                <option value=""></option>
+                <option v-for="estado_civil in catalogos.catalogo_beneficiario.estados_civiles" :value="estado_civil.id">{{ estado_civil.nombre }}</option>
+            </Input>
+            <Input v-model="store.beneficiario.etnia_id" option="select" title="seleccione etnia" :error="store.errors.hasOwnProperty('etnia_id')">
+                <option value=""></option>
+                <option v-for="etnia in catalogos.catalogo_beneficiario.etnias" :value="etnia.id">{{ etnia.nombre }}</option>
+            </Input>
+        </div>
+    </details>
 </template>
+

@@ -1,41 +1,23 @@
 <script setup>
-    import { useInscripcionStore } from '@/stores/inscripcion'
-    import { useCatalogosStore } from '@/stores/catalogos'
+    import { useBeneficiariosStore } from '@/stores/Inscripciones/beneficiarios'
+    import { useCatalogosStore } from '@/stores/Catalogos/catalogos'
 
-    const store = useInscripcionStore()
+    const store = useBeneficiariosStore()
     const catalogos = useCatalogosStore()
 
 </script>
 
 <template>
-    <details class="border p-4 rounded-lg border-color-4">
-        <summary class="cursor-pointer">DATOS MEDICOS </summary>
-        <br>
-        <div class="grid xl:flex gap-4">
-            <div class="grow">
-                <span class="uppercase">tipo sangre</span>
-                <select v-model="store.beneficiario.datos_medicos.id_tipo" class="input focus:outline-none uppercase" :class="{'border-red-400':store.errors.hasOwnProperty('datos_medicos.id_tipo')}">
-                    <option value=""> -- SELECCIONE -- </option>
-                    <option v-for="tipo in catalogos.catalogos.tipo_sangre" :value="tipo.id_tipo">{{ tipo.descripcion }}</option>
-                </select>
-            </div>
-            <div class="grow">
-                <span class="uppercase">¿ Padece alguna enfermedad cronica, cual ?</span>
-                <select v-model="store.beneficiario.datos_medicos.id_enfermedad" class="input focus:outline-none uppercase" :class="{'border-red-400':store.errors.hasOwnProperty('datos_medicos.id_enfermedad')}">
-                    <option value=""> -- SELECCIONE -- </option>
-                    <option v-for="enfermedad in catalogos.catalogos.enfermedades" :value="enfermedad.id_enfermedad">{{ enfermedad.descripcion }}</option>
-                </select>
-            </div>
-        </div>
-        <div class="grid xl:flex gap-4">
-            <div class="grow">
-                <span class="uppercase">¿ Toma algun medicamento ?</span>
-                <input v-model="store.beneficiario.datos_medicos.medicamentos" type="text" maxlength="100" class="input focus:outline-none" :class="{'border-red-400':store.errors.hasOwnProperty('datos_medicos.medicamentos')}" >
-            </div>
-            <div class="grow">
-                <span class="uppercase">¿ Dosis de medicamento ?</span>
-                <input v-model="store.beneficiario.datos_medicos.dosis" type="text" maxlength="100" class="input focus:outline-none" :class="{'border-red-400':store.errors.hasOwnProperty('datos_medicos.dosis')}" >
-            </div>
+    <details class="border-t-2 py-4">
+        <summary class="text-color-4 text-lg mb-3 cursor-pointer hover:bg-gray-100 rounded-lg font-medium">DATOS MÉDICOS</summary>
+        <div class="grid lg:grid-cols-2 gap-4">
+            <Input v-model="store.beneficiario.datos_medicos.enfermedades_alergias" option="label" title="enfermedades o alergias" maxlength="500" :error="store.errors.hasOwnProperty('datos_medicos.enfermedades_alergias')"/>
+            <Input v-model="store.beneficiario.datos_medicos.medicamentos" option="label" title="medicamentos" maxlength="500" :error="store.errors.hasOwnProperty('datos_medicos.medicamentos')"/>
+            <Input v-model="store.beneficiario.datos_medicos.dosis" option="label" title="dosis de medicamentos" maxlength="150" :error="store.errors.hasOwnProperty('datos_medicos.dosis')"/>
+            <Input v-model="store.beneficiario.datos_medicos.tipo_sangre_id" option="select" title="seleccione tipo sangre" :error="store.errors.hasOwnProperty('datos_medicos.tipo_sangre_id')">
+                <option value=""></option>
+                <option v-for="tipo_sangre in catalogos.catalogo_beneficiario.tipos_sangre" :value="tipo_sangre.id">{{ tipo_sangre.nombre }}</option>
+            </Input>
         </div>
     </details>
 </template>
