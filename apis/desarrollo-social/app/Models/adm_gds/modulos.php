@@ -31,6 +31,14 @@ class modulos extends Model
         return $this->belongsToMany(detalles_cursos::class,'cursos_modulos','modulo_id','detalle_curso_id');
     }
 
+    public function requisitos() {
+        return $this->belongsToMany(requisitos::class,'requisitos_modulos','modulo_id','requisito_id');
+    }
+
+    public function beneficiarios() {
+        return $this->belongsToMany(beneficiarios::class,'beneficiarios_modulos','modulo_id','beneficiario_id')->where('BENEFICIARIOS_MODULOS.estado','A');
+    }
+
     // RELACIONES INVERSAS
 
     public function programa() {

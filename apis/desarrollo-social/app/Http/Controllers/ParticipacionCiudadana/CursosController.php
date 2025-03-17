@@ -4,6 +4,7 @@ namespace App\Http\Controllers\ParticipacionCiudadana;
 
 use App\Http\Controllers\Controller;
 use App\Models\adm_gds\detalles_cursos;
+use App\Models\adm_gds\modulos;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -15,19 +16,13 @@ class CursosController extends Controller
             $query = "
                 SELECT
                     DC.ID,
-                    I.NOMBRE INSTRUCTOR,
-                    T.NOMBRE TEMPORALIDAD,
+                    C.NOMBRE MODULO_CURSO,
                     S.NOMBRE SEDE,
-                    C.NOMBRE CURSO,
-                    P.NOMBRE PROGRAMA,
-                    H.HORA_INICIAL||' A '||H.HORA_FINAL HORARIO,
-                    ConcatenarDias(LUN, MAR, MIE, JUE, VIE, SAB, DOM) DIAS,
-                    TO_CHAR(DC.FECHA_INICIAL,'DD-MM-YYYY')||' - '||TO_CHAR(DC.FECHA_FINAL,'DD-MM-YYYY') FECHAS,
+                    T.NOMBRE TEMPORALIDAD,
                     DC.MODALIDAD,
-                    DC.SECCION,
-                    DC.CAPACIDAD,
                     DC.ESTADO,
-                    DC.PUBLICO
+                    DC.PUBLICO,
+                    'CURSO' TIPO
                 FROM DETALLES_CURSOS DC
                     INNER JOIN INSTRUCTORES I
                         ON I.ID = DC.INSTRUCTOR_ID
@@ -44,9 +39,33 @@ class CursosController extends Controller
                 WHERE DC.ESTADO = 'A'
                 AND DC.PUBLICO = 'S'
                 AND EXTRACT(YEAR FROM DC.FECHA_INICIAL) = ?
+
+                UNION ALL
+
+                SELECT DISTINCT
+                    M.ID,
+                    M.NOMBRE MODULO_CURSO,
+                    S.NOMBRE SEDE,
+                    T.NOMBRE TEMPORALIDAD,
+                    DC.MODALIDAD,
+                    M.ESTADO,
+                    M.PUBLICO,
+                    'MODULO' TIPO
+                FROM MODULOS M
+                    INNER JOIN CURSOS_MODULOS CM
+                        ON CM.MODULO_ID = M.ID
+                    INNER JOIN DETALLES_CURSOS DC
+                        ON CM.DETALLE_CURSO_ID = DC.ID
+                    INNER JOIN SEDES S
+                        ON DC.SEDE_ID = S.ID
+                    INNER JOIN TEMPORALIDADES T
+                        ON DC.TEMPORALIDAD_ID = T.ID
+                WHERE M.ESTADO = 'A'
+                AND M.PUBLICO = 'S'
+                AND EXTRACT(YEAR FROM M.FECHA_INICIAL) = ?
             ";
 
-            $cursos = DB::connection('gds')->select($query,[date('Y')]);
+            $cursos = DB::connection('gds')->select($query,[date('Y'),date('Y')]);
 
             return response($cursos);
 
@@ -55,7 +74,7 @@ class CursosController extends Controller
         }
     }
 
-    public function show (detalles_cursos $curso) {
+    public function getCurso (detalles_cursos $curso) {
         try {
             return response($curso->load([
                 'programa',
@@ -64,7 +83,27 @@ class CursosController extends Controller
                 'temporalidad',
                 'horario',
                 'sede.zona',
+                'requisitos',
             ])->loadCount('beneficiarios'));
+
+        } catch (\Throwable $th) {
+            return response($th->getMessage(),422);
+        }
+    }
+
+    public function getModulo (modulos $modulo) {
+        try {
+            $modulo = $modulo->load([
+                'cursos.curso',
+                'requisitos'
+            ])->loadCount('beneficiarios');
+
+            $modulo['sede'] = $modulo->cursos[0]->sede;
+            $modulo['horario'] = $modulo->cursos[0]->horario;
+            $modulo['modalidad'] = $modulo->cursos[0]->modalidad;
+            $modulo['capacidad'] = $modulo->cursos[0]->capacidad;
+
+            return response($modulo);
 
         } catch (\Throwable $th) {
             return response($th->getMessage(),422);
