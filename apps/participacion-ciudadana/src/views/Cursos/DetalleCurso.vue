@@ -29,12 +29,16 @@
         if(!cui){
             inscripcion.messageCui = 'Ingrese cui'
             inscripcion.success = false
+            inscripcion.nuevo_registro = false
+            inscripcion.beneficiario.nombre_completo = ''
             return false 
         }
 
         if (cui.length !== 13 || !/^[0-9]{4}\s?[0-9]{5}\s?[0-9]{4}$/.test(cui)) {
             inscripcion.messageCui = 'Cui invalido'
             inscripcion.success = false
+            inscripcion.nuevo_registro = false
+            inscripcion.beneficiario.nombre_completo = ''
             return false
         }
 
@@ -58,6 +62,8 @@
         if (depto === 0 || muni === 0 || depto > munisPorDepto.length || muni > munisPorDepto[depto - 1].cantidad) {
             inscripcion.messageCui = 'Cui invalido'
             inscripcion.success = false
+            inscripcion.nuevo_registro = false
+            inscripcion.beneficiario.nombre_completo = ''
             return false
         }
 
@@ -84,6 +90,8 @@
 
         inscripcion.messageCui = 'Cui invalido'
         inscripcion.success = false
+        inscripcion.nuevo_registro = false
+        inscripcion.beneficiario.nombre_completo = ''
         return false
     }
 
@@ -91,6 +99,7 @@
         if(inscripcion.cui == '') {
             inscripcion.nuevo_registro = false
             inscripcion.errors = []
+            inscripcion.success = false
             inscripcion.beneficiario = {
                 sexo : 'M',
                 domicilio : {
@@ -189,8 +198,9 @@
                         {{ store.curso?.curso?.descripcion }}
                     </p>
                 </div>
+
                 <div class="flex justify-center items-center">
-                    <Button @click="inscripcion.inscripcion(props.curso_id)" icon="fas fa-thumbs-up" text="Inscribete" class="bg-color-9 btn text-white rounded-full h-16 w-40 text-3xl self-center mx-auto" />
+                    <Button @click="inscripcion.inscripcion(props.curso_id,'curso')" icon="fas fa-thumbs-up" text="Inscribete" class="bg-color-9 btn text-white rounded-full h-16 w-40 text-3xl self-center mx-auto" />
                 </div>
             </div>
         </div>
@@ -204,7 +214,7 @@
             <div class="text-color-9 grid gap-4">
                 <div>
                     <div class="relative">
-                        <Input @keyup="verifyCui()" v-model="inscripcion.cui" option="label" title="*Cui" maxlength="13" type="search" :class="{'focus:border-red-400 border-red-400 focus:outline-red-400': !inscripcion.success, 'focus:border-green-500 border-green-500 focus:outline-green-400' : inscripcion.success }" required />
+                        <Input @keyup="verifyCui()" v-model="inscripcion.cui" option="label" title="*Ingresa cui" maxlength="13" type="search" :class="{'focus:border-red-400 border-red-400 focus:outline-red-400': !inscripcion.success, 'focus:border-green-500 border-green-500 focus:outline-green-400' : inscripcion.success }" required />
                         <Icon v-if="inscripcion.loading.show" icon="fas fa-spinner" class="animate-spin absolute top-3 right-3 text-gray-500" />
                     </div>
                     <small :class="inscripcion.success ? 'text-green-400' : 'text-red-400'">{{ inscripcion.messageCui }}</small>
@@ -223,7 +233,7 @@
         <Validate-Errors v-if="inscripcion.errors != 0" :errors="inscripcion.errors" />
         <template #footer>
             <Button @click="inscripcion.resetData()" text="Cancelar" class="btn-secondary rounded-full" icon="fas fa-xmark" />
-            <Button @click="inscripcion.store" text="Pre-inscribirse" class="btn-primary rounded-full" icon="fas fa-save" :loading="store.loading.store" />
+            <Button v-if="inscripcion.success" @click="inscripcion.store" text="Pre-inscribirse" class="btn-primary rounded-full" icon="fas fa-save" :loading="store.loading.store" />
         </template>
     </Modal>
     

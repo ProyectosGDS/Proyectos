@@ -27,6 +27,10 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
     const reload = ref(false)
     const success = ref(false)
     const nuevo_registro = ref(false)
+    const params = ref({
+        formacion_id : null,
+        formacion_tipo : ''
+    })
 
     const loading = ref({
         show : false,
@@ -44,16 +48,21 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         estado : false,
     })
 
-    function inscripcion (detalle_curso_id) {
-        beneficiario.value.detalle_curso_id = detalle_curso_id
+    function inscripcion (id, formacion_tipo) {
+        params.value = {
+            formacion_id : id,
+            formacion_tipo : formacion_tipo
+        }
         modal.value.new = true
     }
 
 
     const store = async () => {
         loading.value.store = true
+        beneficiario.value.formacion_id = params.value.formacion_id
+        beneficiario.value.formacion_tipo = params.value.formacion_tipo
         try {
-            const response = await axios.post('beneficiarios', beneficiario.value)
+            const response = await axios.post('participacion-ciudadana/inscripcion', beneficiario.value)
             reload.value = true
             global.setAlert(response.data,'success')
             resetData()
@@ -67,26 +76,10 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         }
     }
 
-    const create = async () => {
-        loading.value.store = true
-        try {
-            const response = await axios.post('beneficiarios/create', beneficiario.value)
-            beneficiario.value = response.data
-            errors.value = []
-        } catch (error) {
-            global.manejarError(error)
-            if(error.status === 422) {
-                errors.value = error.response.data.errors
-            }
-        } finally {
-            loading.value.store = false
-        }
-    }
-
     async function getBeneficiarioUnico (cui) {
         loading.value.show = true
         try {
-            const response = await axios.post('beneficiarios/consulta-beneficiario-unico',{
+            const response = await axios.post('participacion-ciudadana/consulta-beneficiario-unico',{
                cui : cui
             })
                 success.value = true
@@ -98,7 +91,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
                 } else {
                     messageCui.value = 'Se encontro información'
                 }
-
+                
                 beneficiario.domicilio = response.data.domicilio == null ? { departamento_id : 7, grupo_zona : {} } : response.data.domicilio
                 beneficiario.datos_medicos = response.data.datos_medicos == null ? {} : response.data.datos_medicos
                 beneficiario.datos_academicos = response.data.datos_academicos == null ? {} : response.data.datos_academicos
@@ -140,6 +133,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
             delete : false
         }
         copy_beneficiario.value = {}
+        nuevo_registro.value = false
         errors.value = []
         messageCui.value = ''
         cui.value = ''
@@ -161,7 +155,6 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         inscripcion,
         getBeneficiarioUnico,
         store,
-        create,
         resetData,
     }
 })

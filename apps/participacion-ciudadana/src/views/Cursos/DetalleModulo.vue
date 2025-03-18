@@ -29,12 +29,15 @@
         if(!cui){
             inscripcion.messageCui = 'Ingrese cui'
             inscripcion.success = false
+            inscripcion.nuevo_registro = false
             return false 
         }
 
         if (cui.length !== 13 || !/^[0-9]{4}\s?[0-9]{5}\s?[0-9]{4}$/.test(cui)) {
             inscripcion.messageCui = 'Cui invalido'
             inscripcion.success = false
+            inscripcion.nuevo_registro = false
+            inscripcion.beneficiario.nombre_completo = ''
             return false
         }
 
@@ -58,6 +61,8 @@
         if (depto === 0 || muni === 0 || depto > munisPorDepto.length || muni > munisPorDepto[depto - 1].cantidad) {
             inscripcion.messageCui = 'Cui invalido'
             inscripcion.success = false
+            inscripcion.nuevo_registro = false
+            inscripcion.beneficiario.nombre_completo = ''
             return false
         }
 
@@ -84,6 +89,8 @@
 
         inscripcion.messageCui = 'Cui invalido'
         inscripcion.success = false
+        inscripcion.nuevo_registro = false
+        inscripcion.beneficiario.nombre_completo = ''
         return false
     }
 
@@ -91,6 +98,7 @@
         if(inscripcion.cui == '') {
             inscripcion.nuevo_registro = false
             inscripcion.errors = []
+            inscripcion.success = false
             inscripcion.beneficiario = {
                 sexo : 'M',
                 domicilio : {
@@ -201,7 +209,7 @@
                     </p>
                 </div>
                 <div class="flex justify-center items-center">
-                    <Button @click="inscripcion.inscripcion(props.curso_id)" icon="fas fa-thumbs-up" text="Inscribete" class="bg-color-9 btn text-white rounded-full h-16 w-40 text-3xl self-center mx-auto" />
+                    <Button @click="inscripcion.inscripcion(props.modulo_id,'modulo')" icon="fas fa-thumbs-up" text="Inscribete" class="bg-color-9 btn text-white rounded-full h-16 w-40 text-3xl self-center mx-auto" />
                 </div>
             </div>
         </div>
@@ -234,7 +242,7 @@
         <Validate-Errors v-if="inscripcion.errors != 0" :errors="inscripcion.errors" />
         <template #footer>
             <Button @click="inscripcion.resetData()" text="Cancelar" class="btn-secondary rounded-full" icon="fas fa-xmark" />
-            <Button @click="inscripcion.store" text="Pre-inscribirse" class="btn-primary rounded-full" icon="fas fa-save" :loading="store.loading.store" />
+            <Button v-if="inscripcion.success" @click="inscripcion.store" text="Pre-inscribirse" class="btn-primary rounded-full" icon="fas fa-save" :loading="store.loading.store" />
         </template>
     </Modal>
     
