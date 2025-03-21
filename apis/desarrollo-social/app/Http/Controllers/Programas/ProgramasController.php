@@ -69,7 +69,7 @@ class ProgramasController extends Controller
 
     public function show (programas $programa) {
         try {
-            return response($programa->load(['dependencia','modulos.programa']));  
+            return response($programa->load(['dependencia','modulos.programa','modulos.requisitos']));  
         } catch (\Throwable $th) {
             return response($th->getMessage());
         }

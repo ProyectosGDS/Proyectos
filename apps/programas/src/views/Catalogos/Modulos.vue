@@ -10,6 +10,7 @@
     
     onBeforeMount(() => {
         programas.fetch()
+        store.getRequirements()
     })
 
 </script>
@@ -38,6 +39,7 @@
                 <Drop-Down-Button icon="fas fa-ellipsis-v" >
                     <ul>
                         <li v-if="auth.checkPermission('editar modulo')" @click="store.edit(item)" class="text-color-4">Editar</li>
+                        <li v-if="auth.checkPermission('asignar requisitos modulo')" @click="store.assignRequirements(item)" class="text-color-4">Asignar requisitos</li>
                         <template v-if="item.estado == 'A'">
                             <li v-if="auth.checkPermission('eliminar modulo')" @click="store.remove(item)" class="text-red-400">Desactivar</li>
                         </template>
@@ -118,6 +120,31 @@
         <template #footer>
             <Button @click="store.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
             <Button @click="store.destroy" text="Sí, desactivar" icon="fas fa-trash" class="btn-danger" :loading="store.loading.destroy" />
+        </template>
+    </Modal>
+
+    <Modal :open="store.modal.requisitos" title="Asignar requisitos modulo" icon="fas fa-folder-tree">
+        <template #close>
+            <Icon @click="store.resetData" icon="fas fa-xmark" class="cursor-pointer text-white" />
+        </template>
+        <div>
+            <Input v-model="store.modulo.nombre" option="label" title="Módulo seleccionado" readonly disabled />
+            <br>
+            <details open class="border p-3 uppercase rounded-md border-color-4 text-color-1">
+                <summary>Requisitos disponibles</summary>
+                <Loading-Bar v-if="store.loading.requisitos" class="bg-color-4 h-1" />
+                <div class="grid grid-cols-2 gap-4 py-2">
+                    <label v-for="requisito in store.requisitos" class="flex gap-2 text-sm text-color-4">
+                        <input type="checkbox" v-model="store.selected_requirements" :value="requisito.id">
+                        <span>{{ requisito.nombre }}</span>
+                    </label>
+                </div>
+            </details>
+        </div>
+        <Validate-Errors :errors="store.errors" v-if="store.errors != 0"/>
+        <template #footer>
+            <Button @click="store.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
+            <Button @click="store.assign" text="Asignar" icon="fas fa-check" class="btn-primary" :loading="store.loading.update" />
         </template>
     </Modal>
 

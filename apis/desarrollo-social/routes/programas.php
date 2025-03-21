@@ -32,6 +32,7 @@ Route::apiResource('programas',ProgramasController::class);
 
 Route::get('modulos/get-cursos/{modulo_id}',[ModulosController::class,'get_cursos']);
 Route::post('modulos/store-cursos',[ModulosController::class,'store_cursos']);
+Route::post('modulos/asignar-requisitos/{modulo}',[ModulosController::class,'assign_requirements']);
 Route::apiResource('modulos',ModulosController::class);
 
 Route::apiResource('cursos',CursosController::class);

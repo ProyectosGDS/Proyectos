@@ -22,19 +22,38 @@ export const useModulosStore = defineStore('modulos', () => {
     const programa_id = ref(null)
     const modulos = ref([])
     const modulo = ref({})
+    const requisitos = ref([])
+    const selected_requirements = ref([])
     const copy_modulo = ref({})
     const loading = ref({
         fetch : false,
         store : false,
         update : false,
-        destroy : false
+        destroy : false,
+        requisitos : false,
     })
     const errors = ref([])
     const modal = ref({
         new : false,
         edit : false,
-        delete : false
+        delete : false,
+        requisitos : false,
     })
+
+    const getRequirements = async () => {
+        loading.value.requisitos = true
+        try {
+            const response = await axios.get('requisitos')
+            requisitos.value = response.data
+        } catch (error) {
+            global.manejarError(error)
+            if(error.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.requisitos = false
+        }
+    }
 
     const fetch = async (programa_id) => {
         loading.value.fetch = true
@@ -107,6 +126,25 @@ export const useModulosStore = defineStore('modulos', () => {
         }
     }
 
+    const assign = async (item) => {
+        loading.value.update = true
+        try {
+            const response = await axios.post('modulos/asignar-requisitos/' + modulo.value.id, {
+                requisitos : selected_requirements.value
+            })
+            fetch(programa_id.value)
+            global.setAlert(response.data,'success')
+            resetData()
+        } catch (error) {
+            global.manejarError(error)
+            if(error.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.update = false
+        }
+    }
+
     const edit = (item) => {
         modulo.value = item
         copy_modulo.value = JSON.parse(JSON.stringify(item))
@@ -128,22 +166,33 @@ export const useModulosStore = defineStore('modulos', () => {
             delete : false
         }
     }
-    
+
+    const assignRequirements = (item) => {
+        selected_requirements.value = item.requisitos.map(requisito => requisito.id)
+        modulo.value = item
+        modal.value.requisitos = true
+    }
+
     return {
         headers,
         programa_id,
         modulos,
         modulo,
+        requisitos,
+        selected_requirements,
         loading,
         errors,
         modal,
         
+        getRequirements,
         fetch,
         store,
         update,
         destroy,
+        assign,
         edit,
         remove,
+        assignRequirements,
         resetData
     }
 })

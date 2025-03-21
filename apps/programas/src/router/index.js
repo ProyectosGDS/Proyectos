@@ -96,6 +96,14 @@ const router = createRouter({
 					}
 				},
 				{
+					path : 'asignacion-de-requisitos',
+					name : 'Asignación de requisitos',
+					component : () => import('@/views/Asignaciones/AsignacionRequisitos.vue'),
+					meta : {
+						auth : true,
+					}
+				},
+				{
 					path : 'actividades-por-programa',
 					name : 'Actividades por programa',
 					component : () => import('@/views/Asignaciones/ActividadesPrograma.vue'),

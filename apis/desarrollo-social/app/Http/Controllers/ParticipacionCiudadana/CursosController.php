@@ -24,18 +24,12 @@ class CursosController extends Controller
                     DC.PUBLICO,
                     'CURSO' TIPO
                 FROM DETALLES_CURSOS DC
-                    INNER JOIN INSTRUCTORES I
-                        ON I.ID = DC.INSTRUCTOR_ID
                     INNER JOIN TEMPORALIDADES T
                         ON T.ID = DC.TEMPORALIDAD_ID
                     INNER JOIN SEDES S
                         ON S.ID = DC.SEDE_ID
-                    INNER JOIN HORARIOS H
-                        ON H.ID = DC.HORARIO_ID
                     INNER JOIN CURSOS C
                         ON C.ID = DC.CURSO_ID
-                    INNER JOIN PROGRAMAS P
-                        ON P.ID = DC.PROGRAMA_ID
                 WHERE DC.ESTADO = 'A'
                 AND DC.PUBLICO = 'S'
                 AND EXTRACT(YEAR FROM DC.FECHA_INICIAL) = ?

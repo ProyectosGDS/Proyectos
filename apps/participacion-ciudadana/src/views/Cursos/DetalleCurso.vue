@@ -81,7 +81,7 @@
                 datos_medicos : {},
                 responsable : {},
                 emergencia : {},
-                estado : 'V',
+                estado : 'P',
             }
             inscripcion.getBeneficiarioUnico(cleanCui)
             inscripcion.beneficiario.cui = cleanCui    
@@ -110,7 +110,7 @@
                 datos_medicos : {},
                 responsable : {},
                 emergencia : {},
-                estado : 'V',
+                estado : 'P',
             }
         }
     }

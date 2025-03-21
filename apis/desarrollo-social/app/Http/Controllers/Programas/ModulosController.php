@@ -188,5 +188,15 @@ class ModulosController extends Controller
         }
     }
 
+    public function assign_requirements(Request $request, modulos $modulo) {
+        try {
+
+            $modulo->requisitos()->sync($request->requisitos);
+            return response('Requisitos asignados correctamente');
+
+        } catch (\Throwable $th) {
+            return response($th->getMessage());
+        }
+    }
     
 }

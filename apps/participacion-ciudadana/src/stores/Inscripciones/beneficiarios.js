@@ -17,7 +17,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         datos_medicos : {},
         responsable : {},
         emergencia : {},
-        estado : 'V',
+        estado : 'P',
     })
 
     const copy_beneficiario = ref({})
@@ -125,7 +125,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
             datos_medicos : {},
             responsable : {},
             emergencia : {},
-            estado : 'V',
+            estado : 'P',
         }
         modal.value = {
             new : false,
