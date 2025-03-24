@@ -3,13 +3,11 @@
 namespace App\Http\Controllers\Programas;
 
 use App\Http\Controllers\Controller;
-use App\Models\adm_gds\beneficiarios;
 use App\Models\adm_gds\detalles_actividades;
 use App\Models\adm_gds\detalles_cursos;
 use App\Models\adm_gds\programas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class ProgramasController extends Controller
 {
@@ -113,20 +111,12 @@ class ProgramasController extends Controller
             $query = "
                 SELECT
                     DC.*,
-                    DC.ID,
                     P.NOMBRE PROGRAMA,
                     C.NOMBRE CURSO,
-                    DC.SECCION,
                     I.NOMBRE INSTRUCTOR,
                     UPPER(S.NOMBRE||' '||Z.DESCRIPCION||' '||D.NOMBRE||' '||S.DIRECCION) SEDE,
                     UPPER(H.HORA_INICIAL||' A '||H.HORA_FINAL||' - '||CONCATENARDIAS(H.LUN,H.MAR,H.MIE,H.JUE,H.VIE,H.SAB,H.DOM)) HORARIO,
                     T.NOMBRE TEMPORALIDAD,
-                    DC.MODALIDAD,
-                    DC.CAPACIDAD,
-                    DC.FECHA_INICIAL,
-                    DC.FECHA_FINAL,
-                    DC.PUBLICO,
-                    DC.ESTADO,
                     P.DEPENDENCIA_ID
                 FROM DETALLES_CURSOS DC
                 LEFT JOIN CURSOS_MODULOS CM

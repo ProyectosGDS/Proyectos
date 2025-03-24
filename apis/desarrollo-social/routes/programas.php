@@ -37,7 +37,9 @@ Route::apiResource('modulos',ModulosController::class);
 
 Route::apiResource('cursos',CursosController::class);
 
+Route::get('detalles-curso/get-requisitos/{curso}',[DetallesCursosController::class,'getRequirements']);
 Route::post('detalles-curso/disabled/{curso}',[DetallesCursosController::class,'disabled']);
+Route::post('detalles-curso/asignar-requisitos/{curso}',[DetallesCursosController::class,'assigRequirements']);
 Route::apiResource('detalles-curso',DetallesCursosController::class)->parameters(['detalles-curso' => 'curso']);
 
 Route::apiResource('instructores',InstructoresController::class)->parameters(['instructores' => 'instructor']);

@@ -42,7 +42,15 @@
         </template>
         <div class="grid gap-4">
             <Input v-model="store.curso.nombre" option="label" title="*Nombre" maxlength="80" :error="store.errors.hasOwnProperty('nombre')" />
-            <Input v-model="store.curso.descripcion" option="text-area" title="Descripción" placeholder="Describe el curso ..." rows="7" maxlength="255" :error="store.errors.hasOwnProperty('descripcion')" />
+            <Input v-model="store.curso.descripcion" option="text-area" title="Descripción" placeholder="Describe el curso ..." rows="7" maxlength="500" :error="store.errors.hasOwnProperty('descripcion')" />
+            <div class="flex justify-evenly uppercase text-color-4">
+                <label class="uppercase">*Inpulsatec</label>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-500">Sí</span>
+                    <Switch v-model="store.curso.inpulsatec" class="h-auto w-14 bg-red-400 has-[:checked]:bg-green-500" :values="['S','N']" />
+                    <span class="text-sm text-gray-500">No</span>
+                </div>
+            </div>
         </div>
         <Validate-Errors :errors="store.errors" v-if="store.errors != 0" />
         <template #footer>
@@ -64,7 +72,15 @@
                 </div>
             </div>
             <Input v-model="store.curso.nombre" option="label" title="*Nombre" maxlength="80" :error="store.errors.hasOwnProperty('nombre')" />
-            <Input v-model="store.curso.descripcion" option="text-area" title="Descripción" placeholder="Describe el curso ..." rows="7" maxlength="255" :error="store.errors.hasOwnProperty('descripcion')" />
+            <Input v-model="store.curso.descripcion" option="text-area" title="Descripción" placeholder="Describe el curso ..." rows="7" maxlength="500" :error="store.errors.hasOwnProperty('descripcion')" />
+            <div class="flex justify-evenly uppercase text-color-4">
+                <label class="uppercase">*Inpulsatec</label>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-500">Sí</span>
+                    <Switch v-model="store.curso.inpulsatec" class="h-auto w-14 bg-red-400 has-[:checked]:bg-green-500" :values="['S','N']" />
+                    <span class="text-sm text-gray-500">No</span>
+                </div>
+            </div>
         </div>
         <Validate-Errors :errors="store.errors" v-if="store.errors != 0" />
         <template #footer>

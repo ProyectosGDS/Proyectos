@@ -190,5 +190,22 @@ class DetallesCursosController extends Controller
             return response($th->getMessage());
         }
     }
+
+    public function getRequirements(detalles_cursos $curso) {
+        try {
+            return response($curso->load('requisitos'));
+        } catch (\Throwable $th) {
+            return response($th->getMessage());
+        }
+    }
+
+    public function assigRequirements(Request $request, detalles_cursos $curso) {
+        try {
+            $curso->requisitos()->sync($request->requisitos);
+            return response('Requisitos asignados exitosamente.');      
+        } catch (\Throwable $th) {
+            return response($th->getMessage());
+        }
+    }
     
 }

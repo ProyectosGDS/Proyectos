@@ -44,7 +44,7 @@
 <template>
 	<div class="overflow-hidden max-w-full relative ">
 		<div ref="track" class="flex transition-transform ease-in-out duration-300">
-			<a v-for="(item, index) in items" :href="item.link" target="_blank" class="flex-none" :style="{ flex: '0 0 100%' }">
+			<a v-for="(item, index) in items" :href="item.link" target="_blank" :title="item.nombre" class="flex-none" :style="{ flex: '0 0 100%' }">
 				<img :src="item.url" :alt="item.nombre" :key="index"
 					class="object-cover h-56 lg:h-36 w-full object-center" />
 			</a>

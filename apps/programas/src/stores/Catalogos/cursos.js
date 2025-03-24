@@ -10,13 +10,16 @@ export const useCursosStore = defineStore('cursos', () => {
     const headers = [
         { title : 'id', key : 'id', type : 'numeric' },
         { title : 'nombre', key : 'nombre', class: 'uppercase text-xs' },
-        { title : 'descripcion', key : 'descripcion', class: 'uppercase text-xs' },
+        { title : 'descripcion', key : 'descripcion', class: 'uppercase text-xs'},
+        { title : 'inpulsatec', key : 'inpulsatec', width : '10px', align : 'center' },
         { title : 'estado', key : 'estado', width : '10px', align : 'center' },
         { title : '', key : 'actions', width : '10px', align : 'center' },
     ]
 
     const cursos = ref([])
-    const curso = ref({})
+    const curso = ref({
+        inpulsatec : 'N'
+    })
     const copy_curso = ref({})
     const loading = ref({
         fetch : false,
@@ -112,7 +115,9 @@ export const useCursosStore = defineStore('cursos', () => {
     }
 
     const resetData = () => {
-        curso.value = {}
+        curso.value = {
+            inpulsatec : 'N'
+        }
         copy_curso.value = {}
         errors.value = []
         modal.value = {

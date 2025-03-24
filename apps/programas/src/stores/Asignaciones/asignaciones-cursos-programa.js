@@ -30,6 +30,7 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
     const cursos = ref([])
     const curso = ref({})
     const copy_curso = ref({})
+    const selected_requirements = ref([])
     const loading = ref({
         fetch : false,
         show : false,
@@ -41,7 +42,8 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
     const errors = ref([])
     const modal = ref({
         edit : false,
-        delete : false
+        delete : false,
+        requisitos : false,
     })
 
     const fetch = async (programa_id) => {
@@ -151,6 +153,46 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
         }
     }
 
+    const assign = async () => {
+        loading.value.update = true
+        try {
+            const response = await axios.post('detalles-curso/asignar-requisitos/' + curso.value.id, {
+                requisitos : selected_requirements.value
+            })
+            fetch(programa_id.value)
+            global.setAlert(response.data,'success')
+            resetData()
+        } catch (error) {
+            global.manejarError(error)
+            if(error.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.update = false
+        }
+    }
+
+    const assignRequirements = async (item) => {
+
+        loading.value.requisitos = true
+        try {
+            const response = await axios.get('detalles-curso/get-requisitos/' + item.id)
+            curso.value = response.data
+            selected_requirements.value = response.data.requisitos.map(requisito => requisito.id)
+            modal.value.requisitos = true
+        } catch (error) {
+            global.manejarError(error)
+            if(error.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.requisitos = false
+        }
+
+        modal.value.requisitos = true
+        curso.value = item
+    }
+
     const disabledCurso = (item) => {
         curso.value = item
         modal.value.delete = true
@@ -235,6 +277,7 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
         cursos,
         curso,
         copy_curso,
+        selected_requirements,
         loading,
         errors,
         modal,
@@ -246,6 +289,8 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
         destroy,
         disabledCurso,
         disabled,
+        assign,
+        assignRequirements,
         validateDuplicateCourseList,
         exportExcel,
         resetData

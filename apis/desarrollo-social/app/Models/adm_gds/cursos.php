@@ -13,7 +13,8 @@ class cursos extends Model
     protected $fillable = [
         'nombre',
         'descripcion',
-        'estado'
+        'estado',
+        'inpulsatec'
     ];
 
     // RELACIONES

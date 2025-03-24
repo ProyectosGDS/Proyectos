@@ -5,7 +5,8 @@
     import { useCursosProgramaStore } from '@/stores/Asignaciones/cursos-programa'
     import { useCatalogosStore } from '@/stores/Catalogos/catalogos'
     import { useAuthStore } from '@/stores/auth'
-    import { useAsignacionesCursosProgramaStore } from '@/stores/Asignaciones/asignaciones-cursos-programa' 
+    import { useAsignacionesCursosProgramaStore } from '@/stores/Asignaciones/asignaciones-cursos-programa'
+    import { useRequisitosStore } from '@/stores/Catalogos/requisitos'
 
     import Curso from './CursosPrograma/Curso.vue'
     import Instructor from './CursosPrograma/Instructor.vue'
@@ -18,6 +19,7 @@
     const asignaciones = useAsignacionesCursosProgramaStore()
     const programas = useProgramasStore()
     const catalogos = useCatalogosStore()
+    const requisitos = useRequisitosStore()
     const auth = useAuthStore()
 
 
@@ -48,6 +50,7 @@
     onBeforeMount(() => {
         programas.fetch()
         catalogos.getCatalogosCurso()
+        requisitos.fetch()
     })
 
 </script>
@@ -177,13 +180,14 @@
                                         </span>
                                     </div>
                                 </Card>
-                                <div class="grid items-center">
+                                <div class="grid items-center pr-4">
                                     <Icon v-if="!asignacion.hasOwnProperty('id')" @click="store.removeCurso(index)" icon="fas fa-trash" class="icon-button btn-danger" />
                                     <template v-if="asignacion.estado == 'A'">
-                                        <Icon v-if="auth.checkPermission('desactivar cursos programa')" @click="asignaciones.disabledCurso(asignacion)" icon="fas fa-xmark" class="icon-button btn-danger" />
+                                        <Icon v-if="auth.checkPermission('desactivar cursos programa')" @click="asignaciones.disabledCurso(asignacion)" icon="fas fa-xmark" title="Desactivar curso" class="icon-button btn-danger" />
                                     </template>
+                                    <Icon v-if="auth.checkPermission('asignar requisitos curso')" @click="asignaciones.assignRequirements(asignacion)" icon="fas fa-list-check" class="icon-button btn-secondary" title="Asignar requisitos" />
                                     <template v-if="asignacion.hasOwnProperty('id')">
-                                        <Icon v-if="auth.checkPermission('editar cursos programa')" @click="asignaciones.show(asignacion.id)" icon="fas fa-pencil" class="icon-button btn-secondary" />
+                                        <Icon v-if="auth.checkPermission('editar cursos programa')" @click="asignaciones.show(asignacion.id)" icon="fas fa-pencil" title="editar" class="icon-button btn-secondary" />
                                     </template>
                                 </div>
                             </div>
@@ -327,6 +331,32 @@
         <template #footer>
             <Button @click="asignaciones.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
             <Button @click="asignaciones.validateDuplicateCourseList" text="Actualizar" icon="fas fa-arrows-rotate" class="btn-primary" :loading="asignaciones.loading.update" />
+        </template>
+    </Modal>
+    
+    <Modal :open="asignaciones.modal.requisitos" title="Asignar requisitos a curso" icon="fas fa-list-check">
+        <template #close>
+            <Icon @click="asignaciones.resetData" icon="fas fa-xmark" class="cursor-pointer text-white" />
+        </template>
+        <div>
+            <Input v-model="asignaciones.curso.curso" option="label" title="Curso seleccionado" readonly disabled/>
+            <br>
+            <details open class="border rounded-md border-color-4 text-color-1 uppercase p-4">
+                <summary>Requisitos disponibles</summary>
+                <br>
+                <div class="grid grid-cols-2 gap-4">
+                    <label v-for="requisito in requisitos.requisitos" class="flex items-center gap-2"> 
+                        <input type="checkbox" v-model="asignaciones.selected_requirements" :value="requisito.id">
+                        <span>{{ requisito.nombre }}</span>
+                    </label>
+                </div>
+            </details>
+        </div>
+        
+        <Validate-Errors :errors="asignaciones.errors" v-if="asignaciones.errors != 0" />
+        <template #footer>
+            <Button @click="asignaciones.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
+            <Button @click="asignaciones.assign" text="Asignar" icon="fas fa-check" class="btn-primary" :loading="asignaciones.loading.update" />
         </template>
     </Modal>
 
