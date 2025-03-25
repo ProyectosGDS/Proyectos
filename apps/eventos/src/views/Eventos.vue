@@ -80,7 +80,6 @@
             <Input v-model="store.evento.descripcion" option="text-area" title="Descripción" placeholder="Describe el evento ..." rows="7" maxlength="500" :error="store.errors.hasOwnProperty('descripcion')" />
             <Input v-model="store.evento.ubicacion" option="label" title="*ubicación" maxlength="500" :error="store.errors.hasOwnProperty('ubicacion')" />
             <Input v-model="store.evento.responsable" option="label" title="*responsable" maxlength="100" :error="store.errors.hasOwnProperty('responsable')" />
-            <Input v-model="store.evento.duracion" option="label" title="*duracion" maxlength="200" :error="store.errors.hasOwnProperty('duracion')" />
             <div class="grid xl:flex gap-4">
                 <Input v-model="store.evento.fecha_inicial" option="label" title="*fecha inicial" type="date" :error="store.errors.hasOwnProperty('fecha_inicial')" />
                 <Input v-model="store.evento.fecha_final" option="label" title="*fecha final" type="date" :error="store.errors.hasOwnProperty('fecha_final')" />
@@ -110,7 +109,6 @@
             <Input v-model="store.evento.descripcion" option="text-area" title="Descripción" placeholder="Describe el evento ..." rows="7" maxlength="500" :error="store.errors.hasOwnProperty('descripcion')" />
             <Input v-model="store.evento.ubicacion" option="label" title="*ubicación" maxlength="500" :error="store.errors.hasOwnProperty('ubicacion')" />
             <Input v-model="store.evento.responsable" option="label" title="*responsable" maxlength="100" :error="store.errors.hasOwnProperty('responsable')" />
-            <Input v-model="store.evento.duracion" option="label" title="*duracion" maxlength="200" :error="store.errors.hasOwnProperty('duracion')" />
             <div class="grid xl:flex gap-4">
                 <Input v-model="store.evento.fecha_inicial" option="label" title="*fecha inicial" type="date" :error="store.errors.hasOwnProperty('fecha_inicial')" />
                 <Input v-model="store.evento.fecha_final" option="label" title="*fecha final" type="date" :error="store.errors.hasOwnProperty('fecha_final')" />

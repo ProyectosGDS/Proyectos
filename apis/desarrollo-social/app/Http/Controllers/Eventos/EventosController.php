@@ -12,6 +12,7 @@ class EventosController extends Controller
     public function index(Request $request) {
 
         $year = $request->input('year',date('Y'));
+        
         $profile = mb_strtoupper(auth()->user()->perfil->nombre);
 
         try {
@@ -26,7 +27,6 @@ class EventosController extends Controller
                         E.FECHA_FINAL,
                         E.HORA_INICIAL||' A '||E.HORA_FINAL HORARIO,
                         E.RESPONSABLE,
-                        E.DURACION,
                         TE.NOMBRE TIPO,
                         EE.NOMBRE ESTADO,
                         D.NOMBRE DEPENDENCIA,
@@ -101,7 +101,6 @@ class EventosController extends Controller
                 'hora_inicial' => $request->hora_inicial,
                 'hora_final' => $request->hora_final,
                 'responsable' => mb_strtoupper($request->responsable),
-                'duracion' => $request->duracion ?? null,
                 'estado_evento_id' => 2,
                 'tipo_evento_id' => $request->tipo_evento_id,
                 'dependencia_id' => $request->dependencia_id ?? auth()->user()->dependencia_id,
@@ -141,7 +140,6 @@ class EventosController extends Controller
             $evento->hora_inicial = $request->hora_inicial;
             $evento->hora_final = $request->hora_final;
             $evento->responsable = mb_strtoupper($request->responsable);
-            $evento->duracion = $request->duracion ?? null;
             $evento->estado_evento_id = $request->estado_evento_id;
             $evento->tipo_evento_id = $request->tipo_evento_id;
             $evento->dependencia_id = $request->dependencia_id ?? auth()->user()->dependencia_id;

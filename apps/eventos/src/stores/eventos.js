@@ -13,7 +13,6 @@ export const useEventosStore = defineStore('eventos', () => {
         { title : 'descripcion', key : 'descripcion' },
         { title : 'ubicacion', key : 'ubicacion' },
         { title : 'responsable', key : 'responsable' },
-        { title : 'duracion', key : 'duracion' },
         { title : 'fecha inicial', key : 'fecha_inicial', type : 'date' },
         { title : 'fecha final', key : 'fecha_final', type : 'date'},
         { title : 'horario', key : 'horario' },

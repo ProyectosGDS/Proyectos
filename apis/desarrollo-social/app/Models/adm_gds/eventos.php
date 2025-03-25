@@ -23,7 +23,6 @@ class eventos extends Model
         'hora_inicial',
         'hora_final',
         'responsable',
-        'duracion',
         'estado_evento_id',
         'tipo_evento_id',
         'dependencia_id',
