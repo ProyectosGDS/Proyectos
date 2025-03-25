@@ -52,12 +52,29 @@ Esta es la forma en la que los proyectos empaquetados tanto el proyecto principa
             |- index.html
             |- .htaccess (archivo de manejo de rutas internas)
 
+        |- eventos
+            |- assets
+            |- docs
+            |- img
+            |- favicon.ico
+            |- index.html
+            |- .htaccess (archivo de manejo de rutas internas)
+
     |- assets
     |- docs
     |- img
     |- favicon.ico
     |- index.html
     |- .htaccess (archivo de manejo de rutas internas)
+
+|- participacion-ciudadana(esta al mismo nivel de plataforma-gds)
+    |- assets
+    |- docs
+    |- img
+    |- favicon.ico
+    |- index.html
+    |- .htaccess (archivo de manejo de rutas internas)
+
 ```
 El proyecto `base o principal plataforma-gds` tiene una carpeta llamada apps donde almacena los diferentes sub proyectos empaquetados que conforman los módulos.
 
@@ -68,6 +85,7 @@ Los proyectos que conforman la plataforma-gds son:
             |- admin // módulos
             |- programas // módulos
             |- beneficiarios // módulos
+            |- eventos // módulos
 
     |- participacion-ciudadana //este es otro proyecto base pero no tiene módulos
 
