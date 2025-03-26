@@ -1,5 +1,5 @@
 <script setup>
-    import { onMounted, ref, watchEffect } from 'vue'
+    import { onBeforeMount, ref, watchEffect } from 'vue'
     import Logo from './Logo.vue'
     import TitlePage from './TitlePage.vue'
     import { useGlobalStore } from '@/stores/global'
@@ -49,7 +49,7 @@
         localStorage.setItem(btoa('menu'),btoa(JSON.stringify(menus.value)))
     }
 
-    onMounted(async () => {
+    onBeforeMount(async () => {
 
         const menu = await JSON.parse(atob(localStorage.getItem(btoa('menu'))))        
 

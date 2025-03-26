@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\adm_gds\usuarios;
 use App\Rules\ValidateCui;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
@@ -53,7 +55,6 @@ class UsuariosController extends Controller
         }
     }
 
-
     public function show(usuarios $usuario) {
         try {
             return response(
@@ -67,7 +68,6 @@ class UsuariosController extends Controller
             return response($th->getMessage(),422);
         }
     }
-
 
     public function update(Request $request, usuarios $usuario) {
         
@@ -106,7 +106,7 @@ class UsuariosController extends Controller
         }
     }
 
-    function restartPassword(usuarios $usuario) {
+    public function restartPassword(usuarios $usuario) {
         try {
 
             $year = date('Y');
@@ -118,6 +118,36 @@ class UsuariosController extends Controller
 
         } catch (\Throwable $th) {
             return response($th->getMessage(),422);
+        }
+    }
+
+    public function updatePassword(Request $request, usuarios $usuario) {
+        $request->validate([
+            'old_password' => 'required|string|min:8|max:15',
+            'new_password' => 'required|string|min:8|max:15|confirmed'
+        ]);
+
+        try {
+
+            $usuario->makeVisible('password');
+
+            if(Hash::check($request->old_password,$usuario->password)) {
+
+                $usuario->password = Hash::make($request->new_password);
+                $usuario->save();
+
+                return response('Contraseña actualizada exitosamente');
+            }
+
+            return response([
+                'message' => 'La contraseña anterior es incorrecta',
+                'errors' => [
+                    'old_password' => [ 'La contraseña anterior es incorrecta']
+                ]
+            ],422);
+
+        } catch (\Throwable $th) {
+            return response($th->getMessage());
         }
     }
 

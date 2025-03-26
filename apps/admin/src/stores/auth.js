@@ -2,11 +2,12 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useGlobalStore } from './global'
 
 export const useAuthStore = defineStore('auth', () => {
 
 	const router = useRouter()
-
+	const global = useGlobalStore()
 	const user = ref({})
 	const loading = ref(false)
 	const errors = ref([])
@@ -37,18 +38,20 @@ export const useAuthStore = defineStore('auth', () => {
 	}
 	
 	const validateAuth = () => {
-		axios.post('me')
-		.then(response =>{
-			user.value = JSON.parse(atob(response.data))
-			localStorage.setItem( btoa('permisos'), btoa(JSON.stringify(user.value.permisos)))
-			localStorage.setItem(btoa('menu'),btoa(JSON.stringify(user.value.menu)))
-			localStorage.setItem(btoa('id_dependencia'),btoa(JSON.stringify(user.value.id_dependencia)))
-			localStorage.setItem(btoa('id_usuario'),btoa(JSON.stringify(user.value.id_usuario)))
-		}) 		
-		.catch(error => {
-			resetData()
-			router.push({name:'Login'})
-		})
+		if(global.checkIfCookieExists(btoa('access_token'))) {
+			axios.post('me')
+			.then(response =>{
+				user.value = JSON.parse(atob(response.data))
+				localStorage.setItem( btoa('permisos'), btoa(JSON.stringify(user.value.permisos)))
+				localStorage.setItem(btoa('menu'),btoa(JSON.stringify(user.value.menu)))
+				localStorage.setItem(btoa('id_dependencia'),btoa(JSON.stringify(user.value.id_dependencia)))
+				localStorage.setItem(btoa('id_usuario'),btoa(JSON.stringify(user.value.id_usuario)))
+			}) 		
+			.catch(error => {
+				resetData()
+				router.push({name:'Login'})
+			})
+		}
 	}
 
 	const resetData = () => {

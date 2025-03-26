@@ -38,18 +38,20 @@ export const useAuthStore = defineStore('auth', () => {
 	}
 	
 	const validateAuth = () => {
-		axios.post('me')
-		.then(response =>{
-			user.value = JSON.parse(atob(response.data))
-			localStorage.setItem( btoa('permisos'), btoa(JSON.stringify(user.value.permisos)))
-			localStorage.setItem(btoa('menu'),btoa(JSON.stringify(user.value.menu)))
-			localStorage.setItem(btoa('id_dependencia'),btoa(JSON.stringify(user.value.id_dependencia)))
-			localStorage.setItem(btoa('id_usuario'),btoa(JSON.stringify(user.value.id_usuario)))
-		}) 		
-		.catch(error => {
-			resetData()
-			router.push({name:'Login'})
-		})
+		if(global.checkIfCookieExists(btoa('access_token'))) {
+			axios.post('me')
+			.then(response =>{
+				user.value = JSON.parse(atob(response.data))
+				localStorage.setItem( btoa('permisos'), btoa(JSON.stringify(user.value.permisos)))
+				localStorage.setItem(btoa('menu'),btoa(JSON.stringify(user.value.menu)))
+				localStorage.setItem(btoa('id_dependencia'),btoa(JSON.stringify(user.value.id_dependencia)))
+				localStorage.setItem(btoa('id_usuario'),btoa(JSON.stringify(user.value.id_usuario)))
+			}) 		
+			.catch(error => {
+				resetData()
+				router.push({name:'Login'})
+			})
+		}
 	}
 
 	const resetData = () => {
@@ -61,7 +63,7 @@ export const useAuthStore = defineStore('auth', () => {
 		sessionStorage.clear()
 		localStorage.clear()
 		try {
-			const response = await axios.post('logout')
+			await axios.post('logout')
 			resetData()
 			window.location.href = import.meta.env.VITE_MY_URL + 'login'
 

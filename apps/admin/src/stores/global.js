@@ -113,6 +113,21 @@ export const useGlobalStore = defineStore('global', () => {
         window.location.href = import.meta.env.VITE_MY_URL
     }
 
+    function checkIfCookieExists(cookieName) {
+        
+        const cookies = document.cookie.split(';');
+        
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            
+            if (cookie.startsWith(cookieName + '=')) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
     return {
         openSidebar,
         updateOpenSidebar,
@@ -132,6 +147,8 @@ export const useGlobalStore = defineStore('global', () => {
         hasChanged,
 
         manejarError,
+
+        checkIfCookieExists,
 
     }
 })

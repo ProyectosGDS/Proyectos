@@ -3,7 +3,6 @@ import { ref } from 'vue';
 import { onClickOutside } from '@vueuse/core'
 import { useAuthStore } from '../stores/auth'
 import UserPhoto from './UserPhoto.vue'
-import { RouterLink } from 'vue-router';
 
     const auth = useAuthStore()
 
@@ -39,14 +38,12 @@ import { RouterLink } from 'vue-router';
                 class="absolute w-56 px-5 py-3 bg-white rounded shadow-lg border-2 mt-5 right-1 z-10 text-blue-muni text-color-1">
                 <ul class="space-y-3">
                     <li class="font-medium">
-                        <a href="/plataforma-gds/perfil" class="flex items-center transform transition-colors duration-200 border-r-4 border-transparent hover:border-blue-700">
-                            <div class="mr-3">
-                                <i class="fas fa-address-card"></i>
-                            </div>
+                        <a href="/plataforma-gds/profile" class="flex gap-2 items-center transform transition-colors duration-200 border-r-4 border-transparent hover:border-blue-700">
+                            <Icon icon="far fa-user" />
                             Perfil
                         </a>
                     </li>
-                    <li class="font-medium">
+                    <!-- <li class="font-medium">
                         <a href="#" @click="openModalHelp = true" class="flex items-center transform transition-colors duration-200 border-r-4 border-transparent hover:border-blue-700">
                             <div class="mr-3">
                                 <i class="fas fa-gears"></i>
@@ -54,12 +51,10 @@ import { RouterLink } from 'vue-router';
                             Ayuda ?
                         </a>
                     </li>
-                    <hr>
+                    <hr> -->
                     <li @click="auth.logout()" class="font-medium cursor-pointer">
-                        <div class="flex items-center transform transition-colors duration-200 border-r-4 border-transparent hover:border-red-600" >
-                            <div class="mr-3 text-red-600">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                            </div>
+                        <div class="flex gap-2 items-center transform transition-colors duration-200 border-r-4 border-transparent hover:border-red-600" >
+                            <Icon icon="fas fa-arrow-right-from-bracket" class="text-red-500" />
                             Cerrar sesión
                         </div>
                     </li>

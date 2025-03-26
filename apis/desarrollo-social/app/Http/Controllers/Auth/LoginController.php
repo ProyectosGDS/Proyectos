@@ -61,7 +61,12 @@ class LoginController extends Controller
                 }
             }
 
-            return response(['errors' => ['credenciales' => ['Credenciales invalidas']] ], 422);
+            return response([
+                'message' => 'Credenciales invalidas',
+                'errors' => [
+                    'credenciales' => ['Credenciales invalidas']
+                ] 
+            ], 422);
 
         } catch (\Throwable $th) {
             return response($th->getMessage());
