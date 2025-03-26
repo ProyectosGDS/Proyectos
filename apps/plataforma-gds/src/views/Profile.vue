@@ -20,9 +20,20 @@
             
             <div class="grid gap-y-4 xl:pl-8">
                 <h1 class="text-color-1 font-bold uppercase text-center text-2xl">Cambio de contraseña</h1>
-                <p class="text-color-4">
-                    Para efectuar con exito el cambio de contraseña debe asegurarse que está tenga una longitud minima de 8 caracteres o un maximo de 15 caracteres los cuales para su seguridad se le recomienda que contengan mayúsculas, minúsculas, números y caracteres especiales.
-                </p>
+                <div class="text-color-4">
+                    <p>
+                        Para efectuar con éxito eI cambio de contraseña, sirvase atender las siguientes recomendaciones:
+                    </p>
+                    <ul class="list-decimal list-inside">
+                        <li>
+                            Su nueva contraseña debe tener una longitud entre 8 y 15 caracteres
+                        </li>
+                        <li>
+                            Por seguridad incluya mayúsculas, minúsculas, números y caracteres especiales.
+                        </li>
+                    </ul>
+                </div>
+
                 <Input v-model="store.user.old_password" option="label" title="Contraseña anterior" type="password" minlength="8" maxlength="15" :error="store.errors.hasOwnProperty('old_password')" />
                 <Input v-model="store.user.new_password" option="label" title="Nueva contraseña" type="password" minlength="8" maxlength="15" :error="store.errors.hasOwnProperty('new_password')" />
                 <Input v-model="store.user.new_password_confirmation" option="label" title="Confirme contraseña" type="password" minlength="8" maxlength="15" :error="store.errors.hasOwnProperty('new_password_confirmation')" />
