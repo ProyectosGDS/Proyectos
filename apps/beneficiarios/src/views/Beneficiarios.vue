@@ -202,7 +202,13 @@
     <Modal :open="bitacora.modal.bitacora" title="Historial del beneficiario" icon="fas fa-person" class="w-3/4">
         <details :open="true" class="border rounded-lg border-color-4 p-4">
             <summary class="text-lg font-semibold text-color-4 px-3">Bitacora de inscripciones</summary>
-            <Data-Table :headers="bitacora.headersInscripciones" :data="bitacora.bitacoras.inscripciones" :loading="bitacora.loading.fetch" :filterAdvance="false" :excel="false" />
+            <Data-Table :headers="bitacora.headersInscripciones" :data="bitacora.bitacoras.inscripciones" :loading="bitacora.loading.fetch" :filterAdvance="false" :excel="false">
+                <template #estado="item">
+                    <span class="text-xs" :class="item.estado == 'A' ? 'text-green-500' : 'text-red-500'">
+                        {{ item.estado == 'A' ? 'ACTIVO' : 'INACTIVO' }}
+                    </span>
+                </template>
+            </Data-Table>
         </details>
         <br>
         <details :open="true" class="border rounded-lg border-color-4 p-4">
