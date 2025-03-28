@@ -185,7 +185,9 @@
                                     <template v-if="asignacion.estado == 'A'">
                                         <Icon v-if="auth.checkPermission('desactivar cursos programa')" @click="asignaciones.disabledCurso(asignacion)" icon="fas fa-xmark" title="Desactivar curso" class="icon-button btn-danger" />
                                     </template>
-                                    <Icon v-if="auth.checkPermission('asignar requisitos curso')" @click="asignaciones.assignRequirements(asignacion)" icon="fas fa-list-check" class="icon-button btn-secondary" title="Asignar requisitos" />
+                                    <template v-if="asignacion.hasOwnProperty('id')">
+                                        <Icon v-if="auth.checkPermission('asignar requisitos curso')" @click="asignaciones.assignRequirements(asignacion)" icon="fas fa-list-check" class="icon-button btn-secondary" title="Asignar requisitos" />
+                                    </template>
                                     <template v-if="asignacion.hasOwnProperty('id')">
                                         <Icon v-if="auth.checkPermission('editar cursos programa')" @click="asignaciones.show(asignacion.id)" icon="fas fa-pencil" title="editar" class="icon-button btn-secondary" />
                                     </template>

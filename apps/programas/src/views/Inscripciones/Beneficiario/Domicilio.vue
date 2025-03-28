@@ -37,7 +37,7 @@
                 <option v-for="grupo_habitacional in catalogos.catalogo_beneficiario.grupos_habitacionales" :value="grupo_habitacional.id">{{ grupo_habitacional.nombre }}</option>
             </Input>
             <div class="relative">
-                <Input v-model="store.beneficiario.domicilio.grupo_zona_id" option="select" title="selecicone grupo habitacional" :error="store.errors.hasOwnProperty('domicilio.grupo_zona_id')">
+                <Input v-model="store.beneficiario.domicilio.grupo_zona_id" option="select" title="seleccione grupo habitacional" :error="store.errors.hasOwnProperty('domicilio.grupo_zona_id')">
                     <option value=""></option>
                     <option v-for="grupo_zona in catalogos.grupos_zonas" :value="grupo_zona.id">{{ grupo_zona.descripcion }}</option>
                 </Input>
