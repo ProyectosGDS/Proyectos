@@ -140,21 +140,23 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
             const response = await axios.post('beneficiarios/consulta-beneficiario-unico',{
                cui : cui
             })
-                success.value = true
-                const beneficiario = response.data
 
-                if(!beneficiario.id) {
-                    nuevo_registro.value = true
-                    messageCui.value = 'Se encontro información en sistema antiguo'
-                } else {
-                    messageCui.value = 'Se encontro información'
-                }
-                beneficiario.domicilio = response.data.domicilio == null ? { departamento_id : 7, grupo_zona : {} } : response.data.domicilio
-                beneficiario.datos_medicos = response.data.datos_medicos == null ? {} : response.data.datos_medicos
-                beneficiario.datos_academicos = response.data.datos_academicos == null ? {} : response.data.datos_academicos
-                beneficiario.responsable = response.data.responsable == null ? {} : response.data.responsable
-                beneficiario.emergencia = response.data.emergencia == null ? {} : response.data.emergencia
-                updatePropertyBeneficiario(beneficiario)
+            success.value = true
+            const beneficiario = response.data
+
+            if(!beneficiario.id) {
+                nuevo_registro.value = true
+                messageCui.value = 'Se encontro información en sistema antiguo'
+            } else {
+                messageCui.value = 'Se encontro información'
+            }
+
+            beneficiario.domicilio = response.data.domicilio == null ? { departamento_id : 7, grupo_zona : {} } : response.data.domicilio
+            beneficiario.datos_medicos = {}
+            beneficiario.datos_academicos = {}
+            beneficiario.responsable = {}
+            beneficiario.emergencia = {}
+            updatePropertyBeneficiario(beneficiario)
     
         } catch (error) {
             nuevo_registro.value = true
@@ -166,6 +168,39 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         }
     }
 
+    async function getBeneficiarioUnicoDetalles (cui) {
+        loading.value.show = true
+        try {
+            const response = await axios.post('beneficiarios/consulta-beneficiario-unico',{
+               cui : cui
+            })
+            
+            success.value = true
+            const beneficiario = response.data
+
+            if(!beneficiario.id) {
+                nuevo_registro.value = true
+                messageCui.value = 'Se encontro información en sistema antiguo'
+            } else {
+                messageCui.value = 'Se encontro información'
+            }
+
+            beneficiario.domicilio = response.data.domicilio == null ? { departamento_id : 7, grupo_zona : {} } : response.data.domicilio
+            beneficiario.datos_medicos = response.data.datos_medicos == null ? {} : response.data.datos_medicos
+            beneficiario.datos_academicos = response.data.datos_academicos == null ? {} : response.data.datos_academicos
+            beneficiario.responsable = response.data.responsable == null ? {} : response.data.responsable
+            beneficiario.emergencia = response.data.emergencia == null ? {} : response.data.emergencia
+            updatePropertyBeneficiario(beneficiario)
+    
+        } catch (error) {
+            nuevo_registro.value = true
+            messageCui.value = error.response.data
+            success.value = true
+            console.error(error)
+        }finally {
+            loading.value.show = false
+        }
+    }
 
     const edit = (item) => {
         beneficiario.value = item
@@ -226,6 +261,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         destroy,
         edit,
         getBeneficiarioUnico,
+        getBeneficiarioUnicoDetalles,
         remove,
         resetData,
     }

@@ -181,6 +181,7 @@
 
                 <Validate-Errors :errors="store.errorsDetails" v-if="store.errorsDetails != 0" />
                 <Validate-Errors :errors="beneficiarios.errors" v-if="beneficiarios.errors != 0" />
+
                 <div class="flex justify-center gap-4">
                     <Tool-Tip v-if="!beneficiarios.nuevo_registro" message="Agregar beneficiario al curso" class="-mt-6 text-color-4">
                         <Button @click="store.addBeneficiario()" icon="fas fa-plus" class="btn-primary" />

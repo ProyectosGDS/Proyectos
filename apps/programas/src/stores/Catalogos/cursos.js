@@ -11,7 +11,7 @@ export const useCursosStore = defineStore('cursos', () => {
         { title : 'id', key : 'id', type : 'numeric' },
         { title : 'nombre', key : 'nombre', class: 'uppercase text-xs' },
         { title : 'descripcion', key : 'descripcion', class: 'uppercase text-xs'},
-        { title : 'inpulsatec', key : 'inpulsatec', width : '10px', align : 'center' },
+        { title : 'impulsatec', key : 'inpulsatec', width : '10px', align : 'center' },
         { title : 'estado', key : 'estado', width : '10px', align : 'center' },
         { title : '', key : 'actions', width : '10px', align : 'center' },
     ]

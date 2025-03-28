@@ -24,7 +24,7 @@ class BeneficiarioUnicoResource extends JsonResource
             'sexo' => $this->sexo,
             'fecha_nacimiento' => date('Y-m-d',strtotime($this->fecha_nacimiento)),
             'celular' => $this->celular_alum ?? $this->telefono,
-            'email' => $this->correo_alumno,
+            'correo' => $this->correo_alumno,
             'interlocutor' => $this->interlocutor,
             'datos_academicos' => [
                 'tipo' => $this->escuela_tipo,

@@ -77,7 +77,7 @@
                 emergencia : {},
                 estado : 'V',
             }
-            beneficiarios.getBeneficiarioUnico(cleanCui)
+            beneficiarios.getBeneficiarioUnicoDetalles(cleanCui)
             beneficiarios.beneficiario.cui = cleanCui    
             return true
         }
