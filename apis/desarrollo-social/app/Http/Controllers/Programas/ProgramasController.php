@@ -117,7 +117,8 @@ class ProgramasController extends Controller
                     UPPER(S.NOMBRE||' '||Z.DESCRIPCION||' '||D.NOMBRE||' '||S.DIRECCION) SEDE,
                     UPPER(H.HORA_INICIAL||' A '||H.HORA_FINAL||' - '||CONCATENARDIAS(H.LUN,H.MAR,H.MIE,H.JUE,H.VIE,H.SAB,H.DOM)) HORARIO,
                     T.NOMBRE TEMPORALIDAD,
-                    P.DEPENDENCIA_ID
+                    P.DEPENDENCIA_ID,
+                    C.INPULSATEC IMPULSATEC
                 FROM DETALLES_CURSOS DC
                 LEFT JOIN CURSOS_MODULOS CM
                     ON DC.ID = CM.DETALLE_CURSO_ID
