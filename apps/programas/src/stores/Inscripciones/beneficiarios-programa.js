@@ -15,6 +15,7 @@ export const useBeneficiariosProgramaStore = defineStore('beneficiarios-programa
         { title : 'módulo/curso/actividad', key : 'modulo_curso' },
         { title : 'fecha inscripcion', key : 'fecha_inscripcion', type : 'date', width :'10px', align : 'center' },
         { title : 'tipo', key : 'tipo' },
+        { title : 'impulsatec', key : 'impulsatec', width :'10px', align : 'center' },
         { title : 'estado', key : 'estado', width :'10px', align : 'center' },
         { title : '', key : 'actions', width :'10px', align : 'center' },
     ]

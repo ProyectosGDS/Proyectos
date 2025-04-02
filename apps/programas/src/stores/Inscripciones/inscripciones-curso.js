@@ -23,6 +23,8 @@ export const useInscripcionesCursoStore = defineStore('inscripciones-curso', () 
         { title : '', key : 'actions', width :'10px', align : 'center' },
     ]
 
+    const cupo = ref(0)
+
     const programa_id  = ref(null)
     const curso_id  = ref(null)
     const year = ref(0)
@@ -49,6 +51,7 @@ export const useInscripcionesCursoStore = defineStore('inscripciones-curso', () 
             if(curso_id != '') {
                 const response = await axios.get('inscripciones-curso/get-beneficiarios/' + curso_id + '/' + year.value)
                 beneficiarios.value = response.data
+                cupo.value = beneficiario_curso.curso.capacidad - beneficiarios.value.length
             }
         } catch (error) {
             global.manejarError(error)
@@ -162,6 +165,7 @@ export const useInscripcionesCursoStore = defineStore('inscripciones-curso', () 
     return {
         headers,
         year,
+        cupo,
         programa_id,
         curso_id,
         beneficiarios,

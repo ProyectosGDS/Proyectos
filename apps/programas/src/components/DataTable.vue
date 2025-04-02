@@ -32,7 +32,10 @@ const emit = defineEmits(['selectdAllItems'])
 
 const props = defineProps({
     headers: null,
-    data: null,
+    data: {
+        type: Array,
+        default: () => []
+    },
     color: {
         default: 'bg-color-1 text-color-4'
     },

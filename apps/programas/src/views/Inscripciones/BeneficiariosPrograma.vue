@@ -37,7 +37,6 @@ onBeforeMount(() => {
             <template v-for="programa in programas.programas">
                 <option v-if="programa.estado == 'A'" :value="programa.id">{{ programa.nombre }}</option>
             </template>
-            <option value="">TODOS</option>
             </Input>
             <Button @click="store.fetch(store.programa_id)" text="Consultar" icon="fas fa-search"
                 class="btn-primary flex-none" :loading="store.loading.fetch" />
@@ -47,25 +46,23 @@ onBeforeMount(() => {
             BENEFICIARIOS UNICOS : {{ store.beneficiarios.total_beneficiario_unico }}
         </Card>
 
-        <template v-if="store.beneficiarios?.beneficiarios_inscritos">
-            <Data-Table v-if="auth.checkPermission('ver beneficiarios programa')" 
-                :headers="store.headers"
-                :data="store.beneficiarios?.beneficiarios_inscritos" :loading="store.loading.fetch"
-                :excel="auth.checkPermission('exportar excel beneficiarios programa')">
-                <template #estado="{ item }">
-                    <Badge  :color="item.estado == 'A' ? 'green' : 'red'" :text="item.estado == 'A' ? 'Activo' : 'Inactivo'" />
-                </template>
-                <template #actions="{ item }">
-                    <Drop-Down-Button icon="fas fa-ellipsis-v">
-                        <ul>
-                            <li @click="store.edit(item)" class="text-color-4">Editar</li>
-                            <template v-if="item.estado == 'A'">
-                                <li @click="store.remove(item)" class="text-red-400">Desactivar</li>
-                            </template>
-                        </ul>
-                    </Drop-Down-Button>
-                </template>
-            </Data-Table>
-        </template>
+        <Data-Table v-if="auth.checkPermission('ver beneficiarios programa')" 
+            :headers="store.headers"
+            :data="store.beneficiarios?.beneficiarios_inscritos" :loading="store.loading.fetch"
+            :excel="auth.checkPermission('exportar excel beneficiarios programa')">
+            <template #estado="{ item }">
+                <Badge  :color="item.estado == 'A' ? 'green' : 'red'" :text="item.estado == 'A' ? 'Activo' : 'Inactivo'" />
+            </template>
+            <template #actions="{ item }">
+                <Drop-Down-Button icon="fas fa-ellipsis-v">
+                    <ul>
+                        <li @click="store.edit(item)" class="text-color-4">Editar</li>
+                        <template v-if="item.estado == 'A'">
+                            <li @click="store.remove(item)" class="text-red-400">Desactivar</li>
+                        </template>
+                    </ul>
+                </Drop-Down-Button>
+            </template>
+        </Data-Table>
     </Card>
 </template>

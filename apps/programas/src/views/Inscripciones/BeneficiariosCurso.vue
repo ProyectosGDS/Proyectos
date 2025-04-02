@@ -193,7 +193,7 @@
             </div>
             <div class="xl:pl-8">
                 <h1 class="text-center text-2xl font-medium text-gray-500">
-                    Cantidad de beneficiarios : {{ inscripcion.beneficiarios.length }}
+                    Cupo : {{ inscripcion.cupo }}
                 </h1>
                 <div class="flex items-center gap-4">
                     <Input v-model="store.search" icon="fas fa-search" type="search" placeholder="Buscar beneficiario .. " class="h-11" />
@@ -245,7 +245,7 @@
                         </template>
                     </div>
                 </div>
-                <div v-if="inscripcion.beneficiarios.length" class="flex justify-center gap-4">
+                <div v-if="inscripcion.beneficiarios.length && inscripcion.cupo > 0" class="flex justify-center gap-4">
                     <Button v-if="auth.checkPermission('crear inscripcion curso')" @click="inscripcion.store" text="Inscribir beneficiarios nuevos al curso" icon="fas fa-plus" class="btn-primary" :loading="inscripcion.loading.store"/>
                 </div>
             </div>
