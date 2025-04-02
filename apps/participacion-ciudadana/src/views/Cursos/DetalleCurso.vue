@@ -115,7 +115,6 @@
         }
     }
 
-
     watchEffect(() => {
         store.show_curso(props.curso_id)
     })
@@ -157,7 +156,7 @@
                         <li class="flex gap-3 items-center">
                             <Icon icon="fas fa-users"/>
                             <span class="font-medium">Cupo disponible :</span>
-                            <span>{{ cupo }}</span>
+                            <span :class="{'text-red-500' : cupo == 0 }">{{ cupo == 0 ? 'Cupo lleno' : cupo }}</span>
                         </li>
                         <li class="flex gap-3 items-center">
                             <Icon icon="fas fa-chalkboard-user"/>
@@ -172,7 +171,7 @@
                         <li class="flex gap-3 items-center">
                             <Icon icon="fas fa-city"/>
                             <span class="font-medium">Sede :</span>
-                            <span>{{ `${store.curso?.sede?.direccion} ${store.curso?.sede?.zona?.descripcion} ${store.curso?.sede?.nombre}` }}</span>
+                            <span class="text-xs">{{ store.curso?.sede?.nombre_completo }}</span>
                         </li>
                     </ul>
                 </div>
@@ -200,7 +199,7 @@
                 </div>
 
                 <div class="flex justify-center items-center">
-                    <Button @click="inscripcion.inscripcion(props.curso_id,'curso')" icon="fas fa-thumbs-up" text="Inscribete" class="bg-color-9 btn text-white rounded-full h-16 w-40 text-3xl self-center mx-auto" />
+                    <Button v-if="cupo > 0" @click="inscripcion.inscripcion(props.curso_id,'curso')" icon="fas fa-thumbs-up" text="Inscribete" class="bg-color-9 btn text-white rounded-full h-16 w-40 text-3xl self-center mx-auto" />
                 </div>
             </div>
         </div>

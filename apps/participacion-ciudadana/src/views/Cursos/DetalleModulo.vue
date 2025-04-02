@@ -159,7 +159,7 @@
                         <li class="flex gap-3 items-center">
                             <Icon icon="fas fa-users"/>
                             <span class="font-medium">Cupo disponible :</span>
-                            <span>{{ cupo }}</span>
+                            <span>{{ cupo == 0 ? 'Cupo lleno' : cupo }}</span>
                         </li>
                         <li class="flex gap-3 items-center">
                             <Icon icon="fas fa-layer-group" class="text-lg"/>
