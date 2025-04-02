@@ -25,7 +25,7 @@ class LoginController extends Controller
 
             if(in_array($aud,$receivers)){
 
-                $user = usuarios::with('dependencia')->where('cui',$request->cui)->first();
+                $user = usuarios::with('dependencia')->where('cui',$request->cui)->whereNull('deleted_at')->first();
 
                 $user->makeVisible('password');
 

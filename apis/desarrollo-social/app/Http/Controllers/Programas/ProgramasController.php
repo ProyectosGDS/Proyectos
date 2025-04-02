@@ -201,6 +201,7 @@ class ProgramasController extends Controller
                     M.NOMBRE MODULO_CURSO,
                     BM.CREATED_AT FECHA_INSCRIPCION,
                     BM.ESTADO,
+                    CAST('N' AS VARCHAR2(1)) IMPULSATEC,
                     CAST('MODULO' AS VARCHAR2(50)) TIPO
                 FROM BENEFICIARIOS_MODULOS BM
                 INNER JOIN BENEFICIARIOS B
@@ -222,6 +223,7 @@ class ProgramasController extends Controller
                     C.NOMBRE MODULO_CURSO,
                     BC.CREATED_AT FECHA_INSCRIPCION,
                     BC.ESTADO,
+                    CAST(C.INPULSATEC AS VARCHAR2(1)) IMPULSATEC,
                     CAST('CURSO' AS VARCHAR2(50)) TIPO
                 FROM BENEFICIARIOS_CURSOS BC
                 INNER JOIN BENEFICIARIOS B
@@ -245,6 +247,7 @@ class ProgramasController extends Controller
                     A.NOMBRE MODULO_CURSO,
                     BA.CREATED_AT FECHA_INSCRIPCION,
                     BA.ESTADO,
+                    CAST('N' AS VARCHAR2(1)) IMPULSATEC,
                     CAST(TA.NOMBRE AS VARCHAR2(50)) TIPO
                 FROM BENEFICIARIOS_ACTIVIDADES BA
                 INNER JOIN BENEFICIARIOS B
