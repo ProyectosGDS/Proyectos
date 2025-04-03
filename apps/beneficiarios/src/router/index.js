@@ -23,7 +23,15 @@ const router = createRouter({
 					meta : {
 						auth : true,
 					}
-				}
+				},
+				{
+					path : 'verificacion-datos-beneficiario',
+					name : 'Verificación de datos beneficiario',
+					component : () => import('@/views/VerificacionDatosBeneficiario.vue'),
+					meta : {
+						auth : true,
+					}
+				},
 			]
 		},
 		{
