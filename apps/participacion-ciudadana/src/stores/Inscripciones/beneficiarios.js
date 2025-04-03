@@ -61,6 +61,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         loading.value.store = true
         beneficiario.value.formacion_id = params.value.formacion_id
         beneficiario.value.formacion_tipo = params.value.formacion_tipo
+        beneficiario.value.estado = 'P'
         try {
             const response = await axios.post('participacion-ciudadana/inscripcion', beneficiario.value)
             reload.value = true
