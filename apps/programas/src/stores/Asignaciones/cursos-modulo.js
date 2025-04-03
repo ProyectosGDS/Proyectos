@@ -56,7 +56,6 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
             Object.keys(modulo.value).length > 0 &&
             Object.keys(curso.value.curso).length > 0 &&
             Object.keys(curso.value.sede).length > 0 &&
-            curso.value.capacidad &&
             curso.value.modalidad &&
             curso.value.temporalidad
         )
@@ -72,7 +71,6 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
                 news_course.push({
                     curso : item,
                     sede : curso.value.sede,
-                    capacidad : curso.value.capacidad,
                     modalidad : curso.value.modalidad,
                     temporalidad : curso.value.temporalidad,
                     seccion : curso.value.seccion ?? null,
@@ -95,7 +93,6 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
                         curso : {
                             programa_id: programa_id.value,
                             curso: item.curso,
-                            capacidad: item.capacidad,
                             modalidad: item.modalidad,
                             sede: item.sede,
                             temporalidad: item.temporalidad,

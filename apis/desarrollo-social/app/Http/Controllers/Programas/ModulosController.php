@@ -41,6 +41,7 @@ class ModulosController extends Controller
             'nombre' => 'required|string|max:80',
             'descripcion' => 'nullable|string|max:255',
             'programa_id' => 'required',
+            'capacidad' => 'required',
             'fecha_inicial' => 'nullable|required_with:fecha_final|date|date_format:Y-m-d',
             'fecha_final' => 'nullable|required_with:fecha_inicial|date|date_format:Y-m-d|after:fecha_inicial'
         ]);
@@ -54,6 +55,7 @@ class ModulosController extends Controller
                 'estado' => 'A',
                 'fecha_inicial' => $request->fecha_inicial ?? null,
                 'fecha_final' => $request->fecha_final ?? null,
+                'capacidad' => $request->capacidad,
                 'publico' => 'S',
             ]);
 
@@ -77,6 +79,7 @@ class ModulosController extends Controller
             'nombre' => 'required|string|max:80',
             'descripcion' => 'nullable|string|max:255',
             'programa_id' => 'required',
+            'capacidad' => 'required',
             'fecha_inicial' => 'nullable|required_with:fecha_final|date|date_format:Y-m-d',
             'fecha_final' => 'nullable|required_with:fecha_inicial|date|date_format:Y-m-d|after:fecha_inicial'
         ]);
@@ -90,6 +93,7 @@ class ModulosController extends Controller
             $modulo->fecha_inicial = $request->fecha_inicial ?? null;
             $modulo->fecha_final = $request->fecha_final ?? null;
             $modulo->publico = $request->publico;
+            $modulo->capacidad = $request->capacidad;
             $modulo->save();
 
             return response('Módulo modificado correctamente');  
@@ -154,7 +158,7 @@ class ModulosController extends Controller
                             'horario_id'        => $curso['curso']['horario']['id'],
                             'temporalidad_id'   => $curso['curso']['temporalidad'],
                             'seccion'           => $curso['curso']['seccion'],
-                            'capacidad'         => $curso['curso']['capacidad'],
+                            'capacidad'         => null,
                             'modalidad'         => $curso['curso']['modalidad'],
                         ],
                         [

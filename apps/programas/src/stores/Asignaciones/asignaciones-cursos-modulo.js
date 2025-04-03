@@ -22,7 +22,6 @@ export const useAsignacionesCursosModuloStore = defineStore('asignaciones-cursos
         { title : 'horario', key : 'curso.horario.nombre_completo' },
         { title : 'temporalidad', key : 'curso.temporalidad.nombre', class: 'uppercase text-xs', width : '10px', align : 'center' },
         { title : 'modalidad', key : 'curso.modalidad', width : '10px', align : 'center' },
-        { title : 'capacidad', key : 'curso.capacidad', width : '10px', align : 'center' },
         { title : '', key : 'actions', width : '10px', align : 'center' },
     ]
     

@@ -81,7 +81,6 @@
                     <option v-for="temporalidad in catalogos.temporalidades" :value="temporalidad.id">{{ temporalidad.nombre }}</option>
                 </Input>
                 <Input v-model="store.curso.seccion" option="label" title="sección" maxlength="45" :error="store.errorsDetails.hasOwnProperty('seccion')" />
-                <Input v-model="store.curso.capacidad" option="label" title="*Capacidad" type="number" min="0" :error="store.errorsDetails.hasOwnProperty('capacidad')" />
                 <div class="flex justify-evenly text-color-4">
                     <label class="flex gap-2 cursor-pointer">
                         <input type="radio" v-model="store.curso.modalidad" value="PRESENCIAL" name="modalidad">
@@ -148,10 +147,6 @@
                                         <span v-if="asignacion.curso.horario.nombre_completo">
                                             <span class="font-medium">HORARIO: </span>
                                             <span>{{ asignacion.curso.horario.nombre_completo }}</span>
-                                        </span>
-                                        <span>
-                                            <span class="font-medium">CAPACIDAD: </span>
-                                            <span>{{ asignacion.curso.capacidad }}</span>
                                         </span>
                                         <span>
                                             <span class="font-medium">MODALIDAD: </span>
@@ -280,7 +275,6 @@
                 <option v-for="temporalidad in catalogos.catalogos_curso.temporalidades" :value="temporalidad.id">{{ temporalidad.nombre }}</option>
             </Input>
             <Input v-model="asignaciones.curso.seccion" option="label" title="sección" maxlength="45" :error="asignaciones.errors.hasOwnProperty('seccion')" />
-            <Input v-model="asignaciones.curso.capacidad" option="label" title="*Capacidad" type="number" min="0" :error="asignaciones.errors.hasOwnProperty('capacidad')" />
             <div class="flex justify-evenly text-color-4">
                 <label class="flex gap-2 cursor-pointer">
                     <input type="radio" v-model="asignaciones.curso.modalidad" value="PRESENCIAL" name="modalidad">

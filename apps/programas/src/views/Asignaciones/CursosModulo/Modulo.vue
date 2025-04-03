@@ -32,6 +32,7 @@
         <Input v-model="modulos.modulo.fecha_inicial" option="label" title="inicia" type="date" :error="modulos.errors.hasOwnProperty('fecha_inicial')" />
         <Input v-model="modulos.modulo.fecha_final" option="label" title="termina" type="date" :error="modulos.errors.hasOwnProperty('fecha_final')" />
     </div>
+    <Input v-model="modulos.modulo.capacidad" option="label" title="Capacidad" type="number" min="1" :error="modulos.errors.hasOwnProperty('capacidad')" />
     <Validate-Errors :errors="modulos.errors" v-if="modulos.errors != 0" />
     <div class="flex justify-center">
         <Button @click="modulos.store" text="Crear módulo" icon="fas fa-folder-tree" class="btn-primary" :loading="modulos.loading.store"/>

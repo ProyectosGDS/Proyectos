@@ -162,13 +162,13 @@
                     </template>
                 </Input>
                 <div class="flex gap-2 items-center">
-                    <Input @change="store.selectedModulo()" v-model="inscripcion.modulo_id" option="select" title="*seleccione modulo" :error="store.errors.hasOwnProperty('modulo_id')">
+                    <Input @change="store.selectedModulo()" v-model="inscripcion.modulo" option="select" title="*seleccione modulo" :error="store.errors.hasOwnProperty('modulo_id')">
                         <option value=""></option>
                         <template v-for="modulo in modulos.modulos">
-                            <option v-if="modulo.estado == 'A'" :value="modulo.id">{{ modulo.nombre }}</option>
+                            <option v-if="modulo.estado == 'A'" :value="JSON.stringify(modulo)">{{ modulo.nombre }}</option>
                         </template>
                     </Input>
-                    <Icon v-if="inscripcion.modulo_id" @click="inscripcion.fetch(inscripcion.modulo_id)" icon="fas fa-arrows-rotate" class="icon-button btn-secondary" title="Actualizar consulta" :class="{'animate-spin' : inscripcion.loading.fetch }"  />
+                    <Icon v-if="typeof(inscripcion.modulo) === 'string'" @click="inscripcion.fetch()" icon="fas fa-arrows-rotate" class="icon-button btn-secondary" title="Actualizar consulta" :class="{'animate-spin' : inscripcion.loading.fetch }"  />
                 </div>
                 <div class="col-span-2">
                     <div class="relative">
@@ -200,8 +200,8 @@
                 </div>
             </div>
             <div class="xl:pl-8">
-                <h1 class="text-center text-2xl font-medium text-gray-500">
-                    Cantidad de beneficiarios : {{ inscripcion.beneficiarios.length }}
+                <h1 v-if="inscripcion.modulo" class="text-center text-2xl font-medium text-gray-500">
+                     Cupo : {{ inscripcion.cupo }}
                 </h1>
                 <div class="flex items-center gap-4">
                     <Input v-model="store.search" icon="fas fa-search" type="search" placeholder="Buscar beneficiario .. " class="h-11" />

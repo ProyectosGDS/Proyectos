@@ -15,6 +15,7 @@ export const useModulosStore = defineStore('modulos', () => {
         { title : 'inicia', key : 'fecha_inicial', type : 'date' },
         { title : 'termina', key : 'fecha_final', type : 'date' },
         { title : 'público', key : 'publico', width : '10px', align : 'center' },
+        { title : 'capacidad', key : 'capacidad', width : '10px', align : 'center' },
         { title : 'estado', key : 'estado', width : '10px', align : 'center' },
         { title : '', key : 'actions', width : '10px', align : 'center' },
     ]

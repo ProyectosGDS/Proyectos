@@ -14,7 +14,7 @@ class cursos extends Model
         'nombre',
         'descripcion',
         'estado',
-        'inpulsatec'
+        'impulsatec'
     ];
 
     // RELACIONES

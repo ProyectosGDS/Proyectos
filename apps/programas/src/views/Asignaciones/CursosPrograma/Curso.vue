@@ -22,7 +22,7 @@
                 <label class="uppercase">*Impulsatec</label>
                 <div class="flex items-center gap-2">
                     <span class="text-sm text-gray-500">Sí</span>
-                    <Switch v-model="store.curso.inpulsatec" class="h-auto w-14 bg-red-400 has-[:checked]:bg-green-500" :values="['S','N']" />
+                    <Switch v-model="store.curso.impulsatec" class="h-auto w-14 bg-red-400 has-[:checked]:bg-green-500" :values="['S','N']" />
                     <span class="text-sm text-gray-500">No</span>
                 </div>
             </div>

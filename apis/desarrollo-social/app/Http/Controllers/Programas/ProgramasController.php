@@ -118,7 +118,7 @@ class ProgramasController extends Controller
                     UPPER(H.HORA_INICIAL||' A '||H.HORA_FINAL||' - '||CONCATENARDIAS(H.LUN,H.MAR,H.MIE,H.JUE,H.VIE,H.SAB,H.DOM)) HORARIO,
                     T.NOMBRE TEMPORALIDAD,
                     P.DEPENDENCIA_ID,
-                    C.INPULSATEC IMPULSATEC
+                    C.IMPULSATEC
                 FROM DETALLES_CURSOS DC
                 LEFT JOIN CURSOS_MODULOS CM
                     ON DC.ID = CM.DETALLE_CURSO_ID
@@ -224,7 +224,7 @@ class ProgramasController extends Controller
                     C.NOMBRE MODULO_CURSO,
                     BC.CREATED_AT FECHA_INSCRIPCION,
                     BC.ESTADO,
-                    CAST(C.INPULSATEC AS VARCHAR2(1)) IMPULSATEC,
+                    CAST(C.IMPULSATEC AS VARCHAR2(1)) IMPULSATEC,
                     CAST('CURSO' AS VARCHAR2(50)) TIPO
                 FROM BENEFICIARIOS_CURSOS BC
                 INNER JOIN BENEFICIARIOS B

@@ -33,7 +33,8 @@ export const useBeneficiariosModuloStore = defineStore('beneficiarios-modulo', (
 
     const selectedModulo = () => {
         inscripcion.beneficiarios = []
-        inscripcion.fetch(inscripcion.modulo_id)
+        inscripcion.fetch()
+        
     }
 
     const removeInscripcion = (item,index) => {
@@ -58,15 +59,16 @@ export const useBeneficiariosModuloStore = defineStore('beneficiarios-modulo', (
 
         if (
             inscripcion.programa_id &&
-            inscripcion.modulo_id &&
+            typeof(inscripcion.modulo) == 'string' &&
             beneficiariosStore.beneficiario.hasOwnProperty('primer_nombre')
         ) {
 
             const new_beneficiario = inscripcion.beneficiarios.filter(item => item.beneficiario.cui === beneficiariosStore.beneficiario.cui )            
+            const modulo = JSON.parse(inscripcion.modulo)
 
             if(!Object.keys(new_beneficiario).length > 0) {
                 inscripcion.beneficiarios.unshift({
-                    modulo_id : inscripcion.modulo_id,
+                    modulo_id : modulo.id,
                     beneficiario_id : beneficiariosStore.beneficiario.id,
                     beneficiario : beneficiariosStore.beneficiario,
                 })
@@ -89,7 +91,7 @@ export const useBeneficiariosModuloStore = defineStore('beneficiarios-modulo', (
     const saveAddBeneficiario = async () => {
         if (
             inscripcion.programa_id &&
-            inscripcion.modulo_id &&
+            typeof(inscripcion.modulo) == 'string' &&
             beneficiariosStore.beneficiario.hasOwnProperty('primer_nombre')
         ) {
             
@@ -102,9 +104,9 @@ export const useBeneficiariosModuloStore = defineStore('beneficiarios-modulo', (
                 if(beneficiariosStore.errors == 0) {
 
                     beneficiariosStore.nuevo_registro = false
-
+                    const modulo = JSON.parse(inscripcion.modulo)
                     inscripcion.beneficiarios.unshift({
-                        modulo_id : inscripcion.modulo_id,
+                        modulo_id : modulo.id,
                         beneficiario_id : beneficiariosStore.beneficiario.id,
                         beneficiario : beneficiariosStore.beneficiario,
                     })

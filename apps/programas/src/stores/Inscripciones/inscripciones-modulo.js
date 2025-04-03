@@ -22,7 +22,8 @@ export const useInscripcionesModuloStore = defineStore('inscripciones-modulo', (
     ]
 
     const programa_id  = ref(null)
-    const modulo_id  = ref(null)
+    const cupo = ref(0)
+    const modulo  = ref({})
     const year = ref(0)
     const beneficiarios = ref([])
     const inscripcion = ref({})
@@ -41,12 +42,14 @@ export const useInscripcionesModuloStore = defineStore('inscripciones-modulo', (
         disabled : false,
     })
 
-    const fetch = async (modulo_id) => {
+    const fetch = async () => {        
         loading.value.fetch = true
         try {
-            if(modulo_id != '') {
-                const response = await axios.get('inscripciones-modulo/get-beneficiarios/' + modulo_id + '/' + year.value)
+            if(typeof(modulo.value) === 'string') {
+                const module = JSON.parse(modulo.value)
+                const response = await axios.get('inscripciones-modulo/get-beneficiarios/' + module.id + '/' + year.value)
                 beneficiarios.value = response.data
+                cupo.value = module.capacidad - response.data.length 
             }
         } catch (error) {
             global.manejarError(error)
@@ -65,7 +68,7 @@ export const useInscripcionesModuloStore = defineStore('inscripciones-modulo', (
                 beneficiarios: beneficiarios.value
             })
             global.setAlert(response.data, 'success')
-            fetch(modulo_id.value)
+            fetch()
         } catch (error) {
             global.manejarError(error)
             if (error.status === 422) {
@@ -81,7 +84,7 @@ export const useInscripcionesModuloStore = defineStore('inscripciones-modulo', (
         try {
             const response = await axios.put('inscripciones-modulo/' + inscripcion.value.id, inscripcion.value)
             global.setAlert(response.data, 'success')
-            fetch(modulo_id.value)
+            fetch()
             resetData()
         } catch (error) {
             global.manejarError(error)
@@ -98,7 +101,7 @@ export const useInscripcionesModuloStore = defineStore('inscripciones-modulo', (
         try {
             const response = await axios.delete('inscripciones-modulo/' + inscripcion.value.id)
             global.setAlert(response.data, 'success')
-            fetch(modulo_id.value)
+            fetch()
             resetData()
         } catch (error) {
             global.manejarError(error)
@@ -160,8 +163,9 @@ export const useInscripcionesModuloStore = defineStore('inscripciones-modulo', (
     return {
         headers,
         year,
+        cupo,
         programa_id,
-        modulo_id,
+        modulo,
         beneficiarios,
         inscripcion,
         loading,

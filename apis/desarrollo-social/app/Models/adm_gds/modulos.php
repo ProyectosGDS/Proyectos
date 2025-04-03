@@ -22,6 +22,7 @@ class modulos extends Model
         'fecha_inicial',
         'fecha_final',
         'publico',
+        'capacidad',
         
     ];
 
@@ -44,4 +45,5 @@ class modulos extends Model
     public function programa() {
         return $this->belongsTo(programas::class,'programa_id');
     }
+
 }

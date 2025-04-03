@@ -25,7 +25,7 @@ class CursosController extends Controller
         $request->validate([
             'nombre' => 'required|string|max:80',
             'descripcion' => 'required|string|max:255',
-            'inpulsatec' => 'required'
+            'impulsatec' => 'required'
         ]);
 
         try {
@@ -33,7 +33,7 @@ class CursosController extends Controller
             $curso = cursos::create([
                 'nombre' => mb_strtoupper($request->nombre),
                 'descripcion' => $request->descripcion ?? null,
-                'inpulsatec' => $request->inpulsatec,
+                'impulsatec' => $request->impulsatec,
                 'estado' => 'A',
             ]);
 
@@ -56,14 +56,14 @@ class CursosController extends Controller
         $request->validate([
             'nombre' => 'required|string|max:80',
             'descripcion' => 'required|string|max:255',
-            'inpulsatec' => 'required',
+            'impulsatec' => 'required',
         ]);
 
         try {
 
             $curso->nombre = mb_strtoupper($request->nombre);
             $curso->descripcion = $request->descripcion ?? null;
-            $curso->inpulsatec = $request->inpulsatec;
+            $curso->impulsatec = $request->impulsatec;
             $curso->estado = $request->estado;
             $curso->save();
 

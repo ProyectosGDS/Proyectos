@@ -64,6 +64,7 @@
             <Input v-model="store.modulo.descripcion" option="text-area" title="Descripción" placeholder="Describe el modulo ..." rows="7" maxlength="255" :error="store.errors.hasOwnProperty('descripcion')" />
             <Input v-model="store.modulo.fecha_inicial" option="label" title="inicia" type="date" :error="store.errors.hasOwnProperty('fecha_inicial')" />
             <Input v-model="store.modulo.fecha_final" option="label" title="termina" type="date" :error="store.errors.hasOwnProperty('fecha_final')" />
+            <Input v-model="store.modulo.capacidad" option="label" title="Capacidad" type="number" min="1" :error="store.errors.hasOwnProperty('capacidad')" />
         </div>
         <Validate-Errors :errors="store.errors" v-if="store.errors != 0" />
         <template #footer>
@@ -94,6 +95,7 @@
             <Input v-model="store.modulo.descripcion" option="text-area" title="Descripción" placeholder="Describe el modulo ..." rows="7" maxlength="255" :error="store.errors.hasOwnProperty('descripcion')" />
             <Input v-model="store.modulo.fecha_inicial" option="label" title="inicia" type="date" :error="store.errors.hasOwnProperty('fecha_inicial')" />
             <Input v-model="store.modulo.fecha_final" option="label" title="termina" type="date" :error="store.errors.hasOwnProperty('fecha_final')" />
+            <Input v-model="store.modulo.capacidad" option="label" title="Capacidad" type="number" min="1" :error="store.errors.hasOwnProperty('capacidad')" />
             <div class="flex justify-evenly">
                 <div class="flex items-center gap-2">
                     <span class="text-sm text-gray-500">PÚBLICO</span>
