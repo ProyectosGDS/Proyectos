@@ -37,7 +37,8 @@ class modulos extends Model
     }
 
     public function beneficiarios() {
-        return $this->belongsToMany(beneficiarios::class,'beneficiarios_modulos','modulo_id','beneficiario_id')->where('BENEFICIARIOS_MODULOS.estado','A');
+        return $this->belongsToMany(beneficiarios::class,'beneficiarios_modulos','modulo_id','beneficiario_id')
+            ->where('BENEFICIARIOS_MODULOS.estado','A');
     }
 
     // RELACIONES INVERSAS

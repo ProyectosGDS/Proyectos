@@ -23,6 +23,8 @@ Route::get('temporalidades',function(){
     return response(temporalidades::all());
 });
 
+Route::get('programas/modulos-cursos',[ProgramasController::class,'get_modulos_cursos']);
+Route::get('programas/beneficiarios-modulo-curso',[ProgramasController::class,'get_beneficiarios_modulo_curso']);
 Route::get('programas/get-actividades/{programa_id}/{year}',[ProgramasController::class,'get_actividades']);
 Route::get('programas/get-cursos/{programa_id}',[ProgramasController::class,'get_cursos']);
 Route::get('programas/get-beneficiarios/{programa_id}/{year}',[ProgramasController::class,'get_beneficiarios']);

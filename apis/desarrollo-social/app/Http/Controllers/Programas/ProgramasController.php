@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Programas;
 
 use App\Http\Controllers\Controller;
+use App\Models\adm_gds\beneficiarios_cursos;
+use App\Models\adm_gds\beneficiarios_modulos;
 use App\Models\adm_gds\detalles_actividades;
 use App\Models\adm_gds\detalles_cursos;
+use App\Models\adm_gds\modulos;
 use App\Models\adm_gds\programas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -198,6 +201,9 @@ class ProgramasController extends Controller
                     BM.ID INSCRIPCION_ID,
                     B.CUI,
                     CONCATENARNOMBRES(B.PRIMER_NOMBRE,B.SEGUNDO_NOMBRE,B.PRIMER_APELLIDO,B.SEGUNDO_APELLIDO) AS BENEFICIARIO,
+                    B.CORREO,
+                    B.CELULAR,
+                    B.ESTADO STATUS,
                     P.NOMBRE PROGRAMA,
                     M.NOMBRE MODULO_CURSO,
                     BM.CREATED_AT FECHA_INSCRIPCION,
@@ -220,6 +226,9 @@ class ProgramasController extends Controller
                     BC.ID INSCRIPCION_ID,
                     B.CUI,
                     CONCATENARNOMBRES(B.PRIMER_NOMBRE,B.SEGUNDO_NOMBRE,B.PRIMER_APELLIDO,B.SEGUNDO_APELLIDO) AS BENEFICIARIO,
+                    B.CORREO,
+                    B.CELULAR,
+                    B.ESTADO STATUS,
                     P.NOMBRE PROGRAMA,
                     C.NOMBRE MODULO_CURSO,
                     BC.CREATED_AT FECHA_INSCRIPCION,
@@ -244,6 +253,9 @@ class ProgramasController extends Controller
                     BA.ID INSCRIPCION_ID,
                     B.CUI,
                     CONCATENARNOMBRES(B.PRIMER_NOMBRE,B.SEGUNDO_NOMBRE,B.PRIMER_APELLIDO,B.SEGUNDO_APELLIDO) AS BENEFICIARIO,
+                    B.CORREO,
+                    B.CELULAR,
+                    B.ESTADO STATUS,
                     P.NOMBRE PROGRAMA,
                     A.NOMBRE MODULO_CURSO,
                     BA.CREATED_AT FECHA_INSCRIPCION,
@@ -397,6 +409,77 @@ class ProgramasController extends Controller
             }
 
             return response($count_actividades.' Actividades asignadas correctamente');
+
+        } catch (\Throwable $th) {
+            return response($th->getMessage());
+        }
+    }
+
+    public function get_modulos_cursos(Request $request) {
+        $programa_id = $request->input('programa_id');
+        $tipo = $request->input('tipo');
+
+        try {
+
+            if($tipo == 'modulo') {
+                $modulos = modulos::where('programa_id',$programa_id)
+                    ->get();
+
+                return response($modulos);
+            }
+
+            $query = "
+                SELECT
+                    DC.ID,
+                    C.NOMBRE,
+                    DC.ESTADO
+                FROM DETALLES_CURSOS DC
+                LEFT JOIN CURSOS_MODULOS CM
+                    ON DC.ID = CM.DETALLE_CURSO_ID
+                INNER JOIN CURSOS C
+                    ON DC.CURSO_ID = C.ID
+                WHERE CM.MODULO_ID IS NULL
+                AND DC.PROGRAMA_ID = ?
+                ORDER BY C.NOMBRE ASC
+            ";
+
+            $cursos = DB::connection('gds')->select($query,[$programa_id]);
+            return response($cursos);
+
+        } catch (\Throwable $th) {
+            return response($th->getMessage());
+        }
+    }
+
+    public function get_beneficiarios_modulo_curso(Request $request) {
+
+        $year = $request->input('year',date('Y'));
+        $modulo_curso_id = $request->input('modulo_curso_id');
+        $tipo = $request->input('tipo');
+
+        try {
+
+            $inscritos = [];
+
+            if($tipo == 'modulo') {
+                $inscritos = beneficiarios_modulos::whereHas('beneficiario',function($query) {
+                        $query->where('estado','P');  
+                    })
+                    ->with(['beneficiario'])
+                    ->where('modulo_id',$modulo_curso_id)
+                    ->whereYear('created_at',$year)
+                    ->get();
+            } else {
+                $inscritos = beneficiarios_cursos::whereHas('beneficiario',function($query) {
+                        $query->where('estado','P');  
+                    })  
+                    ->with(['beneficiario'])
+                    ->where('detalle_curso_id',$modulo_curso_id)
+                    ->whereYear('created_at',$year)
+                    ->get();
+            }
+            
+            return response($inscritos);
 
         } catch (\Throwable $th) {
             return response($th->getMessage());

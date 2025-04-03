@@ -143,7 +143,7 @@ class BeneficiariosController extends Controller
             
             $this->updateBeneficiario($request, $beneficiario);
 
-            if (!is_null($beneficiario->domicilios)) {
+            if (!is_null($beneficiario->domicilio)) {
                 $this->updateDomicilio($request, $beneficiario);
             } else {
                 $this->storeDomicilio($request,$beneficiario->id);
