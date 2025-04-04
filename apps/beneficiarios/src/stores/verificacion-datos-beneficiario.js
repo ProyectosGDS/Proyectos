@@ -79,7 +79,14 @@ export const useVerificacionDatosBeneficiarioStore = defineStore('verificacion-d
         }
     }
 
-
+    const changeStatus = async () => {
+        try {
+            await beneficiario.changeStatus()
+            fetch()
+        } catch (error) {
+            console.error(error)
+        }
+    }
     
     return {
         headers,
@@ -92,5 +99,6 @@ export const useVerificacionDatosBeneficiarioStore = defineStore('verificacion-d
 
         fetch,
         update,
+        changeStatus,
     }
 })

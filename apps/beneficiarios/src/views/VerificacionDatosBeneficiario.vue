@@ -121,7 +121,7 @@
         <Validate-Errors :errors="beneficiario.errors" v-if="beneficiario.errors != 0" />
         <template #footer>
             <Button @click="beneficiario.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
-            <Button @click="beneficiario.changeStatus" text="Guardar" icon="fas fa-save" class="btn-primary" :loading="beneficiario.loading.estado" />
+            <Button @click="store.changeStatus" text="Guardar" icon="fas fa-save" class="btn-primary" :loading="beneficiario.loading.estado" />
         </template>
     </Modal>
 
