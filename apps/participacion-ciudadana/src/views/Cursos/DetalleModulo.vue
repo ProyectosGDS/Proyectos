@@ -125,7 +125,6 @@
 </script>
 
 <template>
-    
     <div class="p-2 md:p-4 lg:p-8" v-if="store.modulo?.hasOwnProperty('nombre')">
         <div class="flex">
             <div @click="store.router.go(-1)" class="flex items-center justify-center gap-2 text-color-9 cursor-pointer">
@@ -169,7 +168,7 @@
                         <li class="flex gap-3 items-center">
                             <Icon icon="fas fa-city"/>
                             <span class="font-medium">Sede :</span>
-                            <span>{{ store.modulo?.sede?.nombre_completo }}</span>
+                            <span class="text-xs">{{ store.modulo?.sede?.nombre_completo }}</span>
                         </li>
                     </ul>
                 </div>

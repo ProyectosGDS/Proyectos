@@ -95,7 +95,7 @@ class CursosController extends Controller
             $modulo['sede'] = $modulo->cursos[0]->sede;
             $modulo['horario'] = $modulo->cursos[0]->horario;
             $modulo['modalidad'] = $modulo->cursos[0]->modalidad;
-            $modulo['capacidad'] = $modulo->cursos[0]->capacidad;
+            $modulo['capacidad'] = $modulo->capacidad;
 
             return response($modulo);
 
