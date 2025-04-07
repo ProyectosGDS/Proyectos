@@ -27,8 +27,8 @@
 
 </script>
 <template>
-    <label class="relative cursor-pointer block aspect-[1.6/0.75] rounded-full transition-all duration-500">
+    <label class="relative cursor-pointer block aspect-[1.6/0.75] rounded-full transition-all duration-500" :class="{'bg-red-500' : props.error}">
         <input class="peer/input hidden" type="checkbox" :checked="isChecked" :value="props.modelValue" @change="toggleChecked">
-        <div class="absolute right-[6%] top-1/2 aspect-square h-[70%] -translate-y-1/2  rounded-full transition-all duration-500 peer-checked/input:right-[57%]" :class="props.error ? 'bg-red-500' : 'bg-white'"></div>
+        <div class="absolute right-[6%] top-1/2 aspect-square h-[70%] -translate-y-1/2 bg-white  rounded-full transition-all duration-500 peer-checked/input:right-[57%]"></div>
     </label>
 </template>

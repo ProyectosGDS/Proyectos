@@ -26,7 +26,7 @@ import ToolTip from './components/ToolTip.vue'
 import DataTable from './components/DataTable.vue'
 import DropDownButton from './components/DropDownButton.vue'
 import LoadingBar from './components/LoadingBar.vue'
-
+import Switch from './components/Switch.vue'
 
 import axios from 'axios'
 
@@ -53,6 +53,7 @@ app.component('Icon', FontAwesomeIcon)
 .component('Data-Table', DataTable)
 .component('Drop-Down-Button', DropDownButton)
 .component('Loading-Bar', LoadingBar)
+.component('Switch', Switch)
 
 app.mount('#app')
 

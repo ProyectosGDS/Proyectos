@@ -27,38 +27,39 @@ class LoginController extends Controller
 
                 $user = usuarios::with('dependencia')->where('cui',$request->cui)->whereNull('deleted_at')->first();
 
-                $user->makeVisible('password');
-
-            
-                if(Hash::check(base64_decode($request->password),$user->password)){
-
-                    $user->makeHidden('password');
-
-                    Auth::login($user);
-                    
-                    $payload = [
-                        'sub' => $user->id,
-                    ];
-
-                    $accessToken = $user->createToken($payload, $aud);
-
-                    if($accessToken) {
-
-                        $cookie = cookie(base64_encode('access_token'), $accessToken, config('jwt.expired_token'), '/', null, null, false);
-
-                        $user['permisos'] = $this->permisosApp($user,$request->header('App'));
-                        $user['menu'] = $this->menu($user);
-
-                        $perfil = $user->perfil->nombre;
-                        unset($user->perfil);
-                        $user['perfil'] = $perfil;
-                        $user->makeHidden('perfil_id');
-
-                        return response(base64_encode($user))->withCookie($cookie);
+                if($user) {
+                    $user->makeVisible('password');
+                    if(Hash::check(base64_decode($request->password),$user->password)){
+    
+                        $user->makeHidden('password');
+    
+                        Auth::login($user);
+                        
+                        $payload = [
+                            'sub' => $user->id,
+                        ];
+    
+                        $accessToken = $user->createToken($payload, $aud);
+    
+                        if($accessToken) {
+    
+                            $cookie = cookie(base64_encode('access_token'), $accessToken, config('jwt.expired_token'), '/', null, null, false);
+    
+                            $user['permisos'] = $this->permisosApp($user,$request->header('App'));
+                            $user['menu'] = $this->menu($user);
+    
+                            $perfil = $user->perfil->nombre;
+                            unset($user->perfil);
+                            $user['perfil'] = $perfil;
+                            $user->makeHidden('perfil_id');
+    
+                            return response(base64_encode($user))->withCookie($cookie);
+                        }
+    
+                        return response('Unauthorized',422);
                     }
-
-                    return response('Unauthorized',422);
                 }
+
             }
 
             return response([

@@ -32,7 +32,7 @@ class MenusController extends Controller
             $paginas = [];
 
             $menu = menus::create([
-                'nombre' => $request->nombre,
+                'nombre' => mb_strtoupper($request->nombre),
             ]);
 
             if(count($request->paginas) > 0 ) {
@@ -58,7 +58,7 @@ class MenusController extends Controller
 
             $paginas = [];
 
-            $menu->nombre = $request->nombre;
+            $menu->nombre = mb_strtoupper($request->nombre);
             $menu->save();
 
             if(count($request->paginas) > 0 ) {

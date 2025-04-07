@@ -33,7 +33,7 @@ class RolesController extends Controller
             $permisos = [];
 
             $role = roles::create([
-                'nombre' => $request->nombre,
+                'nombre' => mb_strtoupper($request->nombre),
                 'descripcion' => $request->descripcion
             ]);
             
@@ -61,7 +61,7 @@ class RolesController extends Controller
 
             $permisos = [];
 
-            $role->nombre = $request->nombre;
+            $role->nombre = mb_strtoupper($request->nombre);
             $role->descripcion = $request->descripcion;
             $role->save();
 

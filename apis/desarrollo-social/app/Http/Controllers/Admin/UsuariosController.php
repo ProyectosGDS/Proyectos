@@ -6,8 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\adm_gds\usuarios;
 use App\Rules\ValidateCui;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
@@ -39,7 +37,6 @@ class UsuariosController extends Controller
             
             $usuario = usuarios::create([
                 'cui' => $request->cui,
-                // 'password' => Hash::make('MuniGuateGDS'.$year),
                 'password' => Hash::make('muniguate'.$year),
                 'nombre' => mb_strtoupper(trim($request->nombre)),
                 'dependencia_id' => $request->dependencia_id,
@@ -83,6 +80,7 @@ class UsuariosController extends Controller
             $usuario->nombre = mb_strtoupper(trim($request->nombre));
             $usuario->dependencia_id = $request->dependencia_id;
             $usuario->perfil_id = $request->perfil_id ?? null;
+            $usuario->deleted_at = $request->deleted_at;
             $usuario->save();
 
             return response('Usuario modificado exitosamente');
@@ -99,7 +97,7 @@ class UsuariosController extends Controller
             $usuario->deleted_at = now();
             $usuario->save();
 
-            return response('Usuario eliminado exitosamente');
+            return response('Usuario desactivado exitosamente');
 
         } catch (\Throwable $th) {
             return response($th->getMessage(),422);
@@ -110,7 +108,6 @@ class UsuariosController extends Controller
         try {
 
             $year = date('Y');
-            // $usuario->password = Hash::make('MuniGuateGDS'.$year);
             $usuario->password = Hash::make('muniguate'.$year);
             $usuario->save();
 

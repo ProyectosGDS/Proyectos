@@ -35,7 +35,7 @@ class PerfilesController extends Controller
         try {
 
             $perfil = perfiles::create([
-                'nombre' => $request->nombre,
+                'nombre' => mb_strtoupper($request->nombre),
                 'rol_id' => $request->rol_id,
                 'menu_id' => $request->menu_id,
                 'descripcion' => $request->descripcion,
@@ -62,7 +62,7 @@ class PerfilesController extends Controller
 
         try {
 
-            $perfile->nombre = strtolower($request->nombre);
+            $perfile->nombre = mb_strtoupper($request->nombre);
             $perfile->rol_id = $request->rol_id;
             $perfile->menu_id = $request->menu_id;
             $perfile->descripcion = $request->descripcion;
