@@ -8,7 +8,7 @@
         <div class="bg-color-1 flex flex-col items-center justify-center h-screen ">
             <h1 class=" text-9xl text-color-4 font-black">404</h1>
             <h1 class="text-3xl sm:text-5xl font-bold text-color-4 drop-shadow-2xl">
-                Página no econtrada
+                Página no encontrada
             </h1>
             <Button @click="global.goHome()" text="Regresar" icon="fas fa-arrow-left" class="btn-secondary rounded-full" />
         </div>
