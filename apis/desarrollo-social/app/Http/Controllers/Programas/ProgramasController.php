@@ -193,140 +193,164 @@ class ProgramasController extends Controller
         }
     }
 
-    public function get_beneficiarios (int $programa, int $year) {
+    public function get_beneficiarios (string $programa_id, int $year) {
+
+        $perfil = strtolower(auth()->user()->perfil->nombre) == 'sysadmin' ? true : false;
+
+        $dependencia_id = auth()->user()->dependencia_id;
+
+
         try {
+
+            $beneficiarios_cursos = DB::connection('gds')
+                ->table('BENEFICIARIOS_CURSOS BC')
+                ->join('BENEFICIARIOS B','BC.BENEFICIARIO_ID','=','B.ID')
+                ->join('DETALLES_CURSOS DC','BC.DETALLE_CURSO_ID','=','DC.ID')
+                ->join('CURSOS C','DC.CURSO_ID','=','C.ID')
+                ->join('PROGRAMAS P','DC.PROGRAMA_ID','=','P.ID')
+                ->join('DEPENDENCIAS D','P.DEPENDENCIA_ID','=','D.ID')
+                ->select(
+                    'BC.ID AS INSCRIPCION_ID',
+                    'B.CUI',
+                    DB::raw("CONCATENARNOMBRES(B.PRIMER_NOMBRE,B.SEGUNDO_NOMBRE,B.PRIMER_APELLIDO,B.SEGUNDO_APELLIDO) AS BENEFICIARIO"),
+                    'B.CORREO',
+                    'B.CELULAR',
+                    'B.ESTADO AS STATUS',
+                    'P.NOMBRE AS PROGRAMA',
+                    'D.NOMBRE AS DEPENDENCIA',
+                    'C.NOMBRE AS MODULO_CURSO',
+                    'BC.CREATED_AT AS FECHA_INSCRIPCION',
+                    'BC.ESTADO',
+                    DB::raw("CAST(C.IMPULSATEC AS VARCHAR2(1)) AS IMPULSATEC"),
+                    DB::raw("CAST('CURSO' AS VARCHAR2(50)) AS TIPO")
+                )
+                ->whereYear('BC.CREATED_AT',$year)
+                ->when(!empty($programa_id),function($query) use ($programa_id){
+                    return $query->where('P.ID',$programa_id);
+                })
+                ->when(!$perfil, function($query) use ($dependencia_id){
+                    return $query->where('P.DEPENDENCIA_ID',$dependencia_id);
+                });
+
+
+            $beneficiarios_actividades = DB::connection('gds')
+                ->table('BENEFICIARIOS_ACTIVIDADES BA')
+                ->join('BENEFICIARIOS B','BA.BENEFICIARIO_ID','=','B.ID')
+                ->join('DETALLES_ACTIVIDADES DA','BA.DETALLE_ACTIVIDAD_ID','=','DA.ID')
+                ->join('ACTIVIDADES A','DA.ACTIVIDAD_ID','=','A.ID')
+                ->join('PROGRAMAS P','DA.PROGRAMA_ID','=','P.ID')
+                ->join('DEPENDENCIAS D','P.DEPENDENCIA_ID','=','D.ID')
+                ->join('TIPOS_ACTIVIDADES TA','DA.TIPO_ACTIVIDAD_ID','=','TA.ID')
+                ->select(
+                    'BA.ID AS INSCRIPCION_ID',
+                    'B.CUI',
+                    DB::raw("CONCATENARNOMBRES(B.PRIMER_NOMBRE,B.SEGUNDO_NOMBRE,B.PRIMER_APELLIDO,B.SEGUNDO_APELLIDO) AS BENEFICIARIO"),
+                    'B.CORREO',
+                    'B.CELULAR',
+                    'B.ESTADO AS STATUS',
+                    'P.NOMBRE AS PROGRAMA',
+                    'D.NOMBRE AS DEPENDENCIA',
+                    'A.NOMBRE AS MODULO_CURSO',
+                    'BA.CREATED_AT AS FECHA_INSCRIPCION',
+                    'BA.ESTADO',
+                    DB::raw("CAST('N' AS VARCHAR2(1)) AS IMPULSATEC"),
+                    DB::raw("CAST(TA.NOMBRE AS VARCHAR2(50)) AS TIPO")
+                )
+                ->whereYear('BA.CREATED_AT',$year)
+                ->when(!empty($programa_id),function($query) use ($programa_id){
+                    return $query->where('P.ID',$programa_id);
+                })
+                ->when(!$perfil, function($query) use ($dependencia_id){
+                    return $query->where('P.DEPENDENCIA_ID',$dependencia_id);
+                });
+
+            $beneficiarios_inscritos = DB::connection('gds')
+                ->table('BENEFICIARIOS_MODULOS BM')
+                ->join('BENEFICIARIOS B','BM.BENEFICIARIO_ID','=','B.ID')
+                ->join('MODULOS M','BM.MODULO_ID','=','M.ID')
+                ->join('PROGRAMAS P','M.PROGRAMA_ID','=','P.ID')
+                ->join('DEPENDENCIAS D','P.DEPENDENCIA_ID','=','D.ID')
+                ->select(
+                    'BM.ID AS INSCRIPCION_ID',
+                    'B.CUI',
+                    DB::raw("CONCATENARNOMBRES(B.PRIMER_NOMBRE,B.SEGUNDO_NOMBRE,B.PRIMER_APELLIDO,B.SEGUNDO_APELLIDO) AS BENEFICIARIO"),
+                    'B.CORREO',
+                    'B.CELULAR',
+                    'B.ESTADO AS STATUS',
+                    'P.NOMBRE AS PROGRAMA',
+                    'D.NOMBRE AS DEPENDENCIA',
+                    'M.NOMBRE AS MODULO_CURSO',
+                    'BM.CREATED_AT AS FECHA_INSCRIPCION',
+                    'BM.ESTADO',
+                    DB::raw("CAST('N' AS VARCHAR2(1)) AS IMPULSATEC"),
+                    DB::raw("CAST('MODULO' AS VARCHAR2(50)) AS TIPO")
+                )
+                ->whereYear('BM.CREATED_AT',$year)
+                ->when(!empty($programa_id),function($query) use ($programa_id){
+                    return $query->where('P.ID',$programa_id);
+                })
+                ->when(!$perfil, function($query) use ($dependencia_id){
+                    return $query->where('P.DEPENDENCIA_ID',$dependencia_id);
+                })
+                ->unionAll($beneficiarios_cursos)
+                ->unionAll($beneficiarios_actividades)
+                ->orderBy('BENEFICIARIO')
+                ->get();
+
+
+            $count_beneficiarios_cursos = DB::connection('gds')
+                ->table('BENEFICIARIOS_CURSOS BC')
+                ->distinct()
+                ->join('BENEFICIARIOS B','BC.BENEFICIARIO_ID','=','B.ID')
+                ->join('DETALLES_CURSOS DC','BC.DETALLE_CURSO_ID','=','DC.ID')
+                ->join('CURSOS C','DC.CURSO_ID','=','C.ID')
+                ->join('PROGRAMAS P','DC.PROGRAMA_ID','=','P.ID')
+                ->select('B.CUI')
+                ->whereYear('BC.CREATED_AT',$year)
+                ->when(!empty($programa_id),function($query) use ($programa_id){
+                    return $query->where('P.ID',$programa_id);
+                })
+                ->when(!$perfil, function($query) use ($dependencia_id){
+                    return $query->where('P.DEPENDENCIA_ID',$dependencia_id);
+                });
             
-            $query = "
-                SELECT
-                    BM.ID INSCRIPCION_ID,
-                    B.CUI,
-                    CONCATENARNOMBRES(B.PRIMER_NOMBRE,B.SEGUNDO_NOMBRE,B.PRIMER_APELLIDO,B.SEGUNDO_APELLIDO) AS BENEFICIARIO,
-                    B.CORREO,
-                    B.CELULAR,
-                    B.ESTADO STATUS,
-                    P.NOMBRE PROGRAMA,
-                    M.NOMBRE MODULO_CURSO,
-                    BM.CREATED_AT FECHA_INSCRIPCION,
-                    BM.ESTADO,
-                    CAST('N' AS VARCHAR2(1)) IMPULSATEC,
-                    CAST('MODULO' AS VARCHAR2(50)) TIPO
-                FROM BENEFICIARIOS_MODULOS BM
-                INNER JOIN BENEFICIARIOS B
-                    ON BM.BENEFICIARIO_ID = B.ID
-                INNER JOIN MODULOS M
-                    ON BM.MODULO_ID = M.ID
-                INNER JOIN PROGRAMAS P
-                    ON M.PROGRAMA_ID = P.ID
-                WHERE P.ID = ?
-                AND EXTRACT(YEAR FROM BM.CREATED_AT) = ?
+            $count_beneficiarios_actividades = DB::connection('gds')
+                ->table('BENEFICIARIOS_ACTIVIDADES BA')
+                ->distinct()
+                ->join('BENEFICIARIOS B','BA.BENEFICIARIO_ID','=','B.ID')
+                ->join('DETALLES_ACTIVIDADES DA','BA.DETALLE_ACTIVIDAD_ID','=','DA.ID')
+                ->join('ACTIVIDADES A','DA.ACTIVIDAD_ID','=','A.ID')
+                ->join('PROGRAMAS P','DA.PROGRAMA_ID','=','P.ID')
+                ->select('B.CUI')
+                
+                ->whereYear('BA.CREATED_AT',$year)
+                ->when(!empty($programa_id),function($query) use ($programa_id){
+                    return $query->where('P.ID',$programa_id);
+                })
+                ->when(!$perfil, function($query) use ($dependencia_id){
+                    return $query->where('P.DEPENDENCIA_ID',$dependencia_id);
+                });
 
-                UNION ALL
-                        
-                SELECT
-                    BC.ID INSCRIPCION_ID,
-                    B.CUI,
-                    CONCATENARNOMBRES(B.PRIMER_NOMBRE,B.SEGUNDO_NOMBRE,B.PRIMER_APELLIDO,B.SEGUNDO_APELLIDO) AS BENEFICIARIO,
-                    B.CORREO,
-                    B.CELULAR,
-                    B.ESTADO STATUS,
-                    P.NOMBRE PROGRAMA,
-                    C.NOMBRE MODULO_CURSO,
-                    BC.CREATED_AT FECHA_INSCRIPCION,
-                    BC.ESTADO,
-                    CAST(C.IMPULSATEC AS VARCHAR2(1)) IMPULSATEC,
-                    CAST('CURSO' AS VARCHAR2(50)) TIPO
-                FROM BENEFICIARIOS_CURSOS BC
-                INNER JOIN BENEFICIARIOS B
-                    ON BC.BENEFICIARIO_ID = B.ID
-                INNER JOIN DETALLES_CURSOS DC
-                    ON BC.DETALLE_CURSO_ID = DC.ID
-                INNER JOIN CURSOS C
-                    ON DC.CURSO_ID = C.ID
-                INNER JOIN PROGRAMAS P
-                    ON DC.PROGRAMA_ID = P.ID
-                WHERE P.ID = ?
-                AND EXTRACT(YEAR FROM BC.CREATED_AT) = ?
-
-                UNION ALL
-
-                SELECT
-                    BA.ID INSCRIPCION_ID,
-                    B.CUI,
-                    CONCATENARNOMBRES(B.PRIMER_NOMBRE,B.SEGUNDO_NOMBRE,B.PRIMER_APELLIDO,B.SEGUNDO_APELLIDO) AS BENEFICIARIO,
-                    B.CORREO,
-                    B.CELULAR,
-                    B.ESTADO STATUS,
-                    P.NOMBRE PROGRAMA,
-                    A.NOMBRE MODULO_CURSO,
-                    BA.CREATED_AT FECHA_INSCRIPCION,
-                    BA.ESTADO,
-                    CAST('N' AS VARCHAR2(1)) IMPULSATEC,
-                    CAST(TA.NOMBRE AS VARCHAR2(50)) TIPO
-                FROM BENEFICIARIOS_ACTIVIDADES BA
-                INNER JOIN BENEFICIARIOS B
-                    ON BA.BENEFICIARIO_ID = B.ID
-                INNER JOIN DETALLES_ACTIVIDADES DA
-                    ON BA.DETALLE_ACTIVIDAD_ID = DA.ID
-                INNER JOIN ACTIVIDADES A
-                    ON DA.ACTIVIDAD_ID = A.ID
-                INNER JOIN TIPOS_ACTIVIDADES TA
-                    ON DA.TIPO_ACTIVIDAD_ID = TA.ID
-                INNER JOIN PROGRAMAS P
-                    ON DA.PROGRAMA_ID = P.ID
-                WHERE P.ID = ?
-                AND EXTRACT(YEAR FROM BA.CREATED_AT) = ?
-
-                ORDER BY BENEFICIARIO
-            ";
-
-            $queryTotal = "
-                SELECT DISTINCT
-                    B.CUI
-                FROM BENEFICIARIOS_MODULOS BM
-                INNER JOIN BENEFICIARIOS B
-                    ON BM.BENEFICIARIO_ID = B.ID
-                INNER JOIN MODULOS M
-                    ON BM.MODULO_ID = M.ID
-                INNER JOIN PROGRAMAS P
-                    ON M.PROGRAMA_ID = P.ID
-                WHERE P.ID = ?
-                AND EXTRACT(YEAR FROM BM.CREATED_AT) = ?
-
-                UNION
-                                
-                SELECT DISTINCT
-                    B.CUI
-                FROM BENEFICIARIOS_CURSOS BC
-                INNER JOIN BENEFICIARIOS B
-                    ON BC.BENEFICIARIO_ID = B.ID
-                INNER JOIN DETALLES_CURSOS DC
-                    ON BC.DETALLE_CURSO_ID = DC.ID
-                INNER JOIN PROGRAMAS P
-                    ON DC.PROGRAMA_ID = P.ID
-                WHERE P.ID = ?
-                AND EXTRACT(YEAR FROM BC.CREATED_AT) = ?
-
-                UNION
-
-                SELECT DISTINCT
-                    B.CUI
-                FROM BENEFICIARIOS_ACTIVIDADES BA
-                INNER JOIN BENEFICIARIOS B
-                    ON BA.BENEFICIARIO_ID = B.ID
-                INNER JOIN DETALLES_ACTIVIDADES DA
-                    ON BA.DETALLE_ACTIVIDAD_ID = DA.ID
-                INNER JOIN PROGRAMAS P
-                    ON DA.PROGRAMA_ID = P.ID
-                WHERE P.ID = ?
-                AND EXTRACT(YEAR FROM BA.CREATED_AT) = ?
-            ";
-
-            $beneficiarios_inscritos = DB::connection('gds')->select($query,[$programa,$year,$programa,$year,$programa,$year]);
-
-            $total_beneficiario_unico = DB::connection('gds')->select($queryTotal,[$programa,$year,$programa,$year,$programa,$year]);
+            $total_beneficiario_unico = DB::connection('gds')
+                ->table('BENEFICIARIOS_MODULOS BM')
+                ->distinct()
+                ->join('BENEFICIARIOS B','BM.BENEFICIARIO_ID','=','B.ID')
+                ->join('MODULOS M','BM.MODULO_ID','=','M.ID')
+                ->join('PROGRAMAS P','M.PROGRAMA_ID','=','P.ID')
+                ->select('B.CUI')
+                ->whereYear('BM.CREATED_AT',$year)
+                ->when(!empty($programa_id),function($query) use ($programa_id){
+                    return $query->where('P.ID',$programa_id);
+                })
+                ->when(!$perfil, function($query) use ($dependencia_id){
+                    return $query->where('P.DEPENDENCIA_ID',$dependencia_id);
+                })
+                ->union($count_beneficiarios_cursos)
+                ->union($count_beneficiarios_actividades)
+                ->count();
 
             return response([
-                'total_beneficiario_unico' => collect($total_beneficiario_unico)->count(),
+                'total_beneficiario_unico' => $total_beneficiario_unico,
                 'beneficiarios_inscritos' => $beneficiarios_inscritos
             ]);
 

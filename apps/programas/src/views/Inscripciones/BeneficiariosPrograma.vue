@@ -1,28 +1,29 @@
 <script setup>
-import { computed, onBeforeMount } from 'vue'
-import { useBeneficiariosProgramaStore } from '@/stores/Inscripciones/beneficiarios-programa'
-import { useProgramasStore } from '@/stores/Catalogos/programas'
-import { useAuthStore } from '@/stores/auth'
+    import { computed, onBeforeMount } from 'vue'
+    import { useBeneficiariosProgramaStore } from '@/stores/Inscripciones/beneficiarios-programa'
+    import { useProgramasStore } from '@/stores/Catalogos/programas'
+    import { useAuthStore } from '@/stores/auth'
 
-const store = useBeneficiariosProgramaStore()
-const programas = useProgramasStore()
-const auth = useAuthStore()
+    const store = useBeneficiariosProgramaStore()
+    const programas = useProgramasStore()
+    const auth = useAuthStore()
 
-const currentYear = new Date().getFullYear();
+    const currentYear = new Date().getFullYear();
 
-const years = computed(() => {
-    const yearsList = []
-    for (let i = 0; i <= 3; i++) {
-        yearsList.unshift(currentYear - i)
-    }
-    return yearsList
-})
+    const years = computed(() => {
+        const yearsList = []
+        for (let i = 0; i <= 3; i++) {
+            yearsList.unshift(currentYear - i)
+        }
+        return yearsList
+    })
 
-onBeforeMount(() => {
-    const year = new Date()
-    store.year = year.getFullYear()
-    programas.fetch()
-})
+    onBeforeMount(() => {
+        const year = new Date()
+        store.year = year.getFullYear()
+        programas.fetch()
+    })
+
 </script>
 
 <template>
@@ -31,17 +32,15 @@ onBeforeMount(() => {
             <Input v-model="store.year" option="select" title="*seleccione año" :error="store.errors.hasOwnProperty('year')">
                 <option v-for="year in years" :value="year">{{ year }}</option>
             </Input>
-            <Input @change="store.fetch(store.programa_id)" v-model="store.programa_id" option="select"
-                title="*seleccione programa">
-            <option value=""></option>
-            <template v-for="programa in programas.programas">
-                <option v-if="programa.estado == 'A'" :value="programa.id">{{ programa.nombre }}</option>
-            </template>
+            <Input @change="store.fetch(store.programa_id)" v-model="store.programa_id" option="select" title="*seleccione programa">
+                <option value=""></option>
+                <template v-for="programa in programas.programas">
+                    <option v-if="programa.estado == 'A'" :value="programa.id">{{ programa.nombre }}</option>
+                </template>
+                <option value="0">TODOS</option>
             </Input>
-            <Button @click="store.fetch(store.programa_id)" text="Consultar" icon="fas fa-search"
-                class="btn-primary flex-none" :loading="store.loading.fetch" />
+            <Button @click="store.fetch(store.programa_id)" text="Consultar" icon="fas fa-search" class="btn-primary flex-none" :loading="store.loading.fetch" />
         </div>
-
         <Card class="bg-gray-200 p-4 text-2xl text-center w-72 border-black border-2 border-dashed mx-auto my-4">
             BENEFICIARIOS UNICOS : {{ store.beneficiarios.total_beneficiario_unico }}
         </Card>

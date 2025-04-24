@@ -11,6 +11,7 @@ export const useBeneficiariosProgramaStore = defineStore('beneficiarios-programa
         { title : 'id', key : 'inscripcion_id', type : 'numeric' },
         { title : 'cui', key : 'cui' },
         { title : 'beneficiario', key : 'beneficiario' },
+        { title : 'dependencia', key : 'dependencia' },
         { title : 'programa', key : 'programa' },
         { title : 'módulo/curso/actividad', key : 'modulo_curso' },
         { title : 'fecha inscripcion', key : 'fecha_inscripcion', type : 'date', width :'10px', align : 'center' },
@@ -35,7 +36,7 @@ export const useBeneficiariosProgramaStore = defineStore('beneficiarios-programa
     const fetch = async (programa_id) => {
         loading.value.fetch = true
         try {
-            if(programa_id != '') {
+            if(programa_id) {
                 const response = await axios.get('programas/get-beneficiarios/' + programa_id + '/' + year.value)
                 beneficiarios.value = response.data
             }
