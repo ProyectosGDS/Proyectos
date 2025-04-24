@@ -18,7 +18,7 @@ export const useCursosStore = defineStore('cursos', () => {
 
     const cursos = ref([])
     const curso = ref({
-        inpulsatec : 'N'
+        impulsatec : 'N'
     })
     const copy_curso = ref({})
     const loading = ref({
