@@ -73,7 +73,7 @@
         </template>
     </Modal>
 
-    <Modal :open="store.modal.edit" title="Editar modulo" icon="fas fa-folder-tree">
+    <Modal :open="store.modal.edit" title="Editar modulo" icon="fas fa-folder-tree" class="w-1/2">
         <template #close>
             <Icon @click="store.resetData" icon="fas fa-xmark" class="cursor-pointer text-white" />
         </template>
@@ -93,8 +93,10 @@
                 </template>
             </Input>
             <Input v-model="store.modulo.descripcion" option="text-area" title="Descripción" placeholder="Describe el modulo ..." rows="7" maxlength="255" :error="store.errors.hasOwnProperty('descripcion')" />
-            <Input v-model="store.modulo.fecha_inicial" option="label" title="inicia" type="date" :error="store.errors.hasOwnProperty('fecha_inicial')" />
-            <Input v-model="store.modulo.fecha_final" option="label" title="termina" type="date" :error="store.errors.hasOwnProperty('fecha_final')" />
+            <div class="grid grid-cols-2 gap-4">
+                <Input v-model="store.modulo.fecha_inicial" option="label" title="inicia" type="date" :error="store.errors.hasOwnProperty('fecha_inicial')" />
+                <Input v-model="store.modulo.fecha_final" option="label" title="termina" type="date" :error="store.errors.hasOwnProperty('fecha_final')" />
+            </div>
             <Input v-model="store.modulo.capacidad" option="label" title="Capacidad" type="number" min="1" :error="store.errors.hasOwnProperty('capacidad')" />
             <div class="flex justify-evenly">
                 <div class="flex items-center gap-2">

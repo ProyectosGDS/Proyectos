@@ -116,7 +116,7 @@ export const useCursosStore = defineStore('cursos', () => {
 
     const resetData = () => {
         curso.value = {
-            inpulsatec : 'N'
+            impulsatec : 'N'
         }
         copy_curso.value = {}
         errors.value = []

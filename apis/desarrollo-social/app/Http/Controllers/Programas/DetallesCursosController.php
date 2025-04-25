@@ -134,7 +134,7 @@ class DetallesCursosController extends Controller
     public function update (Request $request, detalles_cursos $curso) {
         $request->validate([
             'seccion' => 'nullable|string|max:45',
-            'capacidad' => 'required|numeric',
+            'capacidad' => 'nullable|numeric',
             'modalidad' => 'required|string|max:25',
             'curso_id' => 'required',
             'instructor_id' => 'required',

@@ -270,25 +270,6 @@
             <Select v-model="asignaciones.curso.instructor_id" title="*seleccione instructor" :items="catalogos.catalogos_curso.instructores" :fields="['id','nombre']" :error="asignaciones.errors.hasOwnProperty('instructor_id')" />
             <Select v-model="asignaciones.curso.sede_id" title="*seleccione sede" :items="catalogos.catalogos_curso.sedes" :fields="['id','nombre_completo']" :error="asignaciones.errors.hasOwnProperty('sede_id')" />
             <Select v-model="asignaciones.curso.horario_id" title="*seleccione horario" :items="catalogos.catalogos_curso.horarios" :fields="['id','nombre_completo']" :error="asignaciones.errors.hasOwnProperty('horario_id')" />
-            <Input v-model="asignaciones.curso.temporalidad_id" option="select" title="*seleccione temporalidad" :error="asignaciones.errors.hasOwnProperty('temporalidad_id')">
-                <option value=""></option>
-                <option v-for="temporalidad in catalogos.catalogos_curso.temporalidades" :value="temporalidad.id">{{ temporalidad.nombre }}</option>
-            </Input>
-            <Input v-model="asignaciones.curso.seccion" option="label" title="sección" maxlength="45" :error="asignaciones.errors.hasOwnProperty('seccion')" />
-            <div class="flex justify-evenly text-color-4">
-                <label class="flex gap-2 cursor-pointer">
-                    <input type="radio" v-model="asignaciones.curso.modalidad" value="PRESENCIAL" name="modalidad">
-                    <span>PRESENCIAL</span>
-                </label>
-                <label class="flex gap-2 cursor-pointer">
-                    <input type="radio" v-model="asignaciones.curso.modalidad" value="VIRTUAL" name="modalidad">
-                    <span>VIRTUAL</span>
-                </label>
-                <label class="flex gap-2 cursor-pointer">
-                    <input type="radio" v-model="asignaciones.curso.modalidad" value="HIBRIDA" name="modalidad">
-                    <span>HIBRIDA</span>
-                </label>
-            </div>
         </div>
         <Validate-Errors :errors="asignaciones.errors" v-if="asignaciones.errors != 0" />
         <template #footer>
