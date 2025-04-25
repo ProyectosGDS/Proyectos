@@ -254,7 +254,9 @@
                     </div>
                 </div>
                 <div v-if="inscripcion.beneficiarios.length" class="flex justify-center gap-4">
-                    <Button v-if="auth.checkPermission('crear inscripcion modulo')" @click="inscripcion.store" text="Inscribir beneficiarios nuevos al modulo" icon="fas fa-plus" class="btn-primary" :loading="inscripcion.loading.store"/>
+                    <template v-if="inscripcion.cupo > 0">
+                        <Button v-if="auth.checkPermission('crear inscripcion modulo')" @click="inscripcion.store" text="Inscribir beneficiarios nuevos al modulo" icon="fas fa-plus" class="btn-primary" :loading="inscripcion.loading.store"/>
+                    </template>
                 </div>
             </div>
         </div>
