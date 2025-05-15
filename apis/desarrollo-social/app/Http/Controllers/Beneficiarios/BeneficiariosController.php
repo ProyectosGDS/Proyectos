@@ -436,4 +436,63 @@ class BeneficiariosController extends Controller
         }
     }
 
+    public function historial(Request $request) {
+        $request->validate([
+            'cui' => ['required','numeric','digits:13',new ValidateCui ],
+        ]);
+
+        try {
+            
+            $cui = $request->input('cui');
+            
+            $query = "
+                SELECT
+                    adminsiaf.tb_alumno_g.cui,
+                    adminsiaf.tb_asignacion_g.asignacion,
+                    adminsiaf.tb_asignacion_g.anio,
+                    adminsiaf.tb_alumno_g.alumno,
+                    adminsiaf.tb_asigna_curso_g.tipo_escuela,
+                    adminsiaf.tb_beneficiario_unico.primer_nombre ||' '||adminsiaf.tb_beneficiario_unico.primer_apellido AS beneficiario,
+                    adminsiaf.tb_asigna_curso_g.grado,
+                    adminsiaf.tb_escuela_g.nombre AS programa,
+                    adminsiaf.tb_curso_g.nombre AS nombre_curso,
+                    adminsiaf.tb_asignacion_g.estatus,
+                    adminsiaf.tb_tipo_escuela_g.descripcion AS dependencia,
+                    EXTRACT(YEAR FROM adminsiaf.tb_alumno_g.fecha_grabacion) AS fecha_grabacion
+                FROM
+                    adminsiaf.tb_alumno_g
+                    INNER JOIN adminsiaf.tb_asignacion_g 
+                        ON adminsiaf.tb_asignacion_g.alumno = adminsiaf.tb_alumno_g.alumno
+                        AND adminsiaf.tb_asignacion_g.tipo_escuela = adminsiaf.tb_alumno_g.tipo_escuela
+                    INNER JOIN adminsiaf.tb_asigna_curso_g 
+                        ON adminsiaf.tb_asignacion_g.asignacion = adminsiaf.tb_asigna_curso_g.asignacion
+                    INNER JOIN adminsiaf.tb_beneficiario_unico 
+                        ON adminsiaf.tb_alumno_g.cui = adminsiaf.tb_beneficiario_unico.cui
+                    INNER JOIN adminsiaf.tb_escuela_g 
+                        ON adminsiaf.tb_escuela_g.empresa = adminsiaf.tb_asigna_curso_g.empresa
+                        AND adminsiaf.tb_escuela_g.jardin = adminsiaf.tb_asigna_curso_g.jardin
+                        AND adminsiaf.tb_escuela_g.tipo_escuela = adminsiaf.tb_asigna_curso_g.tipo_escuela
+                    INNER JOIN adminsiaf.tb_curso_g 
+                        ON adminsiaf.tb_curso_g.grado = adminsiaf.tb_asigna_curso_g.grado
+                        AND adminsiaf.tb_curso_g.tipo_escuela = adminsiaf.tb_asigna_curso_g.tipo_escuela
+                    INNER JOIN adminsiaf.tb_tipo_escuela_g 
+                        ON adminsiaf.tb_escuela_g.tipo_escuela = adminsiaf.tb_tipo_escuela_g.tipo_escuela
+                WHERE adminsiaf.tb_asignacion_g.estatus = 'A'
+                AND adminsiaf.tb_alumno_g.cui = ?
+                ORDER BY adminsiaf.tb_asignacion_g.anio DESC
+            ";
+
+            $historial = DB::connection('oracle_back_up')->select($query,[$cui]);
+            if(!$historial){
+                return response('No hay información',422);
+            }
+        
+            return response($historial);
+
+        } catch (\Throwable $th) {
+            return response($th->getMessage());
+        }
+        
+    }
+
 }

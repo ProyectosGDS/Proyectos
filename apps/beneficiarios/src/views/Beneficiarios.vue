@@ -129,6 +129,7 @@
                         <li v-if="auth.checkPermission('cambio estado beneficiario')" @click="store.status(item)" class="text-color-4">Cambiar estado</li>
                         <li v-if="auth.checkPermission('observaciones beneficiario')" @click="bitacora.observacion(item)" class="text-color-4">Observación</li>
                         <li v-if="auth.checkPermission('ver bitacora beneficiario')" @click="bitacora.show(item.id)" class="text-color-4">Historial</li>
+                        <li @click="store.historial(item.cui)" class="text-color-4">Consulta historica</li>
                         <li v-if="auth.checkPermission('eliminar beneficiario')" @click="store.remove(item)" class="text-red-400">Desactivar</li>
                     </ul>
                 </Drop-Down-Button>
@@ -255,6 +256,13 @@
         <template #footer>
             <Button @click="store.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
             <Button @click="store.destroy" text="Sí, Desactivar" icon="fas fa-user-slash" class="btn-danger" :loading="store.loading.destroy" />
+        </template>
+    </Modal>
+
+    <Modal :open="store.modal.historial" title="Consulta historica" icon="fas fa-user-plus">
+        <Data-Table :headers="store.headersHistorial" :data="store.beneficiario" :loading="store.modal.search" />
+        <template #footer>
+            <Button @click="store.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
         </template>
     </Modal>
 </template>

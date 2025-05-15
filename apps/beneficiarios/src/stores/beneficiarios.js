@@ -19,6 +19,17 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         { title : '', key : 'actions', width : '10px', align : 'center' },
     ]
 
+    const headersHistorial = [
+        { title : 'asignación', key: 'asignacion' },
+        { title : 'cui', key: 'cui' },
+        { title : 'beneficiario', key: 'beneficiario' },
+        { title : 'dependencia', key: 'dependencia' },
+        { title : 'curso', key: 'nombre_curso' },
+        { title : 'programa', key: 'programa' },
+        { title : 'año', key: 'anio' },
+        { title : 'estado', key: 'estatus' }
+    ]
+
     const beneficiario = ref({
         sexo : 'M',
         domicilio : {
@@ -52,6 +63,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         edit : false,
         delete : false,
         estado : false,
+        historial : false,
     })
 
     const show = async (id) => {
@@ -151,6 +163,27 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         }
     }
 
+    async function historial (cui) {
+        try {
+            loading.value.search = true
+            const response = await axios.get('beneficiarios/historial',{
+                params : {
+                    cui : cui
+                }
+            })
+            
+            beneficiario.value = response.data
+            modal.value.historial = true
+
+        } catch (error) {
+            if(error.status === 422) {
+                global.setAlert(error.response.data,'danger')
+            }
+        }finally{
+            loading.value.search = false
+        }
+    }
+
     const changeStatus = async () => {
         loading.value.estado = true
         try {
@@ -216,6 +249,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
 
     return {
         headers,
+        headersHistorial,
         beneficiario,
         messageCui,
         cui,
@@ -236,5 +270,6 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         changeStatus,
         remove,
         resetData,
+        historial,
     }
 })
