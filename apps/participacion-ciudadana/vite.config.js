@@ -13,16 +13,6 @@ export default defineConfig({
 	},
 	build: {
 		outDir: 'C:/laragon/www/participacion-ciudadana',
-		minify: 'terser', // Activo por defecto
-		terserOptions: {
-			compress: {
-				drop_console: true, // Elimina console.log
-				drop_debugger: true, // Elimina debugger
-			},
-			format: {
-				comments: false, // Elimina comentarios
-			},
-		},
 	},
 	// base : '/gds/participacion-ciudadana'
 	base: '/participacion-ciudadana'
