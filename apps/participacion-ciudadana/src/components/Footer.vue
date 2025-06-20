@@ -27,3 +27,4 @@ import { ref } from 'vue';
         </div>
     </footer>
 </template>
+ 

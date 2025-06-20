@@ -69,4 +69,8 @@ class detalles_cursos extends Model
         return $this->belongsToMany(requisitos::class,'requisitos_cursos','detalle_curso_id','requisito_id');
     }
 
+    public function control_asistencia() {
+        return $this->belongsToMany(beneficiarios::class,'control_asistencia','curso_modulo_id','beneficiario_id');
+    }
+
 }

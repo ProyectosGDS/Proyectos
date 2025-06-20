@@ -47,4 +47,8 @@ class modulos extends Model
         return $this->belongsTo(programas::class,'programa_id');
     }
 
+    public function control_asistencia() {
+        return $this->belongsToMany(beneficiarios::class,'control_asistencia','curso_modulo_id','beneficiario_id');
+    }
+
 }

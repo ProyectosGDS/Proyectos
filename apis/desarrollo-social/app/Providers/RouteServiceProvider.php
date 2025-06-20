@@ -65,6 +65,10 @@ class RouteServiceProvider extends ServiceProvider
             Route::middleware(['api','jwtAuth'])
                 ->prefix('api')
                 ->group(base_path('routes/actividades.php'));
+
+            Route::middleware(['api','jwtAuth'])
+                ->prefix('api')
+                ->group(base_path('routes/control-asistencia.php'));
         });
     }
 

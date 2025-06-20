@@ -103,7 +103,7 @@ export const useUsuariosStore = defineStore('usuarios', () => {
     const resetPassword = async () => {
         loading.value.destroy = true
         try {
-            const response = await axios.delete('usuarios/reiniciar-password/'+usuario.value.id)
+            const response = await axios.put('usuarios/reiniciar-password/'+usuario.value.id)
             fetch()
             global.setAlert(response.data,'success')
             resetData()

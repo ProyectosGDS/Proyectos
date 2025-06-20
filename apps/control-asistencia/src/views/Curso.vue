@@ -1,0 +1,99 @@
+<script setup>
+    import { computed, onBeforeMount } from 'vue'
+    import { useCatalogosStore } from '@/stores/catalogos'
+    import { useCursoStore } from '@/stores/curso'
+    import Cursos from './Cursos.vue'
+    import Tabla from '@/components/Tabla.vue'
+
+    const catalogos = useCatalogosStore()
+    const store = useCursoStore()
+
+    const currentYear = new Date().getFullYear();
+
+    const years = computed(() => {
+      const yearsList = []
+      for (let i = 0; i <= 3; i++) {
+        yearsList.unshift(currentYear - i)
+      }
+      return yearsList
+    })
+
+    onBeforeMount(() => {
+        catalogos.getProgramas()
+    })
+</script>
+
+<template>
+    <Card class="bg-white p-4 xl:p-8">
+        <div class="grid xl:grid-cols-2 xl:divide-x-2">
+            <div class="grid gap-4 pr-8">
+                <Input v-model="store.year" option="select" title="*Seleccione año">
+                    <option v-for="year in years" :value="year">{{ year }}</option>
+                </Input>
+                <Input @change="store.getBeneficiariosCurso()" option="label" title="*Seleccione fecha de asistencia" type="date" v-model="store.date" />
+                <Input @change="store.resetData()" v-model="catalogos.programa" option="select" title="*Seleccione programa">
+                    <option v-for="programa in catalogos.programas" :key="programa.id" :value="programa.id">
+                        {{ programa.nombre }}
+                    </option>
+                </Input>
+                <div class="flex gap-2 items-center">
+                    <Input @click="store.fetchCursos()" v-model="catalogos.curso.curso" option="label" title="*Seleccione curso" readonly class="cursor-pointer" />
+                    <div class="grid gap-2">
+                        <Icon @click="store.resetData()" icon="fas fa-xmark" class="icon-button btn-danger" title="Limpiar" />
+                        <Icon @click="store.getBeneficiariosCurso()" icon="fas fa-arrows-rotate" title="Recargar" class="icon-button btn-secondary" :class="{'animate-spin' : catalogos.loading.beneficiarios }" />
+                    </div>
+                </div>
+
+            </div>
+            <div class="grid pl-8 h-full overflow-y-auto">
+                <h1 class="text-2xl font-semibold text-color-1">Control de asistencia</h1>
+                <Loading-Bar v-if="catalogos.loading.beneficiarios" class="h-1 bg-color-4"/>
+                <Tabla>
+                    <template #thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>CUI</th>
+                            <th>NOMBRE</th>
+                            <th width="10px" >Asistencia</th>
+                        </tr>
+                    </template>
+                    <template #tbody>
+                        <tr v-for="beneficiario in catalogos.beneficiarios" :key="beneficiario.cui">
+                            <td>{{ beneficiario.beneficiario.id }}</td>
+                            <td>{{ beneficiario.beneficiario.cui }}</td>
+                            <td>{{ beneficiario.beneficiario.nombre_completo }}</td>
+                            <td class="flex justify-center">
+                                <input type="checkbox" v-model="store.asistencia" class="h-8 w-8 cursor-pointer" :value="beneficiario.beneficiario.id" >
+                            </td>
+                        </tr>
+                    </template>
+                </Tabla>
+                <div class="flex items-center justify-center gap-3">
+                    <Button v-if="catalogos.programa != null && catalogos.curso.hasOwnProperty('id') && store.date" @click="store.download" text="Descargar listado" icon="fas fa-download" class="btn-secondary" :loading="store.loading.download" />
+                    <Button @click="store.store" text="Guardar asistencias" icon="fas fa-list-check" class="btn-primary" :loading="store.loading.store" />
+                </div>
+            </div>
+        </div>
+    </Card>
+    <Modal :open="store.modal.cursos" title="Seleccione curso" icon="fas fa-book">
+        <template #close>
+            <Icon @click="store.resetData" icon="fas fa-xmark" class="text-white hover:scale-125 cursor-pointer" />
+        </template>
+        <Cursos />
+        <Validate-Errors :errors="catalogos.errors" v-if="catalogos.errors != 0" />
+        <template #footer>
+            <Button @click="store.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
+            <Button @click="store.selectCurso()" text="Seleccionar" icon="fas fa-check" class="btn-primary" />
+        </template>
+    </Modal>
+</template>
+
+<style scoped>
+    td {
+        @apply py-1 text-gray-800 text-left text-color-4;
+    }
+
+    th {
+        @apply font-semibold uppercase text-left text-color-4;
+    }
+</style>

@@ -27,6 +27,7 @@ Route::get('programas/modulos-cursos',[ProgramasController::class,'get_modulos_c
 Route::get('programas/beneficiarios-modulo-curso',[ProgramasController::class,'get_beneficiarios_modulo_curso']);
 Route::get('programas/get-actividades/{programa_id}/{year}',[ProgramasController::class,'get_actividades']);
 Route::get('programas/get-cursos/{programa_id}',[ProgramasController::class,'get_cursos']);
+Route::get('programas/get-modulos/{programa_id}',[ProgramasController::class,'get_modulos']);
 Route::get('programas/get-beneficiarios/{programa_id}/{year}',[ProgramasController::class,'get_beneficiarios']);
 Route::post('programas/store-cursos',[ProgramasController::class,'store_cursos']);
 Route::post('programas/store-actividades',[ProgramasController::class,'store_actividades']);

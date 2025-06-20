@@ -108,6 +108,31 @@ class ProgramasController extends Controller
         }
     }
 
+    public function get_modulos (int $programa_id) {
+        try {
+
+            $modulos = modulos::with([
+                    'programa',
+                    'cursos.sede',
+                ])
+                ->where('estado','A')
+                ->where('programa_id',$programa_id)
+                ->get();
+
+            $formattedModulos = $modulos->map(function (modulos $modulo) {
+                $modulo->setAttribute('curso', $modulo->cursos->first() ?? []);
+                unset($modulo->cursos); 
+                return $modulo;
+            });
+            
+
+            return response($formattedModulos);
+
+        } catch (\Throwable $th) {
+            return response($th->getMessage());
+        }
+    }
+
     public function get_cursos (int $programa_id) {
         try {
 
