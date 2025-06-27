@@ -11,6 +11,8 @@ class PruebaTokenRenapController extends Controller
 
     public function tokenGenerate() {
         try {
+            //hola
+        
             $token = $this->tokenRenapGenerated();
             return response($token);
         } catch (\Throwable $th) {
