@@ -6,35 +6,42 @@ use App\Models\adm_gds\datos_academicos;
 use App\Models\adm_gds\datos_medicos;
 use App\Models\adm_gds\domicilios;
 use App\Models\adm_gds\beneficiarios;
+use App\Models\adm_gds\renap_consultas;
+use App\Models\adm_gds\renap_historial_consultas;
+use App\Models\adm_gds\renap_tokens;
 use App\Models\adm_gds\responsables;
 use App\Rules\ValidateCui;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
-trait TraitBeneficiarios {
+trait TraitBeneficiarios
+{
 
-     // --------------- CREATE METHODS ---------------
+    // --------------- CREATE METHODS ---------------
 
     public $bagValidations = [];
 
-    public function storeBeneficiario(Request $request) {
+    public function storeBeneficiario(Request $request)
+    {
 
-        $validations = Validator::make($request->all(),[
-            'cui' => ['required','numeric','digits:13',new ValidateCui,'unique:beneficiarios,cui'],
+        $validations = Validator::make($request->all(), [
+            'cui' => ['required', 'numeric', 'digits:13', new ValidateCui, 'unique:beneficiarios,cui'],
             'pasaporte' => 'nullable|string|max:45',
             'primer_nombre' => 'required|string|max:45',
             'segundo_nombre' => 'nullable|string|max:45',
             'primer_apellido' => 'required|string|max:45',
             'segundo_apellido' => 'nullable|string|max:45',
-            'fecha_nacimiento' => 'required|date|date_format:Y-m-d|after:'.(date('Y') - 100).'-12-31|before :'.date('Y-m-d'),
+            'fecha_nacimiento' => 'required|date|date_format:Y-m-d|after:' . (date('Y') - 100) . '-12-31|before :' . date('Y-m-d'),
             'celular' => 'required|numeric|digits:8',
             'sexo' => 'required',
             'interlocutor' => 'nullable|numeric|digits:9',
             'correo' => 'nullable|email'
         ]);
 
-        if($validations->fails()){
+        if ($validations->fails()) {
             $this->bagValidations = array_merge($this->bagValidations, $validations->errors()->toArray());
             return;
         }
@@ -57,17 +64,17 @@ trait TraitBeneficiarios {
         ]);
 
         return $beneficiario;
-
     }
 
-    public function storeDomicilio (Request $request, int $beneficiario_id) {
+    public function storeDomicilio(Request $request, int $beneficiario_id)
+    {
 
-        $validations = Validator::make($request->all(),[
+        $validations = Validator::make($request->all(), [
             'domicilio.direccion' => 'required|max:500',
             'domicilio.municipio_id' => 'required',
         ]);
 
-        if($validations->fails()){
+        if ($validations->fails()) {
             $this->bagValidations = array_merge($this->bagValidations, $validations->errors()->toArray());
             return;
         }
@@ -83,35 +90,36 @@ trait TraitBeneficiarios {
         return $domicilio;
     }
 
-    public function storeDatosMedicos(Request $request, int $beneficiario_id) {
+    public function storeDatosMedicos(Request $request, int $beneficiario_id)
+    {
 
-        $validations = Validator::make($request->all(),[
+        $validations = Validator::make($request->all(), [
             'datos_medicos.enfermedades_alergias' => 'nullable|string|max:500',
             'datos_medicos.medicamentos' => 'nullable|string|max:500',
             'datos_medicos.dosis' => 'nullable|string|max:150',
         ]);
 
-        if($validations->fails()){
+        if ($validations->fails()) {
             $this->bagValidations = array_merge($this->bagValidations, $validations->errors()->toArray());
             return;
         }
 
         $datosMedicos = datos_medicos::create([
             'beneficiario_id' => $beneficiario_id,
-            'enfermedades_alergias' => $request->datos_medicos['enfermedades_alergias'] ?? null ,
-            'medicamentos' => $request->datos_medicos['medicamentos'] ?? null ,
+            'enfermedades_alergias' => $request->datos_medicos['enfermedades_alergias'] ?? null,
+            'medicamentos' => $request->datos_medicos['medicamentos'] ?? null,
             'dosis' => $request->datos_medicos['dosis'] ?? null,
             'tipo_sangre_id' => $request->datos_medicos['tipo_sangre_id'] ?? null,
         ]);
-        
+
         return $datosMedicos;
-        
     }
 
-    public function storeResponsable(Request $request, int $beneficiario_id) {
+    public function storeResponsable(Request $request, int $beneficiario_id)
+    {
 
-        $validations = Validator::make($request->all(),[
-            'responsable.cui' => ['nullable','numeric','digits:13', new ValidateCui],
+        $validations = Validator::make($request->all(), [
+            'responsable.cui' => ['nullable', 'numeric', 'digits:13', new ValidateCui],
             'responsable.nombre' => 'required|string|max:150',
             'responsable.celular' => 'required|numeric|digits:8',
             'responsable.email' => 'nullable|email',
@@ -120,7 +128,7 @@ trait TraitBeneficiarios {
             'responsable.parentesco_id' => 'required',
         ]);
 
-        if($validations->fails()){
+        if ($validations->fails()) {
             $this->bagValidations = array_merge($this->bagValidations, $validations->errors()->toArray());
             return;
         }
@@ -139,13 +147,13 @@ trait TraitBeneficiarios {
         ]);
 
         return $responsable;
-
     }
 
-    public function storeEmergencia(Request $request, int $beneficiario_id) {
+    public function storeEmergencia(Request $request, int $beneficiario_id)
+    {
 
-        $validations = Validator::make($request->all(),[
-            'emergencia.cui' => ['nullable','numeric','digits:13',new ValidateCui],
+        $validations = Validator::make($request->all(), [
+            'emergencia.cui' => ['nullable', 'numeric', 'digits:13', new ValidateCui],
             'emergencia.nombre' => 'required|string|max:150',
             'emergencia.celular' => 'required|numeric|digits:8',
             'emergencia.email' => 'nullable|email',
@@ -154,7 +162,7 @@ trait TraitBeneficiarios {
             'emergencia.parentesco_id' => 'required',
         ]);
 
-        if($validations->fails()){
+        if ($validations->fails()) {
             $this->bagValidations = array_merge($this->bagValidations, $validations->errors()->toArray());
             return;
         }
@@ -173,16 +181,16 @@ trait TraitBeneficiarios {
         ]);
 
         return $emergencia;
-
     }
 
-    public function storeDatosAcademicos(Request $request, int $beneficiario_id) {
-        $validations = Validator($request->all(),[
+    public function storeDatosAcademicos(Request $request, int $beneficiario_id)
+    {
+        $validations = Validator($request->all(), [
             'datos_academicos.escolaridad_id' => 'required',
             'datos_academicos.tipo' => 'required',
         ]);
 
-        if($validations->fails()){
+        if ($validations->fails()) {
             $this->bagValidations = array_merge($this->bagValidations, $validations->errors()->toArray());
             return;
         }
@@ -196,28 +204,28 @@ trait TraitBeneficiarios {
         ]);
 
         return $datosAcademicos;
-    
     }
 
     // --------------- UPDATE METHODS ---------------
 
-    public function updateBeneficiario(Request $request, beneficiarios $beneficiario) {
+    public function updateBeneficiario(Request $request, beneficiarios $beneficiario)
+    {
 
-        $validations = Validator::make($request->all(),[
-            'cui' => ['required','numeric','digits:13',new ValidateCui,Rule::unique('beneficiarios','cui')->ignore($beneficiario->id)],
+        $validations = Validator::make($request->all(), [
+            'cui' => ['required', 'numeric', 'digits:13', new ValidateCui, Rule::unique('beneficiarios', 'cui')->ignore($beneficiario->id)],
             'pasaporte' => 'nullable|string|max:45',
             'primer_nombre' => 'required|string|max:45',
             'segundo_nombre' => 'nullable|string|max:45',
             'primer_apellido' => 'required|string|max:45',
             'segundo_apellido' => 'nullable|string|max:45',
-            'fecha_nacimiento' => 'required|date|date_format:Y-m-d|after:'.(date('Y') - 100).'-12-31',
+            'fecha_nacimiento' => 'required|date|date_format:Y-m-d|after:' . (date('Y') - 100) . '-12-31',
             'celular' => 'required|numeric|digits:8',
             'sexo' => 'required',
             'interlocutor' => 'nullable|numeric|digits:10',
             'correo' => 'nullable|email'
         ]);
 
-        if($validations->fails()){
+        if ($validations->fails()) {
             $this->bagValidations = array_merge($this->bagValidations, $validations->errors()->toArray());
             return;
         }
@@ -240,17 +248,17 @@ trait TraitBeneficiarios {
         ]);
 
         return $beneficiario;
-
     }
 
-    public function updateDomicilio (Request $request, beneficiarios $beneficiario) {
+    public function updateDomicilio(Request $request, beneficiarios $beneficiario)
+    {
 
-        $validations = Validator::make($request->all(),[
+        $validations = Validator::make($request->all(), [
             'domicilio.direccion' => 'required|max:500',
             'domicilio.municipio_id' => 'required',
         ]);
 
-        if($validations->fails()){
+        if ($validations->fails()) {
             $this->bagValidations = array_merge($this->bagValidations, $validations->errors()->toArray());
             return;
         }
@@ -265,34 +273,35 @@ trait TraitBeneficiarios {
         return $domicilios;
     }
 
-    public function updateDatosMedicos(Request $request, beneficiarios $beneficiario) {
+    public function updateDatosMedicos(Request $request, beneficiarios $beneficiario)
+    {
 
-        $validations = Validator::make($request->all(),[
+        $validations = Validator::make($request->all(), [
             'datos_medicos.enfermedades_alergias' => 'nullable|string|max:500',
             'datos_medicos.medicamentos' => 'nullable|string|max:500',
             'datos_medicos.dosis' => 'nullable|string|max:150',
         ]);
 
-        if($validations->fails()){
+        if ($validations->fails()) {
             $this->bagValidations = array_merge($this->bagValidations, $validations->errors()->toArray());
             return;
         }
 
         $datosMedicos = $beneficiario->datos_medicos()->update([
-            'enfermedades_alergias' => $request->datos_medicos['enfermedades_alergias'] ?? null ,
-            'medicamentos' => $request->datos_medicos['medicamentos'] ?? null ,
+            'enfermedades_alergias' => $request->datos_medicos['enfermedades_alergias'] ?? null,
+            'medicamentos' => $request->datos_medicos['medicamentos'] ?? null,
             'dosis' => $request->datos_medicos['dosis'] ?? null,
             'tipo_sangre_id' => $request->datos_medicos['tipo_sangre_id'] ?? null,
         ]);
 
         return $datosMedicos;
-
     }
 
-    public function updateResponsable(Request $request, beneficiarios $beneficiario) {
+    public function updateResponsable(Request $request, beneficiarios $beneficiario)
+    {
 
-        $validations = Validator::make($request->all(),[
-            'responsable.cui' => ['nullable','numeric','digits:13', new ValidateCui],
+        $validations = Validator::make($request->all(), [
+            'responsable.cui' => ['nullable', 'numeric', 'digits:13', new ValidateCui],
             'responsable.nombre' => 'required|string|max:150',
             'responsable.celular' => 'required|numeric|digits:8',
             'responsable.email' => 'nullable|email',
@@ -301,7 +310,7 @@ trait TraitBeneficiarios {
             'responsable.parentesco_id' => 'required',
         ]);
 
-        if($validations->fails()){
+        if ($validations->fails()) {
             $this->bagValidations = array_merge($this->bagValidations, $validations->errors()->toArray());
             return;
         }
@@ -319,13 +328,13 @@ trait TraitBeneficiarios {
         ]);
 
         return $responsable;
-
     }
 
-    public function updateEmergencia(Request $request, beneficiarios $beneficiario) {
+    public function updateEmergencia(Request $request, beneficiarios $beneficiario)
+    {
 
-        $validations = Validator::make($request->all(),[
-            'emergencia.cui' => ['nullable','numeric','digits:13',new ValidateCui],
+        $validations = Validator::make($request->all(), [
+            'emergencia.cui' => ['nullable', 'numeric', 'digits:13', new ValidateCui],
             'emergencia.nombre' => 'required|string|max:150',
             'emergencia.celular' => 'required|numeric|digits:8',
             'emergencia.email' => 'nullable|email',
@@ -334,7 +343,7 @@ trait TraitBeneficiarios {
             'emergencia.parentesco_id' => 'required',
         ]);
 
-        if($validations->fails()){
+        if ($validations->fails()) {
             $this->bagValidations = array_merge($this->bagValidations, $validations->errors()->toArray());
             return;
         }
@@ -352,17 +361,17 @@ trait TraitBeneficiarios {
         ]);
 
         return $emergencia;
-
     }
 
-    public function updateDatosAcademicos(Request $request, beneficiarios $beneficiario) {
+    public function updateDatosAcademicos(Request $request, beneficiarios $beneficiario)
+    {
 
-        $validations = Validator($request->all(),[
+        $validations = Validator($request->all(), [
             'datos_academicos.escolaridad_id' => 'required',
             'datos_academicos.tipo' => 'required',
         ]);
 
-        if($validations->fails()){
+        if ($validations->fails()) {
             $this->bagValidations = array_merge($this->bagValidations, $validations->errors()->toArray());
             return;
         }
@@ -375,6 +384,111 @@ trait TraitBeneficiarios {
         ]);
 
         return $datosAcademicos;
-    
+    }
+
+    public function verifyRenapCui(int|string $cui) {
+
+        $consulta = renap_consultas::where('cui', trim($cui))->first();
+
+        if ($consulta) {
+            return $consulta;
+        }
+
+        $url = env('RENAP_URL_VERIFY_CUI', '');
+
+        $token = $this->tokenRenapGenerated()['token'];
+
+        $response = Http::withToken($token)
+            ->post($url, [
+                'busquedaCui' => [
+                    'cui' => $cui
+                ],
+                'busquedaNombres' => [
+                    'primerNombre' => null,
+                    'segundoNombre' => null,
+                    'primerApellido' => null,
+                    'segundoApellido' => null,
+                    'fechaNacimiento' => null
+                ]
+            ]);
+
+        if ($response->ok()) {
+
+            renap_historial_consultas::create([
+                'cui' => $cui,
+                'usuario_id' => null,
+                'code_status_response' => $response['responseCode'],
+                'message_response' => $response['mensaje'],
+                'fecha_response' => $response['fecha'],
+                'hora_response' => $response['hora'],
+            ]);
+
+            if (count($response['data'])) {
+                renap_consultas::create([
+                    'cui' => $response['data'][0]['CUI'],
+                    'primer_nombre' => $response['data'][0]['PRIMER_NOMBRE'],
+                    'segundo_nombre' => $response['data'][0]['SEGUNDO_NOMBRE'],
+                    'tercer_nombre' => $response['data'][0]['TERCER_NOMBRE'],
+                    'primer_apellido' => $response['data'][0]['PRIMER_APELLIDO'],
+                    'segundo_apellido' => $response['data'][0]['SEGUNDO_APELLIDO'],
+                    'apellido_casada' => $response['data'][0]['APELLIDO_CASADA'],
+                    'fecha_nacimiento' => $response['data'][0]['FECHA_NACIMIENTO'],
+                    'genero' => $response['data'][0]['GENERO'],
+                    'estado_civil' => $response['data'][0]['ESTADO_CIVIL'],
+                    'nacionalidad' => $response['data'][0]['NACIONALIDAD'],
+                    'pais_nacimiento' => $response['data'][0]['PAIS_NACIMIENTO'],
+                    'depto_nacimiento' => $response['data'][0]['DEPTO_NACIMIENTO'],
+                    'muni_nacimiento' => $response['data'][0]['MUNI_NACIMIENTO'],
+                    'vecindad' => $response['data'][0]['VECINDAD'],
+                    'orden_cedula' => $response['data'][0]['ORDEN_CEDULA'],
+                    'registro_cedula' => $response['data'][0]['REGISTRO_CEDULA'],
+                    'fecha_defuncion' => $response['data'][0]['FECHA_DEFUNCION'],
+                    'ocupacion' => $response['data'][0]['OCUPACION'],
+                    'fecha_vencimiento' => $response['data'][0]['FECHA_VENCIMIENTO'],
+                    'correlativo_dpi' => $response['data'][0]['CORRELATIVO_DPI'],
+                ]);
+            }
+        }
+
+        return $response['data'][0];
+    }
+
+    public function tokenRenapGenerated() {
+
+        $user = env('RENAP_USERNAME', '');
+        $pass = env('RENAP_PASSWORD', '');
+        $url = env('RENAP_URL_TOKEN', '');
+
+        $token = $this->hasTokenGeneratedToday();
+
+        if (!$token) {
+
+            $response = Http::withHeaders([
+                'user' => $user,
+                'pass' => $pass
+            ])->post($url);
+
+            if ($response->ok()) {
+                renap_tokens::create([
+                    'token' => $response['data']['token'],
+                    'token_expiry' => Carbon::createFromFormat('d/m/Y H:i:s', $response['data']['expiracion'])->format('Y-m-d H:i:s'),
+                    'status' => 1,
+                ]);
+            }
+
+            $response = $response['data'];
+        } else {
+            $response = $token;
+        }
+
+
+        return $response;
+    }
+
+    public function hasTokenGeneratedToday(): ?renap_token {
+        $token = renap_tokens::whereDate('created_at', now()->toDateString())
+            ->where('status', 1)
+            ->first();
+        return $token;
     }
 }
