@@ -94,19 +94,33 @@
                     <Input v-model="store.curso.fecha_inicial" option="label" title="*inicia" type="date" :error="store.errorsDetails.hasOwnProperty('fecha_inicial')" />
                     <Input v-model="store.curso.fecha_final" option="label" title="*termina" type="date" :error="store.errorsDetails.hasOwnProperty('fecha_final')" />
                 </div>
-                <div class="flex justify-evenly text-color-4">
-                    <label class="flex gap-2 cursor-pointer">
-                        <input type="radio" v-model="store.curso.modalidad" value="PRESENCIAL" name="modalidad">
-                        <span>PRESENCIAL</span>
-                    </label>
-                    <label class="flex gap-2 cursor-pointer">
-                        <input type="radio" v-model="store.curso.modalidad" value="VIRTUAL" name="modalidad">
-                        <span>VIRTUAL</span>
-                    </label>
-                    <label class="flex gap-2 cursor-pointer">
-                        <input type="radio" v-model="store.curso.modalidad" value="HIBRIDA" name="modalidad">
-                        <span>HIBRIDA</span>
-                    </label>
+                <div class="flex justify-around items-center gap-4">
+                    <div class="flex justify-evenly gap-3 text-color-4">
+                        <label class="flex gap-2 cursor-pointer">
+                            <input type="radio" v-model="store.curso.modalidad" value="PRESENCIAL" name="modalidad">
+                            <span>PRESENCIAL</span>
+                        </label>
+                        <label class="flex gap-2 cursor-pointer">
+                            <input type="radio" v-model="store.curso.modalidad" value="VIRTUAL" name="modalidad">
+                            <span>VIRTUAL</span>
+                        </label>
+                        <label class="flex gap-2 cursor-pointer">
+                            <input type="radio" v-model="store.curso.modalidad" value="HIBRIDA" name="modalidad">
+                            <span>HIBRIDA</span>
+                        </label>
+                    </div>
+                    <div>
+                        <h1 class="uppercase text-color-4 text-center">*DE PAGA</h1>
+                        <div class="flex items-center justify-center gap-1">
+                            SÍ
+                            <Switch class="w-auto h-6 bg-gray-400 has-[:checked]:bg-blue-500" :values="['S','N']" v-model="store.curso.paga" :error="store.errors.hasOwnProperty('paga')" />
+                            NO
+                        </div>
+                    </div>
+                </div>
+                <div v-if="store.curso.paga == 'S'" class="flex gap-4">
+                    <Input option="label" title="Tarifa menor" type="number" v-model="store.curso.tarifa_menor" :error="store.errors.hasOwnProperty('tarifa_menor')"  />
+                    <Input option="label" title="Tarifa mayor" type="number" v-model="store.curso.tarifa_mayor" :error="store.errors.hasOwnProperty('tarifa_mayor')"  />
                 </div>
                 <Validate-Errors :errors="store.errorsDetails" v-if="store.errorsDetails != 0" />
                 <div class="flex justify-center gap-4">
@@ -314,19 +328,33 @@
                     <span class="text-sm text-gray-500">PRIVADO</span>
                 </div>
             </div>
-            <div class="flex justify-evenly text-color-4">
-                <label class="flex gap-2 cursor-pointer">
-                    <input type="radio" v-model="asignaciones.curso.modalidad" value="PRESENCIAL" name="modalidad">
-                    <span>PRESENCIAL</span>
-                </label>
-                <label class="flex gap-2 cursor-pointer">
-                    <input type="radio" v-model="asignaciones.curso.modalidad" value="VIRTUAL" name="modalidad">
-                    <span>VIRTUAL</span>
-                </label>
-                <label class="flex gap-2 cursor-pointer">
-                    <input type="radio" v-model="asignaciones.curso.modalidad" value="HIBRIDA" name="modalidad">
-                    <span>HIBRIDA</span>
-                </label>
+            <div class="flex justify-evenly items-center gap-4">
+                <div class="flex justify-evenly gap-3 text-color-4">
+                    <label class="flex gap-2 cursor-pointer">
+                        <input type="radio" v-model="asignaciones.curso.modalidad" value="PRESENCIAL" name="modalidad">
+                        <span>PRESENCIAL</span>
+                    </label>
+                    <label class="flex gap-2 cursor-pointer">
+                        <input type="radio" v-model="asignaciones.curso.modalidad" value="VIRTUAL" name="modalidad">
+                        <span>VIRTUAL</span>
+                    </label>
+                    <label class="flex gap-2 cursor-pointer">
+                        <input type="radio" v-model="asignaciones.curso.modalidad" value="HIBRIDA" name="modalidad">
+                        <span>HIBRIDA</span>
+                    </label>
+                </div>
+                <div>
+                    <h1 class="uppercase text-color-4 text-center">*DE PAGA</h1>
+                    <div class="flex items-center justify-center gap-1">
+                        SÍ
+                        <Switch class="w-auto h-6 bg-gray-400 has-[:checked]:bg-blue-500" :values="['S','N']" v-model="asignaciones.curso.paga" :error="asignaciones.errors.hasOwnProperty('paga')" />
+                        NO
+                    </div>
+                </div>
+            </div>
+            <div v-if="asignaciones.curso.paga == 'S'" class="flex gap-4">
+                <Input option="label" title="Tarifa menor" type="number" v-model="asignaciones.curso.tarifa_menor" :error="asignaciones.errors.hasOwnProperty('tarifa_menor')"  />
+                <Input option="label" title="Tarifa mayor" type="number" v-model="asignaciones.curso.tarifa_mayor" :error="asignaciones.errors.hasOwnProperty('tarifa_mayor')"  />
             </div>
         </div>
         <Validate-Errors :errors="asignaciones.errors" v-if="asignaciones.errors != 0" />

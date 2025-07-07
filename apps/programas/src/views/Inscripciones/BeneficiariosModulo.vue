@@ -139,6 +139,15 @@
         }, object)
     }
 
+    function currency (value) {
+        
+        return new Intl.NumberFormat("es-GT", {
+            'style': "currency",
+            'currency': "GTQ",
+            'minimumFractionDigits': 2,
+        }).format(value)
+    }
+
     onBeforeMount(() => {
         const year = new Date()
         inscripcion.year = year.getFullYear()
@@ -240,6 +249,10 @@
                                         <span>
                                             <span class="font-medium">BENEFICIARIO: </span>
                                             <span>{{ inscripcion.beneficiario.nombre_completo }}</span>
+                                        </span>
+                                        <span>
+                                            <span class="font-medium">TARIFA: </span>
+                                            <span>{{ currency(inscripcion.tarifa) }}</span>
                                         </span>
                                     </div>
                                 </Card>

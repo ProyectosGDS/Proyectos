@@ -65,6 +65,18 @@
             <Input v-model="store.modulo.fecha_inicial" option="label" title="inicia" type="date" :error="store.errors.hasOwnProperty('fecha_inicial')" />
             <Input v-model="store.modulo.fecha_final" option="label" title="termina" type="date" :error="store.errors.hasOwnProperty('fecha_final')" />
             <Input v-model="store.modulo.capacidad" option="label" title="Capacidad" type="number" min="1" :error="store.errors.hasOwnProperty('capacidad')" />
+            <div>
+                <h1 class="uppercase text-color-4 text-center">*DE PAGA</h1>
+                <div class="flex items-center justify-center gap-1">
+                    SÍ
+                    <Switch class="w-auto h-6 bg-gray-400 has-[:checked]:bg-blue-500" :values="['S','N']" v-model="store.modulo.paga" :error="store.errors.hasOwnProperty('paga')" />
+                    NO
+                </div>
+            </div>
+            <div v-if="store.modulo.paga == 'S'" class="flex gap-4">
+                <Input option="label" title="Tarifa menor" type="number" v-model="store.modulo.tarifa_menor" :error="store.errors.hasOwnProperty('tarifa_menor')"  />
+                <Input option="label" title="Tarifa mayor" type="number" v-model="store.modulo.tarifa_mayor" :error="store.errors.hasOwnProperty('tarifa_mayor')"  />
+            </div>
         </div>
         <Validate-Errors :errors="store.errors" v-if="store.errors != 0" />
         <template #footer>
@@ -98,12 +110,26 @@
                 <Input v-model="store.modulo.fecha_final" option="label" title="termina" type="date" :error="store.errors.hasOwnProperty('fecha_final')" />
             </div>
             <Input v-model="store.modulo.capacidad" option="label" title="Capacidad" type="number" min="1" :error="store.errors.hasOwnProperty('capacidad')" />
-            <div class="flex justify-evenly">
-                <div class="flex items-center gap-2">
-                    <span class="text-sm text-gray-500">PÚBLICO</span>
-                    <Switch v-model="store.modulo.publico" class="h-auto w-14 bg-red-400 has-[:checked]:bg-green-500" :values="['S','N']" />
-                    <span class="text-sm text-gray-500">PRIVADO</span>
+            <div class="flex justify-evenly gap-4">
+                <div class="flex justify-evenly">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-500">PÚBLICO</span>
+                        <Switch v-model="store.modulo.publico" class="h-auto w-14 bg-red-400 has-[:checked]:bg-green-500" :values="['S','N']" />
+                        <span class="text-sm text-gray-500">PRIVADO</span>
+                    </div>
                 </div>
+                <div>
+                    <h1 class="uppercase text-color-4 text-center">*DE PAGA</h1>
+                    <div class="flex items-center justify-center gap-1">
+                        SÍ
+                        <Switch class="w-auto h-6 bg-gray-400 has-[:checked]:bg-blue-500" :values="['S','N']" v-model="store.modulo.paga" :error="store.errors.hasOwnProperty('paga')" />
+                        NO
+                    </div>
+                </div>
+            </div>
+            <div v-if="store.modulo.paga == 'S'" class="flex gap-4">
+                <Input option="label" title="Tarifa menor" type="number" v-model="store.modulo.tarifa_menor" :error="store.errors.hasOwnProperty('tarifa_menor')"  />
+                <Input option="label" title="Tarifa mayor" type="number" v-model="store.modulo.tarifa_mayor" :error="store.errors.hasOwnProperty('tarifa_mayor')"  />
             </div>
         </div>
         <Validate-Errors :errors="store.errors" v-if="store.errors != 0" />

@@ -23,7 +23,9 @@ class modulos extends Model
         'fecha_final',
         'publico',
         'capacidad',
-        
+        'paga',
+        'tarifa_menor',
+        'tarifa_mayor',
     ];
 
     // RELACIONES

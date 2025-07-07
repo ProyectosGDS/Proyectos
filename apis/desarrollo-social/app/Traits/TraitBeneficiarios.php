@@ -386,11 +386,11 @@ trait TraitBeneficiarios
         return $datosAcademicos;
     }
 
-    public function verifyRenapCui(int|string $cui) {
+    public function verifyRenapCui($cui) {
 
-        $consulta = renap_consultas::where('cui', trim($cui))->first();
+        $consulta['data'] = renap_consultas::where('cui', trim($cui))->first();
 
-        if ($consulta) {
+        if ($consulta['data']) {
             return $consulta;
         }
 
@@ -418,12 +418,19 @@ trait TraitBeneficiarios
                 'cui' => $cui,
                 'usuario_id' => null,
                 'code_status_response' => $response['responseCode'],
+        
                 'message_response' => $response['mensaje'],
                 'fecha_response' => $response['fecha'],
                 'hora_response' => $response['hora'],
             ]);
 
-            if (count($response['data'])) {
+            if($response['mensaje'] == 'No se encontraron resultados.') {
+                if($response['data'][0]['VALIDACION' === 'NO_HIT']) {
+                    return ['message' => 'Cui no valido'];
+                }
+            }
+
+            if ($response['mensaje'] == 'Se muestran los resultados encontrados.') {
                 renap_consultas::create([
                     'cui' => $response['data'][0]['CUI'],
                     'primer_nombre' => $response['data'][0]['PRIMER_NOMBRE'],
@@ -450,7 +457,7 @@ trait TraitBeneficiarios
             }
         }
 
-        return $response['data'][0];
+        return $response;
     }
 
     public function tokenRenapGenerated() {
@@ -469,6 +476,7 @@ trait TraitBeneficiarios
             ])->post($url);
 
             if ($response->ok()) {
+                
                 renap_tokens::create([
                     'token' => $response['data']['token'],
                     'token_expiry' => Carbon::createFromFormat('d/m/Y H:i:s', $response['data']['expiracion'])->format('Y-m-d H:i:s'),
@@ -485,7 +493,7 @@ trait TraitBeneficiarios
         return $response;
     }
 
-    public function hasTokenGeneratedToday(): ?renap_token {
+    public function hasTokenGeneratedToday(): ?renap_tokens {
         $token = renap_tokens::whereDate('created_at', now()->toDateString())
             ->where('status', 1)
             ->first();

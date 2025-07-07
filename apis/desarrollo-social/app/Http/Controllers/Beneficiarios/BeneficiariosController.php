@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Beneficiarios;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BeneficiarioUnicoResource;
+use App\Http\Resources\RenapConsultaResource;
 use App\Models\adm_gds\beneficiarios;
 use App\Models\adm_gds\bitacora;
 use App\Models\Muni\TbBeneficiarioUnico;
@@ -31,6 +32,7 @@ class BeneficiariosController extends Controller
                         "LOWER(CONCATENARNOMBRES(PRIMER_NOMBRE,SEGUNDO_NOMBRE,PRIMER_APELLIDO,SEGUNDO_APELLIDO)) LIKE ?",
                         ["%" . strtolower($search) . "%"]
                     )
+                    ->orWhere('interlocutor','LIKE','%'. $search .'%')
                     ->orWhere('celular','LIKE','%'. $search .'%')
                     ->orWhere('correo','LIKE','%'. $search .'%');
             })
@@ -231,13 +233,52 @@ class BeneficiariosController extends Controller
         ]);
 
         try {
-            
-            $beneficiarioUnico = TbBeneficiarioUnico::where('cui',$request->cui)->firstOrFail();
-        
-            return response(BeneficiarioUnicoResource::make($beneficiarioUnico));
 
+            $beneficiarioUnico = beneficiarios::where('cui',$request->cui)->first();
+            
+            if(!$beneficiarioUnico) {
+
+                $beneficiarioUnico = TbBeneficiarioUnico::where('cui',$request->cui)->first();
+
+                if($beneficiarioUnico) {
+                    return response([
+                        'message' => 'Se encontro información en la base de datos antigua',
+                        'success' => true,
+                        'data' => BeneficiarioUnicoResource::make($beneficiarioUnico)
+                    ]);
+                }
+
+                $beneficiarioUnico = $this->verifyRenapCui($request->cui);
+
+                if($beneficiarioUnico['data']) {
+                    return response([
+                        'message' => 'Se consulto en renap',
+                        'success' => true,
+                        'data' => RenapConsultaResource::make($beneficiarioUnico['data'])
+                    ]);
+                } else {
+                    return response([
+                        'message' => 'No se encontro información',
+                        'success' => false,
+                        'data' => []
+                    ]);
+                }
+            }
+
+
+            return response([
+                'message' => 'El numero de cui ya existe en la base de datos actual',
+                'success' => false,
+                'data' => []
+            ]);
+        
         } catch (\Throwable $th) {
-            return response($th->getMessage());
+            
+            return response([
+                'message' =>  $th->getMessage(),
+                'success' => false,
+                'data' => []
+            ]);
         }
     }
 
@@ -343,6 +384,12 @@ class BeneficiariosController extends Controller
                 $beneficiarioUnico = TbBeneficiarioUnico::where('cui',$request->cui)->first();
                 if($beneficiarioUnico) {
                     return response(BeneficiarioUnicoResource::make($beneficiarioUnico));
+                }
+
+                $beneficiarioUnico = $this->verifyRenapCui($request->cui);
+
+                if($beneficiarioUnico) {
+                    return response(RenapConsultaResource::make($beneficiarioUnico['data']));
                 }
 
                 return response('No hay información',422);

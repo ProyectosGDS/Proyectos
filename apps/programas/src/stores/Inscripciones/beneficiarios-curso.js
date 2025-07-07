@@ -83,6 +83,7 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
                     detalle_curso_id : curso.value.id,
                     beneficiario_id : beneficiariosStore.beneficiario.id,
                     beneficiario : beneficiariosStore.beneficiario,
+                    tarifa : beneficiariosStore.beneficiario.edad >= 18 ? curso.value.tarifa_mayor : curso.value.tarifa_menor,
                 })
     
                 beneficiariosStore.resetData()
@@ -122,6 +123,7 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
                         detalle_curso_id : curso.value.id,
                         beneficiario_id : beneficiariosStore.beneficiario.id,
                         beneficiario : beneficiariosStore.beneficiario,
+                        tarifa : beneficiariosStore.beneficiario.edad >= 18 ? curso.value.tarifa_mayor : curso.value.tarifa_menor,
                     })
 
                     beneficiariosStore.resetData()

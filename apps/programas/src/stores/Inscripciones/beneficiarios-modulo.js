@@ -71,6 +71,7 @@ export const useBeneficiariosModuloStore = defineStore('beneficiarios-modulo', (
                     modulo_id : modulo.id,
                     beneficiario_id : beneficiariosStore.beneficiario.id,
                     beneficiario : beneficiariosStore.beneficiario,
+                    tarifa : beneficiariosStore.beneficiario.edad >= 18 ? modulo.tarifa_mayor : modulo.tarifa_menor
                 })
     
                 beneficiariosStore.resetData()
@@ -109,6 +110,7 @@ export const useBeneficiariosModuloStore = defineStore('beneficiarios-modulo', (
                         modulo_id : modulo.id,
                         beneficiario_id : beneficiariosStore.beneficiario.id,
                         beneficiario : beneficiariosStore.beneficiario,
+                        tarifa : beneficiariosStore.beneficiario.edad >= 18 ? inscripcion.modulo.tarifa_mayor : inscripcion.modulo.tarifa_menor,
                     })
 
                     beneficiariosStore.resetData()

@@ -205,6 +205,9 @@ class ProgramasController extends Controller
                         'fecha_final' => $curso['fecha_final'],
                         'publico' => 'S',
                         'estado' => 'A',
+                        'paga' => $curso['paga'] ?? 'N',
+                        'tarifa_menor' => $curso['tarifa_menor'] ?? null,
+                        'tarifa_mayor' => $curso['tarifa_mayor'] ?? null,
                     ]);
 
                     $count_cursos ++;

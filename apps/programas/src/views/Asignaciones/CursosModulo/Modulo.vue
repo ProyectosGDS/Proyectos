@@ -32,7 +32,17 @@
         <Input v-model="modulos.modulo.fecha_inicial" option="label" title="inicia" type="date" :error="modulos.errors.hasOwnProperty('fecha_inicial')" />
         <Input v-model="modulos.modulo.fecha_final" option="label" title="termina" type="date" :error="modulos.errors.hasOwnProperty('fecha_final')" />
     </div>
-    <Input v-model="modulos.modulo.capacidad" option="label" title="Capacidad" type="number" min="1" :error="modulos.errors.hasOwnProperty('capacidad')" />
+    <div class="flex gap-4 items-center">
+        <Input v-model="modulos.modulo.capacidad" option="label" title="Capacidad" type="number" min="1" :error="modulos.errors.hasOwnProperty('capacidad')" />
+        <div>
+            <h1 class="uppercase text-color-4 text-center">*DE PAGA</h1>
+            <div class="flex items-center justify-center gap-1">
+                SÍ
+                <Switch class="w-auto h-6 bg-gray-400 has-[:checked]:bg-blue-500" :values="['S','N']" v-model="modulos.modulo.paga" :error="modulos.errors.hasOwnProperty('paga')" />
+                NO
+            </div>
+        </div>
+    </div>
     <Validate-Errors :errors="modulos.errors" v-if="modulos.errors != 0" />
     <div class="flex justify-center">
         <Button @click="modulos.store" text="Crear módulo" icon="fas fa-folder-tree" class="btn-primary" :loading="modulos.loading.store"/>

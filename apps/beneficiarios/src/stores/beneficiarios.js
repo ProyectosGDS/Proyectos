@@ -14,6 +14,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         { title : 'sexo', key : 'sexo', width : '10px', align : 'center' },
         { title : 'fecha nacimiento', key : 'fecha_nacimiento', type : 'date' },
         { title : 'edad', key : 'edad', text : ' años' },
+        { title : 'interlocutor', key : 'interlocutor' },
         { title : 'estado', key : 'estado' },
         { title : 'activo', key : 'deleted_at', width : '10px', align : 'center' },
         { title : '', key : 'actions', width : '10px', align : 'center' },
@@ -146,16 +147,20 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
             loading.value.search = true
             const response = await axios.post('beneficiarios/consulta-back-up',{cui : cui})
             
-            if(response.data.hasOwnProperty('cui')){
-                messageCui.value = 'Se encontro información en sistema antiguo'
-                success.value = true
-                updatePropertyBeneficiario(response.data)
-            }else {
-                messageCui.value = 'No se encontro información en sistema antiguo'
-                success.value = true
-            }
+            // if(response.data.hasOwnProperty('cui')){
+            //     messageCui.value = response.data.message
+            //     success.value = true
+            //     updatePropertyBeneficiario(response.data.data)
+            // }else {
+                //     messageCui.value = 'No se encontro información en sistema antiguo'
+                //     success.value = true
+                // }
+                messageCui.value = response.data.message
+                updatePropertyBeneficiario(response.data.data)
+                success.value = response.data.success
+
         } catch (error) {
-            messageCui.value = 'No se encontro información en sistema antiguo'
+            // messageCui.value = 'No se encontro información en sistema antiguo'
             success.value = true
             console.error(error)
         }finally{

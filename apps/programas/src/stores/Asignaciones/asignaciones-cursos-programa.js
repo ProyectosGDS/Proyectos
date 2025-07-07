@@ -22,6 +22,7 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
         { title : 'termina', key : 'fecha_final', type : 'date' },
         { title : 'impulsatec', key : 'impulsatec', width : '10px', align : 'center' },
         { title : 'público', key : 'publico', width : '10px', align : 'center' },
+        { title : 'paga', key : 'paga', width : '10px', align : 'center' },
         { title : 'estado', key : 'estado', width : '10px', align : 'center' },
         { title : '', key : 'actions', width : '10px', align : 'center' },
     ]

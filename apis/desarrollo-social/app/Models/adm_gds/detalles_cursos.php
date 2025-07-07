@@ -28,6 +28,9 @@ class detalles_cursos extends Model
         'fecha_inicial',
         'fecha_final',
         'publico',
+        'paga',
+        'tarifa_menor',
+        'tarifa_mayor',
     ];
 
     // RELACIONES

@@ -86,7 +86,9 @@ class DetallesCursosController extends Controller
             'programa_id' => 'required',
             'temporalidad_id' => 'required',
             'fecha_inicial' => 'nullable|required_with:fecha_final|date|date_format:Y-m-d',
-            'fecha_final' => 'nullable|required_with:fecha_inicial|date|date_format:Y-m-d|after:fecha_inicial'
+            'fecha_final' => 'nullable|required_with:fecha_inicial|date|date_format:Y-m-d|after:fecha_inicial',
+            'paga' => 'nullable',
+            'tarifa_menor' => 'required_if:paga,S',
         ]);
 
         try {
@@ -104,7 +106,10 @@ class DetallesCursosController extends Controller
                 'fecha_inicial' => $request->fecha_inicial ?? null,
                 'fecha_final' => $request->fecha_final ?? null,
                 'publico' => 'S',
-                'estado' => 'A'
+                'estado' => 'A',
+                'paga' => $request->paga ?? 'N',
+                'tarifa_menor' => $request->tarifa_menor ?? null,
+                'tarifa_mayor' => $request->tarifa_mayor ?? null,
             ]);
 
             return response('curso creado correctamente');
@@ -143,7 +148,9 @@ class DetallesCursosController extends Controller
             'programa_id' => 'required',
             'temporalidad_id' => 'required',
             'fecha_inicial' => 'nullable|required_with:fecha_final|date|date_format:Y-m-d',
-            'fecha_final' => 'nullable|required_with:fecha_inicial|date|date_format:Y-m-d|after:fecha_inicial'
+            'fecha_final' => 'nullable|required_with:fecha_inicial|date|date_format:Y-m-d|after:fecha_inicial',
+            'paga' => 'nullable',
+            'tarifa_menor' => 'required_if:paga,S',
         ]);
 
         try {
@@ -160,6 +167,9 @@ class DetallesCursosController extends Controller
                 $curso->fecha_final = $request->fecha_final ?? null;
                 $curso->publico = $request->publico ?? null;
                 $curso->estado = $request->estado;
+                $curso->paga = $request->paga;
+                $curso->tarifa_menor = $request->tarifa_menor ?? null;
+                $curso->tarifa_mayor = $request->tarifa_mayor ?? null;
                 $curso->save();
 
             return response('curso modificado correctamente');  

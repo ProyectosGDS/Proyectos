@@ -25,6 +25,7 @@ export const useCursosProgramaStore = defineStore('cursos-programa', () => {
         horario: {},
         publico: 'S',
         seccion : null,
+        paga : 'N',
     })
 
     const detalles = ref({
@@ -90,13 +91,17 @@ export const useCursosProgramaStore = defineStore('cursos-programa', () => {
                     fecha_inicial: curso.value.fecha_inicial,
                     fecha_final: curso.value.fecha_final,
                     publico: 'S',
+                    paga : curso.value.paga,
+                    tarifa_menor : curso.value.tarifa_menor,
+                    tarifa_mayor : curso.value.tarifa_mayor,
                 })
                 curso.value = {
                     curso: {},
                     instructor: {},
                     sede: {},
                     horario: {},
-                    publico: 'S'
+                    publico: 'S',
+                    paga : 'N',
                 }
                 errors.value = []
                 return

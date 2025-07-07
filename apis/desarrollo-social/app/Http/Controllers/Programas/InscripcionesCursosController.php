@@ -81,7 +81,8 @@ class InscripcionesCursosController extends Controller
                         'beneficiario_id' => $beneficiario['beneficiario_id'],
                         'detalle_curso_id' => $beneficiario['detalle_curso_id'],
                         'created_at' => now(),
-                        'estado' => 'A'
+                        'estado' => 'A',
+                        'tarifa' => $beneficiario['tarifa']
                     ]);
 
                     bitacora::create([
