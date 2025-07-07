@@ -18,6 +18,8 @@ Las instrucciones que a continuación se presenta se repite para cada proyecto i
 - `admin`
 - `beneficiarios`
 - `programas`
+- `eventos`
+- `control-asistencia`
 
 
 La `plataforma-gds` es un conjunto de proyectos de forma modular que pemirte el crear sub proyectos y que estos funciones como módulos de un solo proyecto principal. Una vez `empaquetados` los proyectos deberan tener la siguiente arquitectura de directorios:
@@ -60,6 +62,14 @@ Esta es la forma en la que los proyectos empaquetados tanto el proyecto principa
             |- index.html
             |- .htaccess (archivo de manejo de rutas internas)
 
+        |- control-asistencia
+            |- assets
+            |- docs
+            |- img
+            |- favicon.ico
+            |- index.html
+            |- .htaccess (archivo de manejo de rutas internas)
+
     |- assets
     |- docs
     |- img
@@ -86,6 +96,7 @@ Los proyectos que conforman la plataforma-gds son:
             |- programas // módulos
             |- beneficiarios // módulos
             |- eventos // módulos
+            |- control-asistencia // módulos
 
     |- participacion-ciudadana //este es otro proyecto base pero no tiene módulos
 
