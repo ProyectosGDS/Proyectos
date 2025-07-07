@@ -416,7 +416,7 @@ trait TraitBeneficiarios
 
             renap_historial_consultas::create([
                 'cui' => $cui,
-                'usuario_id' => null,
+                'usuario_id' => auth()->user()->id,
                 'code_status_response' => $response['responseCode'],
         
                 'message_response' => $response['mensaje'],
