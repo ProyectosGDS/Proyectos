@@ -275,7 +275,7 @@ class BeneficiariosController extends Controller
         } catch (\Throwable $th) {
             
             return response([
-                'message' =>  $th->getMessage(),
+                'message' =>  'Número de cui invalido',
                 'success' => false,
                 'data' => []
             ]);
