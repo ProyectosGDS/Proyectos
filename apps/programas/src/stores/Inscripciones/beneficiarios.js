@@ -141,14 +141,14 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
                cui : cui
             })
 
-            success.value = true
-            const beneficiario = response.data
+            messageCui.value = response.data.message
+            success.value = response.data.success
+            const beneficiario = response.data.data
 
-            if(!beneficiario.id) {
+            if(!beneficiario.id && messageCui.value != "CUI no válido.") {
                 nuevo_registro.value = true
-                messageCui.value = 'Se encontro información en sistema antiguo'
             } else {
-                messageCui.value = 'Se encontro información'
+                nuevo_registro.value = false
             }
 
             beneficiario.domicilio = response.data.domicilio == null ? { departamento_id : 7, grupo_zona : {} } : response.data.domicilio
@@ -156,12 +156,13 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
             beneficiario.datos_academicos = {}
             beneficiario.responsable = {}
             beneficiario.emergencia = {}
+
             updatePropertyBeneficiario(beneficiario)
     
         } catch (error) {
             nuevo_registro.value = true
-            messageCui.value = error.response.data
-            success.value = true
+            messageCui.value = 'Error al realizar la consulta'
+            success.value = false
             console.error(error)
         }finally {
             loading.value.show = false
@@ -175,14 +176,14 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
                cui : cui
             })
             
-            success.value = true
-            const beneficiario = response.data
+            messageCui.value = response.data.message
+            success.value = response.data.success
+            const beneficiario = response.data.data            
 
-            if(!beneficiario.id) {
+            if(!beneficiario.id && messageCui.value != "CUI no válido.") {
                 nuevo_registro.value = true
-                messageCui.value = 'Se encontro información en sistema antiguo'
             } else {
-                messageCui.value = 'Se encontro información'
+                nuevo_registro.value = false
             }
 
             beneficiario.domicilio = response.data.domicilio == null ? { departamento_id : 7, grupo_zona : {} } : response.data.domicilio
@@ -193,9 +194,9 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
             updatePropertyBeneficiario(beneficiario)
     
         } catch (error) {
-            nuevo_registro.value = true
-            messageCui.value = error.response.data
-            success.value = true
+            nuevo_registro.value = false
+            messageCui.value = 'Error en la consulta'
+            success.value = false
             console.error(error)
         }finally {
             loading.value.show = false

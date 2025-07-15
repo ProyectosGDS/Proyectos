@@ -252,7 +252,7 @@ class BeneficiariosController extends Controller
 
                 if($beneficiarioUnico['data']) {
                     return response([
-                        'message' => 'Se consulto en renap',
+                        'message' => 'Se consulto en RENAP',
                         'success' => true,
                         'data' => RenapConsultaResource::make($beneficiarioUnico['data'])
                     ]);
@@ -267,7 +267,7 @@ class BeneficiariosController extends Controller
 
 
             return response([
-                'message' => 'El numero de cui ya existe en la base de datos actual',
+                'message' => 'El cui ya existe en la base de datos actual',
                 'success' => false,
                 'data' => []
             ]);
@@ -275,7 +275,7 @@ class BeneficiariosController extends Controller
         } catch (\Throwable $th) {
             
             return response([
-                'message' =>  'Número de cui invalido',
+                'message' =>  $th->getMessage(),
                 'success' => false,
                 'data' => []
             ]);
@@ -382,23 +382,44 @@ class BeneficiariosController extends Controller
             if(!$beneficiarioUnico){
 
                 $beneficiarioUnico = TbBeneficiarioUnico::where('cui',$request->cui)->first();
+
                 if($beneficiarioUnico) {
-                    return response(BeneficiarioUnicoResource::make($beneficiarioUnico));
+                    return response([
+                        'message' => 'Se encontro información en la base de datos antigua.',
+                        'success' => true,
+                        'data' => BeneficiarioUnicoResource::make($beneficiarioUnico)
+                    ]);
                 }
 
                 $beneficiarioUnico = $this->verifyRenapCui($request->cui);
 
                 if($beneficiarioUnico) {
-                    return response(RenapConsultaResource::make($beneficiarioUnico['data']));
+                    return response([
+                        'message' => 'Se consulto en RENAP.',
+                        'success' => true,
+                        'data' => RenapConsultaResource::make($beneficiarioUnico['data'])
+                    ]);
                 }
 
-                return response('No hay información',422);
+                return response([
+                    'message' => 'No se encontro información del cui.',
+                    'success' => false,
+                    'data' => []
+                ],422);
             }
 
-            return response($beneficiarioUnico);
+            return response([
+                'message' => 'El cui ya existe en la base de datos.',
+                'success' => true,
+                'data' => $beneficiarioUnico
+            ]);
 
         } catch (\Throwable $th) {
-            return response($th->getMessage());
+            return response([
+                'message' => $th->getMessage(),
+                'success' => false,
+                'data' => []
+            ]);
         }
     }
 

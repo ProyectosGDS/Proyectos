@@ -14,6 +14,7 @@ use App\Rules\ValidateCui;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -386,23 +387,28 @@ trait TraitBeneficiarios
         return $datosAcademicos;
     }
 
-    public function verifyRenapCui($cui) {
+    public function verifyRenapCui(string $cui): array {
 
-        $consulta['data'] = renap_consultas::where('cui', trim($cui))->first();
+        try {
 
-        if ($consulta['data']) {
-            return $consulta;
-        }
+            $cui = trim($cui);
 
-        $url = env('RENAP_URL_VERIFY_CUI', '');
+            $consulta = renap_consultas::where('cui', $cui)->first();
+            if ($consulta) {
+                return ['data' => $consulta];
+            }
 
-        $token = $this->tokenRenapGenerated()['token'];
+            $tokenData = $this->tokenRenapGenerated();
+            
+            $token = $tokenData['token'] ?? null;
 
-        $response = Http::withToken($token)
-            ->post($url, [
-                'busquedaCui' => [
-                    'cui' => $cui
-                ],
+            if (!$token) {
+                throw new \Exception("No se pudo obtener token de RENAP.");
+            }
+
+            // Consumir API RENAP
+            $response = Http::withToken($token)->post(env('RENAP_URL_VERIFY_CUI', ''), [
+                'busquedaCui' => ['cui' => $cui],
                 'busquedaNombres' => [
                     'primerNombre' => null,
                     'segundoNombre' => null,
@@ -412,91 +418,117 @@ trait TraitBeneficiarios
                 ]
             ]);
 
-        if ($response->ok()) {
+            if (!$response->ok()) {
+                throw new \Exception("Error al consultar RENAP: " . $response->body());
+            }
 
+            // Registrar historial
             renap_historial_consultas::create([
                 'cui' => $cui,
-                'usuario_id' => auth()->user()->id,
+                'usuario_id' => auth()->id(),
                 'code_status_response' => $response['responseCode'],
-        
                 'message_response' => $response['mensaje'],
-                'fecha_response' => $response['fecha'],
-                'hora_response' => $response['hora'],
+                'fecha_response' => $response['fecha'] ?? null,
+                'hora_response' => $response['hora'] ?? null,
             ]);
 
-            if($response['mensaje'] == 'No se encontraron resultados.') {
-                if($response['data'][0]['VALIDACION' === 'NO_HIT']) {
-                    return ['message' => 'Cui no valido'];
+            // Validaciones del mensaje
+            $mensaje = $response['mensaje'] ?? '';
+            $data = $response['data'][0] ?? null;
+
+            if ($mensaje === 'No se encontraron resultados.') {
+                if ($data && ($data['VALIDACION'] ?? null) === 'NO_HIT') {
+                    throw new \Exception("CUI no válido.");
                 }
             }
 
-            if ($response['mensaje'] == 'Se muestran los resultados encontrados.') {
+            if ($mensaje === 'Se muestran los resultados encontrados.' && $data) {
                 renap_consultas::create([
-                    'cui' => $response['data'][0]['CUI'],
-                    'primer_nombre' => $response['data'][0]['PRIMER_NOMBRE'],
-                    'segundo_nombre' => $response['data'][0]['SEGUNDO_NOMBRE'],
-                    'tercer_nombre' => $response['data'][0]['TERCER_NOMBRE'],
-                    'primer_apellido' => $response['data'][0]['PRIMER_APELLIDO'],
-                    'segundo_apellido' => $response['data'][0]['SEGUNDO_APELLIDO'],
-                    'apellido_casada' => $response['data'][0]['APELLIDO_CASADA'],
-                    'fecha_nacimiento' => $response['data'][0]['FECHA_NACIMIENTO'],
-                    'genero' => $response['data'][0]['GENERO'],
-                    'estado_civil' => $response['data'][0]['ESTADO_CIVIL'],
-                    'nacionalidad' => $response['data'][0]['NACIONALIDAD'],
-                    'pais_nacimiento' => $response['data'][0]['PAIS_NACIMIENTO'],
-                    'depto_nacimiento' => $response['data'][0]['DEPTO_NACIMIENTO'],
-                    'muni_nacimiento' => $response['data'][0]['MUNI_NACIMIENTO'],
-                    'vecindad' => $response['data'][0]['VECINDAD'],
-                    'orden_cedula' => $response['data'][0]['ORDEN_CEDULA'],
-                    'registro_cedula' => $response['data'][0]['REGISTRO_CEDULA'],
-                    'fecha_defuncion' => $response['data'][0]['FECHA_DEFUNCION'],
-                    'ocupacion' => $response['data'][0]['OCUPACION'],
-                    'fecha_vencimiento' => $response['data'][0]['FECHA_VENCIMIENTO'],
-                    'correlativo_dpi' => $response['data'][0]['CORRELATIVO_DPI'],
+                    'cui' => $data['CUI'] ?? null,
+                    'primer_nombre' => $data['PRIMER_NOMBRE'] ?? null,
+                    'segundo_nombre' => $data['SEGUNDO_NOMBRE'] ?? null,
+                    'tercer_nombre' => $data['TERCER_NOMBRE'] ?? null,
+                    'primer_apellido' => $data['PRIMER_APELLIDO'] ?? null,
+                    'segundo_apellido' => $data['SEGUNDO_APELLIDO'] ?? null,
+                    'apellido_casada' => $data['APELLIDO_CASADA'] ?? null,
+                    'fecha_nacimiento' => $data['FECHA_NACIMIENTO'] ?? null,
+                    'genero' => $data['GENERO'] ?? null,
+                    'estado_civil' => $data['ESTADO_CIVIL'] ?? null,
+                    'nacionalidad' => $data['NACIONALIDAD'] ?? null,
+                    'pais_nacimiento' => $data['PAIS_NACIMIENTO'] ?? null,
+                    'depto_nacimiento' => $data['DEPTO_NACIMIENTO'] ?? null,
+                    'muni_nacimiento' => $data['MUNI_NACIMIENTO'] ?? null,
+                    'vecindad' => $data['VECINDAD'] ?? null,
+                    'orden_cedula' => $data['ORDEN_CEDULA'] ?? null,
+                    'registro_cedula' => $data['REGISTRO_CEDULA'] ?? null,
+                    'fecha_defuncion' => $data['FECHA_DEFUNCION'] ?? null,
+                    'ocupacion' => $data['OCUPACION'] ?? null,
+                    'fecha_vencimiento' => $data['FECHA_VENCIMIENTO'] ?? null,
+                    'correlativo_dpi' => $data['CORRELATIVO_DPI'] ?? null,
                 ]);
-            }
-        }
 
-        return $response;
+                return ['data' => $data];
+            }
+
+            throw new \Exception("Respuesta no esperada de RENAP: {$mensaje}");
+        } catch (\Throwable $e) {
+            Log::error("Error al verificar CUI RENAP: " . $e->getMessage());
+            throw $e; // Se vuelve a lanzar para que el controlador lo capture si es necesario
+        }
     }
 
-    public function tokenRenapGenerated() {
+    public function tokenRenapGenerated(): array
+    {
+        try {
+            $token = $this->hasTokenGeneratedToday();
 
-        $user = env('RENAP_USERNAME', '');
-        $pass = env('RENAP_PASSWORD', '');
-        $url = env('RENAP_URL_TOKEN', '');
-
-        $token = $this->hasTokenGeneratedToday();
-
-        if (!$token) {
+            if ($token) {
+                return [
+                    'token' => $token->token,
+                    'token_expiry' => $token->token_expiry,
+                ];
+            }
 
             $response = Http::withHeaders([
-                'user' => $user,
-                'pass' => $pass
-            ])->post($url);
+                'user' => env('RENAP_USERNAME', ''),
+                'pass' => env('RENAP_PASSWORD', ''),
+            ])->post(env('RENAP_URL_TOKEN', ''));
 
-            if ($response->ok()) {
-                
-                renap_tokens::create([
-                    'token' => $response['data']['token'],
-                    'token_expiry' => Carbon::createFromFormat('d/m/Y H:i:s', $response['data']['expiracion'])->format('Y-m-d H:i:s'),
-                    'status' => 1,
-                ]);
+            if (!$response->ok()) {
+                throw new \Exception("Error al obtener token RENAP: " . $response->body());
             }
 
-            $response = $response['data'];
-        } else {
-            $response = $token;
+            $data = $response['data'] ?? null;
+
+            if (!$data || !isset($data['token'], $data['expiracion'])) {
+                throw new \Exception("Datos de token incompletos.");
+            }
+
+            renap_tokens::where('status',1)
+                ->update([
+                    'status' => 0
+                ]);
+
+            $tokenModel = renap_tokens::create([
+                'token' => $data['token'],
+                'token_expiry' => Carbon::createFromFormat('d/m/Y H:i:s', $data['expiracion'])->format('Y-m-d H:i:s'),
+                'status' => 1,
+            ]);
+
+            return [
+                'token' => $tokenModel->token,
+                'token_expiry' => $tokenModel->token_expiry,
+            ];
+        } catch (\Throwable $e) {
+            Log::error("Error al generar token RENAP: " . $e->getMessage());
+            throw $e;
         }
-
-
-        return $response;
     }
 
-    public function hasTokenGeneratedToday(): ?renap_tokens {
-        $token = renap_tokens::whereDate('created_at', now()->toDateString())
+    public function hasTokenGeneratedToday(): ?renap_tokens
+    {
+        return renap_tokens::whereDate('created_at', now()->toDateString())
             ->where('status', 1)
             ->first();
-        return $token;
     }
 }

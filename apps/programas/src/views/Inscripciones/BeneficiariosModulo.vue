@@ -29,12 +29,14 @@
         if(!cui){
             beneficiarios.messageCui = 'Ingrese cui'
             beneficiarios.success = false
+            beneficiarios.nuevo_registro = false
             return false 
         }
 
         if (cui.length !== 13 || !/^[0-9]{4}\s?[0-9]{5}\s?[0-9]{4}$/.test(cui)) {
-            beneficiarios.messageCui = 'Cui invalido'
+            beneficiarios.messageCui = 'CUI no válido.'
             beneficiarios.success = false
+            beneficiarios.nuevo_registro = false
             return false
         }
 
@@ -56,8 +58,9 @@
         ];
 
         if (depto === 0 || muni === 0 || depto > munisPorDepto.length || muni > munisPorDepto[depto - 1].cantidad) {
-            beneficiarios.messageCui = 'Cui invalido'
+            beneficiarios.messageCui = 'CUI no válido.'
             beneficiarios.success = false
+            beneficiarios.nuevo_registro = false
             return false
         }
 
@@ -82,8 +85,9 @@
             return true
         }
 
-        beneficiarios.messageCui = 'Cui invalido'
+        beneficiarios.messageCui = 'CUI no válido.'
         beneficiarios.success = false
+        beneficiarios.nuevo_registro = false
         return false
     }
 
@@ -250,7 +254,7 @@
                                             <span class="font-medium">BENEFICIARIO: </span>
                                             <span>{{ inscripcion.beneficiario.nombre_completo }}</span>
                                         </span>
-                                        <span>
+                                        <span v-if="inscripcion.tarifa">
                                             <span class="font-medium">TARIFA: </span>
                                             <span>{{ currency(inscripcion.tarifa) }}</span>
                                         </span>

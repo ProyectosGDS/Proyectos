@@ -146,22 +146,13 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         try {
             loading.value.search = true
             const response = await axios.post('beneficiarios/consulta-back-up',{cui : cui})
-            
-            // if(response.data.hasOwnProperty('cui')){
-            //     messageCui.value = response.data.message
-            //     success.value = true
-            //     updatePropertyBeneficiario(response.data.data)
-            // }else {
-                //     messageCui.value = 'No se encontro información en sistema antiguo'
-                //     success.value = true
-                // }
                 messageCui.value = response.data.message
                 updatePropertyBeneficiario(response.data.data)
                 success.value = response.data.success
 
         } catch (error) {
-            // messageCui.value = 'No se encontro información en sistema antiguo'
-            success.value = true
+            messageCui.value = 'Error al realizar la consulta'
+            success.value = false
             console.error(error)
         }finally{
             loading.value.search = false
