@@ -1,7 +1,7 @@
 <script setup>
     import { computed, onBeforeMount } from 'vue'
     import { useCatalogosStore } from '@/stores/catalogos'
-    import { useModuloStore } from '@/stores/Modulo'
+    import { useModuloStore } from '@/stores/modulo'
     import Modulos from './Modulos.vue'
     import Tabla from '@/components/Tabla.vue'
 

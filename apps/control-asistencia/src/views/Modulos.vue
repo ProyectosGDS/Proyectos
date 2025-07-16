@@ -1,5 +1,5 @@
 <script setup>
-    import { ref, onBeforeMount } from 'vue'
+    import { onBeforeMount } from 'vue'
     import { useCatalogosStore } from '@/stores/catalogos'
 
     const headers = [
