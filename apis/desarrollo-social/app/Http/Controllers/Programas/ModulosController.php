@@ -41,6 +41,10 @@ class ModulosController extends Controller
             'nombre' => 'required|string|max:80',
             'descripcion' => 'nullable|string|max:255',
             'programa_id' => 'required',
+            'seccion' => 'nullable|string|max:45',
+            'sede_id' => 'required',
+            'modalidad' => 'required|string|max:25',
+            'temporalidad_id' => 'required',
             'capacidad' => 'required',
             'paga' => 'nullable',
             'fecha_inicial' => 'nullable|required_with:fecha_final|date|date_format:Y-m-d',
@@ -54,6 +58,10 @@ class ModulosController extends Controller
                 'nombre' => mb_strtoupper($request->nombre),
                 'descripcion' => $request->descripcion ?? null,
                 'programa_id' => $request->programa_id,
+                'seccion' => $request->seccion ?? null,
+                'sede_id' => $request->sede_id,
+                'modalidad' => $request->modalidad,
+                'temporalidad_id' => $request->temporalidad_id,
                 'estado' => 'A',
                 'fecha_inicial' => $request->fecha_inicial ?? null,
                 'fecha_final' => $request->fecha_final ?? null,
@@ -84,6 +92,10 @@ class ModulosController extends Controller
             'nombre' => 'required|string|max:80',
             'descripcion' => 'nullable|string|max:255',
             'programa_id' => 'required',
+            'seccion' => 'nullable|string|max:45',
+            'sede_id' => 'required',
+            'modalidad' => 'required|string|max:25',
+            'temporalidad_id' => 'required',
             'capacidad' => 'required',
             'fecha_inicial' => 'nullable|required_with:fecha_final|date|date_format:Y-m-d',
             'fecha_final' => 'nullable|required_with:fecha_inicial|date|date_format:Y-m-d|after:fecha_inicial',
@@ -92,10 +104,13 @@ class ModulosController extends Controller
         ]);
 
         try {
-
             $modulo->nombre = mb_strtoupper($request->nombre);
             $modulo->descripcion = $request->descripcion ?? null;
             $modulo->programa_id = $request->programa_id;
+            $modulo->sede_id = $request->sede_id;
+            $modulo->seccion = $request->seccion ?? null;
+            $modulo->temporalidad_id = $request->temporalidad_id;
+            $modulo->modalidad = $request->modalidad;
             $modulo->estado = $request->estado;
             $modulo->fecha_inicial = $request->fecha_inicial ?? null;
             $modulo->fecha_final = $request->fecha_final ?? null;
@@ -166,7 +181,7 @@ class ModulosController extends Controller
                             'instructor_id'     => $curso['curso']['instructor']['id'],
                             'sede_id'           => $curso['curso']['sede']['id'],
                             'horario_id'        => $curso['curso']['horario']['id'],
-                            'temporalidad_id'   => $curso['curso']['temporalidad'],
+                            'temporalidad_id'   => $curso['curso']['temporalidad']['id'],
                             'seccion'           => $curso['curso']['seccion'],
                             'capacidad'         => null,
                             'modalidad'         => $curso['curso']['modalidad'],

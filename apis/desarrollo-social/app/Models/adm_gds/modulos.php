@@ -18,6 +18,10 @@ class modulos extends Model
         'nombre',
         'descripcion',
         'programa_id',
+        'sede_id',
+        'temporalidad_id',
+        'modalidad',
+        'seccion',
         'estado',
         'fecha_inicial',
         'fecha_final',
@@ -52,5 +56,14 @@ class modulos extends Model
     public function control_asistencia() {
         return $this->belongsToMany(beneficiarios::class,'control_asistencia','curso_modulo_id','beneficiario_id');
     }
+
+    public function sede() {
+        return $this->belongsTo(sedes::class);
+    }
+
+    public function temporalidad() {
+        return $this->belongsTo(temporalidades::class);
+    }
+
 
 }

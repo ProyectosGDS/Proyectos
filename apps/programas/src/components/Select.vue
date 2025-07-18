@@ -151,7 +151,7 @@ import { onClickOutside } from '@vueuse/core'
         <div class="flex items-center gap-1">
             <input
                 placeholder="example" :value="props.format ? displayValue : (item ? item[props.fields[1]] : '')" readonly @click="openDropdown" @focus="openDropdown"
-                class="peer m-0 uppercase block bg-white w-full rounded border focus-within:border-color-4 bg-transparent bg-clip-padding px-3 py-3.5 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
+                class="peer m-0 uppercase block bg-white w-full rounded border cursor-pointer focus-within:border-color-4 bg-transparent bg-clip-padding px-3 py-3.5 text-base font-normal leading-tight text-neutral-700 transition duration-200 ease-linear placeholder:text-transparent focus:border-primary focus:pb-[0.625rem] focus:pt-[1.625rem] focus:text-neutral-700 focus:outline-none peer-focus:text-primary [&:not(:placeholder-shown)]:pb-[0.625rem] [&:not(:placeholder-shown)]:pt-[1.625rem]"
                 :class="{'border-red-500' : props.error }"
                 />
             <Icon icon="fas fa-xmark" v-if="item && item[props.fields[0]]" @click="clearSelection" class="text-red-400 cursor-pointer animate-jump" />

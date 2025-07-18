@@ -26,6 +26,7 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
     const label_curso = ref('')
     const programa_id = ref('')
     const modulo = ref({})
+    const nombre_completo = ref('')
     const curso = ref({
         curso: [],
         instructor: {},
@@ -53,11 +54,7 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
     const isFormValid = () => {
         return (
             programa_id.value &&
-            Object.keys(modulo.value).length > 0 &&
-            Object.keys(curso.value.curso).length > 0 &&
-            Object.keys(curso.value.sede).length > 0 &&
-            curso.value.modalidad &&
-            curso.value.temporalidad
+            Object.keys(modulo.value).length > 0
         )
     }
 
@@ -70,10 +67,10 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
             curso.value.curso.forEach(item => {
                 news_course.push({
                     curso : item,
-                    sede : curso.value.sede,
-                    modalidad : curso.value.modalidad,
-                    temporalidad : curso.value.temporalidad,
-                    seccion : curso.value.seccion ?? null,
+                    sede : modulo.value.sede,
+                    modalidad : modulo.value.modalidad,
+                    temporalidad : modulo.value.temporalidad,
+                    seccion : modulo.value.seccion ?? null,
                 })
             })
 
@@ -131,6 +128,7 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
             label_curso.value = ''
         } else if (objeto == 'modulo') {
             modulo.value = {}
+            nombre_completo.value = ''
             asignaciones.cursos = []
         } else {
             curso.value[objeto] = {}
@@ -154,6 +152,7 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
             }
         } else if (objeto == 'modulo') {
             modulo.value = detalles.value[objeto][0]
+            nombre_completo.value = modulo.value?.sede?.nombre + ' - ' + modulo.value.nombre
             asignaciones.fetch(modulo.value.id)
         } else {
             curso.value[objeto] = detalles.value[objeto][0]
@@ -248,6 +247,7 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
         programa_id,
         editDetails,
         modulo,
+        nombre_completo,
         curso,
         detalles,
         errors,

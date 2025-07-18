@@ -3,14 +3,19 @@
     import { useProgramasStore } from '@/stores/Catalogos/programas'
     import { useAuthStore } from '@/stores/auth'
     import { onBeforeMount } from 'vue'
+    import { useCatalogosStore } from '@/stores/Catalogos/catalogos'
+    import Select from '@/components/Select.vue'
 
     const programas = useProgramasStore()
     const store = useModulosStore()
     const auth = useAuthStore()
+    const catalogos = useCatalogosStore()
     
     onBeforeMount(() => {
         programas.fetch()
         store.getRequirements()
+        catalogos.getSedes()
+        catalogos.getTemporalidades()
     })
 
 </script>
@@ -49,30 +54,59 @@
         </Data-Table>
     </Card>
 
-    <Modal :open="store.modal.new" title="Crear módulo" icon="fas fa-folder-tree">
+    <Modal :open="store.modal.new" title="Crear módulo" icon="fas fa-folder-tree" class="w-1/2">
         <template #close>
             <Icon @click="store.resetData" icon="fas fa-xmark" class="cursor-pointer text-white" />
         </template>
         <div class="grid gap-4">
-            <Input v-model="store.modulo.nombre" option="label" title="*Nombre" maxlength="80" :error="store.errors.hasOwnProperty('nombre')" />
             <Input v-model="store.modulo.programa_id" option="select" title="*Seleccione programa" :error="store.errors.hasOwnProperty('programa_id')">
                 <option value=""></option>
                 <template v-for="programa in programas.programas">
                     <option v-if="programa.estado == 'A'" :value="programa.id">{{ programa.nombre }}</option>
                 </template>
             </Input>
+            <Input v-model="store.modulo.nombre" option="label" title="*Nombre módulo" maxlength="80" :error="store.errors.hasOwnProperty('nombre')" />
             <Input v-model="store.modulo.descripcion" option="text-area" title="Descripción" placeholder="Describe el modulo ..." rows="7" maxlength="255" :error="store.errors.hasOwnProperty('descripcion')" />
-            <Input v-model="store.modulo.fecha_inicial" option="label" title="inicia" type="date" :error="store.errors.hasOwnProperty('fecha_inicial')" />
-            <Input v-model="store.modulo.fecha_final" option="label" title="termina" type="date" :error="store.errors.hasOwnProperty('fecha_final')" />
-            <Input v-model="store.modulo.capacidad" option="label" title="Capacidad" type="number" min="1" :error="store.errors.hasOwnProperty('capacidad')" />
-            <div>
-                <h1 class="uppercase text-color-4 text-center">*DE PAGA</h1>
-                <div class="flex items-center justify-center gap-1">
-                    SÍ
-                    <Switch class="w-auto h-6 bg-gray-400 has-[:checked]:bg-blue-500" :values="['S','N']" v-model="store.modulo.paga" :error="store.errors.hasOwnProperty('paga')" />
-                    NO
+            <div class="grid xl:flex gap-4">
+                <Select v-model="store.modulo.sede_id" title="*seleccione sede" :items="catalogos.sedes" :fields="['id','nombre_completo']" :error="store.errors.hasOwnProperty('sede_id')" />
+                <Input v-model="store.modulo.temporalidad_id" option="select" title="*seleccione temporalidad" :error="store.errors.hasOwnProperty('temporalidad_id')">
+                    <option value=""></option>
+                    <option v-for="temporalidad in catalogos.temporalidades" :value="temporalidad.id">{{ temporalidad.nombre }}</option>
+                </Input>
+            </div>
+            <div class="grid xl:flex gap-4">
+                <Input v-model="store.modulo.seccion" option="label" title="sección" maxlength="80" :error="store.errors.hasOwnProperty('seccion')" />
+                <Input v-model="store.modulo.capacidad" option="label" title="*Capacidad" type="number" min="1" :error="store.errors.hasOwnProperty('capacidad')" />
+            </div>
+            <div class="grid xl:flex gap-4">
+                <Input v-model="store.modulo.fecha_inicial" option="label" title="inicia" type="date" :error="store.errors.hasOwnProperty('fecha_inicial')" />
+                <Input v-model="store.modulo.fecha_final" option="label" title="termina" type="date" :error="store.errors.hasOwnProperty('fecha_final')" />
+            </div>
+            <div class="grid xl:flex justify-evenly gap-4 items-center">
+                <div class="flex justify-evenly gap-3 text-color-4">
+                    <label class="flex gap-2 cursor-pointer">
+                        <input type="radio" v-model="store.modulo.modalidad" value="PRESENCIAL" name="modalidad">
+                        <span>PRESENCIAL</span>
+                    </label>
+                    <label class="flex gap-2 cursor-pointer">
+                        <input type="radio" v-model="store.modulo.modalidad" value="VIRTUAL" name="modalidad">
+                        <span>VIRTUAL</span>
+                    </label>
+                    <label class="flex gap-2 cursor-pointer">
+                        <input type="radio" v-model="store.modulo.modalidad" value="HIBRIDA" name="modalidad">
+                        <span>HIBRIDA</span>
+                    </label>
+                </div>
+                <div>
+                    <h1 class="uppercase text-color-4 text-center">*DE PAGA</h1>
+                    <div class="flex items-center justify-center gap-1">
+                        SÍ
+                        <Switch class="w-auto h-6 bg-gray-400 has-[:checked]:bg-blue-500" :values="['S','N']" v-model="store.modulo.paga" :error="store.errors.hasOwnProperty('paga')" />
+                        NO
+                    </div>
                 </div>
             </div>
+            
             <div v-if="store.modulo.paga == 'S'" class="flex gap-4">
                 <Input option="label" title="Tarifa menor" type="number" v-model="store.modulo.tarifa_menor" :error="store.errors.hasOwnProperty('tarifa_menor')"  />
                 <Input option="label" title="Tarifa mayor" type="number" v-model="store.modulo.tarifa_mayor" :error="store.errors.hasOwnProperty('tarifa_mayor')"  />
@@ -97,26 +131,44 @@
                     <span class="text-sm text-gray-500">Inactivo</span>
                 </div>
             </div>
-            <Input v-model="store.modulo.nombre" option="label" title="*Nombre" maxlength="80" :error="store.errors.hasOwnProperty('nombre')" />
             <Input v-model="store.modulo.programa_id" option="select" title="*Seleccione programa" :error="store.errors.hasOwnProperty('programa_id')">
                 <option value=""></option>
                 <template v-for="programa in programas.programas">
                     <option v-if="programa.estado == 'A'" :value="programa.id">{{ programa.nombre }}</option>
                 </template>
             </Input>
+            <Input v-model="store.modulo.nombre" option="label" title="*Nombre módulo" maxlength="80" :error="store.errors.hasOwnProperty('nombre')" />
             <Input v-model="store.modulo.descripcion" option="text-area" title="Descripción" placeholder="Describe el modulo ..." rows="7" maxlength="255" :error="store.errors.hasOwnProperty('descripcion')" />
+            <div class="grid xl:flex gap-4">
+                <Select v-model="store.modulo.sede_id" title="*seleccione sede" :items="catalogos.sedes" :fields="['id','nombre_completo']" :error="store.errors.hasOwnProperty('sede_id')" />
+                <Input v-model="store.modulo.temporalidad_id" option="select" title="*seleccione temporalidad" :error="store.errors.hasOwnProperty('temporalidad_id')">
+                    <option value=""></option>
+                    <option v-for="temporalidad in catalogos.temporalidades" :value="temporalidad.id">{{ temporalidad.nombre }}</option>
+                </Input>
+            </div>
+            <div class="grid xl:flex gap-4">
+                <Input v-model="store.modulo.seccion" option="label" title="sección" maxlength="80" :error="store.errors.hasOwnProperty('seccion')" />
+                <Input v-model="store.modulo.capacidad" option="label" title="*Capacidad" type="number" min="1" :error="store.errors.hasOwnProperty('capacidad')" />
+            </div>
             <div class="grid grid-cols-2 gap-4">
                 <Input v-model="store.modulo.fecha_inicial" option="label" title="inicia" type="date" :error="store.errors.hasOwnProperty('fecha_inicial')" />
                 <Input v-model="store.modulo.fecha_final" option="label" title="termina" type="date" :error="store.errors.hasOwnProperty('fecha_final')" />
             </div>
             <Input v-model="store.modulo.capacidad" option="label" title="Capacidad" type="number" min="1" :error="store.errors.hasOwnProperty('capacidad')" />
-            <div class="flex justify-evenly gap-4">
-                <div class="flex justify-evenly">
-                    <div class="flex items-center gap-2">
-                        <span class="text-sm text-gray-500">PÚBLICO</span>
-                        <Switch v-model="store.modulo.publico" class="h-auto w-14 bg-red-400 has-[:checked]:bg-green-500" :values="['S','N']" />
-                        <span class="text-sm text-gray-500">PRIVADO</span>
-                    </div>
+            <div class="grid xl:flex justify-evenly gap-4 items-center">
+                <div class="flex justify-evenly gap-3 text-color-4">
+                    <label class="flex gap-2 cursor-pointer">
+                        <input type="radio" v-model="store.modulo.modalidad" value="PRESENCIAL" name="modalidad">
+                        <span>PRESENCIAL</span>
+                    </label>
+                    <label class="flex gap-2 cursor-pointer">
+                        <input type="radio" v-model="store.modulo.modalidad" value="VIRTUAL" name="modalidad">
+                        <span>VIRTUAL</span>
+                    </label>
+                    <label class="flex gap-2 cursor-pointer">
+                        <input type="radio" v-model="store.modulo.modalidad" value="HIBRIDA" name="modalidad">
+                        <span>HIBRIDA</span>
+                    </label>
                 </div>
                 <div>
                     <h1 class="uppercase text-color-4 text-center">*DE PAGA</h1>
@@ -124,6 +176,15 @@
                         SÍ
                         <Switch class="w-auto h-6 bg-gray-400 has-[:checked]:bg-blue-500" :values="['S','N']" v-model="store.modulo.paga" :error="store.errors.hasOwnProperty('paga')" />
                         NO
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-evenly gap-4">
+                <div class="flex justify-evenly">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-500">PÚBLICO</span>
+                        <Switch v-model="store.modulo.publico" class="h-auto w-14 bg-red-400 has-[:checked]:bg-green-500" :values="['S','N']" />
+                        <span class="text-sm text-gray-500">PRIVADO</span>
                     </div>
                 </div>
             </div>

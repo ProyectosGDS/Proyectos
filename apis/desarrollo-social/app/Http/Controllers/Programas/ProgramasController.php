@@ -70,7 +70,15 @@ class ProgramasController extends Controller
 
     public function show (programas $programa) {
         try {
-            return response($programa->load(['dependencia','modulos.programa','modulos.requisitos']));  
+            return response($programa->load([
+                    'dependencia',
+                    'modulos.programa',
+                    'modulos.sede',
+                    'modulos.temporalidad',
+                    'modulos.requisitos',
+                    'modulos.cursos'
+                ])
+            );  
         } catch (\Throwable $th) {
             return response($th->getMessage());
         }
@@ -375,10 +383,10 @@ class ProgramasController extends Controller
                 })
                 ->union($count_beneficiarios_cursos)
                 ->union($count_beneficiarios_actividades)
-                ->count();
+                ->get();
 
             return response([
-                'total_beneficiario_unico' => $total_beneficiario_unico,
+                'total_beneficiario_unico' => $total_beneficiario_unico->count(),
                 'beneficiarios_inscritos' => $beneficiarios_inscritos
             ]);
 

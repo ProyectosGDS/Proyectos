@@ -2,13 +2,16 @@ import { defineStore } from 'pinia'
 import { useGlobalStore } from '@/stores/global'
 import { ref } from 'vue'
 import axios from 'axios'
+import { useCursosModuloStore } from '../Asignaciones/cursos-modulo'
 
 export const useModulosStore = defineStore('modulos', () => {
     
     const global = useGlobalStore()
+    const asignaciones = useCursosModuloStore()
     
     const headers = [
         { title : 'id', key : 'id', type : 'numeric' },
+        { title : 'sede', key : 'sede.nombre', class: 'uppercase text-xs' },
         { title : 'nombre', key : 'nombre', class: 'uppercase text-xs' },
         { title : 'descripcion', key : 'descripcion', class: 'uppercase text-xs' },
         { title : 'programa', key : 'programa.nombre' },
@@ -81,6 +84,7 @@ export const useModulosStore = defineStore('modulos', () => {
             fetch(programa_id.value)
             global.setAlert(response.data,'success')
             resetData()
+            modulo.value.programa_id = asignaciones.programa_id
         } catch (error) {
             global.manejarError(error)
             if(error.status === 422) {

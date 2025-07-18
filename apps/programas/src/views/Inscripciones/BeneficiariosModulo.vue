@@ -175,10 +175,10 @@
                     </template>
                 </Input>
                 <div class="flex gap-2 items-center">
-                    <Input @change="store.selectedModulo()" v-model="inscripcion.modulo" option="select" title="*seleccione modulo" :error="store.errors.hasOwnProperty('modulo_id')">
+                    <Input @change="store.selectedModulo()" v-model="inscripcion.modulo" option="select" title="*seleccione módulo con cursos" :error="store.errors.hasOwnProperty('modulo_id')">
                         <option value=""></option>
                         <template v-for="modulo in modulos.modulos">
-                            <option v-if="modulo.estado == 'A'" :value="JSON.stringify(modulo)">{{ modulo.nombre }}</option>
+                            <option v-if="modulo.estado == 'A' && modulo.cursos.length > 0" :value="JSON.stringify(modulo)">{{ modulo.sede?.nombre+' - '+modulo.nombre }}</option>
                         </template>
                     </Input>
                     <Icon v-if="typeof(inscripcion.modulo) === 'string'" @click="inscripcion.fetch()" icon="fas fa-arrows-rotate" class="icon-button btn-secondary" title="Actualizar consulta" :class="{'animate-spin' : inscripcion.loading.fetch }"  />

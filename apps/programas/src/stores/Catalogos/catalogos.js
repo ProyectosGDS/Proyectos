@@ -20,6 +20,7 @@ export const useCatalogosStore = defineStore('catalogos', () => {
     const distritos = ref([])
     const temporalidades = ref([])
     const tipos_actividades = ref([])
+    const sedes = ref([])
 
     const loading = ref({
         dependencia : false,
@@ -30,6 +31,7 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         departamentos : false,
         grupos_zonas : false,
         tipos_actividades : false,
+        sedes : false,
     })
     const errors = ref([])
 
@@ -105,6 +107,21 @@ export const useCatalogosStore = defineStore('catalogos', () => {
             }
         } finally {
             loading.value.dependencia = false
+        }
+    }
+
+    const getSedes = async () => {
+        loading.value.sedes = true
+        try {
+            const response = await axios.get('sedes')
+            sedes.value = response.data
+        } catch (error) {
+            global.manejarError(error)
+            if(error.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.sedes = false
         }
     }
 
@@ -207,6 +224,7 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         distritos,
         grupos_zonas,
         temporalidades,
+        sedes,
         errors,
         loading,
 
@@ -220,5 +238,6 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         getMunicipiosDepartamento,
         getGruposZonas,
         getTiposActividades,
+        getSedes,
     }
 })

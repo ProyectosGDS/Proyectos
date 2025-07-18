@@ -8,7 +8,6 @@
     import { useAsignacionesCursosModuloStore } from '@/stores/Asignaciones/asignaciones-cursos-modulo'
 
     import Curso from './CursosModulo/Curso.vue'
-    import Sede from './CursosModulo/Sede.vue'
     import Modulo from './CursosModulo/Modulo.vue'
     import Instructor from './CursosModulo/Instructor.vue'
     import Horario from './CursosModulo/Horario.vue'
@@ -62,7 +61,7 @@
                     </template>
                 </Input>
                 <div class="flex items-center gap-2">
-                    <Input @click="store.openModal('modulo')" v-model="store.modulo.nombre" option="label" title="*seleccione módulo" class="cursor-pointer" :error="store.errorsDetails.hasOwnProperty('modulo_id')" readonly />
+                    <Input @click="store.openModal('modulo')" v-model="store.nombre_completo" option="label" title="*seleccione módulo" class="cursor-pointer" :error="store.errorsDetails.hasOwnProperty('modulo_id')" readonly />
                     <div class="grid gap-2">
                         <Icon @click="store.removeItem('modulo')" v-if="store.modulo.nombre" icon="fas fa-xmark" class="icon-button btn-danger" />
                         <Icon @click="asignaciones.fetch(store.modulo.id)" v-if="store.modulo.nombre" icon="fas fa-arrows-rotate" class="icon-button btn-secondary" :class="{'animate-spin': asignaciones.loading.fetch}" />
@@ -71,29 +70,6 @@
                 <div class="flex items-center gap-2">
                     <Input @click="store.openModal('curso')" v-model="store.label_curso" option="label" title="*seleccione cursos" class="cursor-pointer" :error="store.errorsDetails.hasOwnProperty('curso_id')" readonly />
                     <Icon @click="store.removeItem('curso')" v-if="store.curso.curso.length" icon="fas fa-xmark" class="icon-button btn-danger" />
-                </div>
-                <div class="flex items-center gap-2">
-                    <Input @click="store.openModal('sede')" v-model="store.curso.sede.nombre_completo" option="label" title="*seleccione sede" class="cursor-pointer" :error="store.errorsDetails.hasOwnProperty('sede_id')" readonly />
-                    <Icon @click="store.removeItem('sede')" v-if="store.curso.sede.nombre_completo" icon="fas fa-xmark" class="icon-button btn-danger" />
-                </div>
-                <Input v-model="store.curso.temporalidad" option="select" title="*seleccione temporalidad" :error="store.errorsDetails.hasOwnProperty('temporalidad_id')">
-                    <option value=""></option>
-                    <option v-for="temporalidad in catalogos.temporalidades" :value="temporalidad.id">{{ temporalidad.nombre }}</option>
-                </Input>
-                <Input v-model="store.curso.seccion" option="label" title="sección" maxlength="45" :error="store.errorsDetails.hasOwnProperty('seccion')" />
-                <div class="flex justify-evenly text-color-4">
-                    <label class="flex gap-2 cursor-pointer">
-                        <input type="radio" v-model="store.curso.modalidad" value="PRESENCIAL" name="modalidad">
-                        <span>PRESENCIAL</span>
-                    </label>
-                    <label class="flex gap-2 cursor-pointer">
-                        <input type="radio" v-model="store.curso.modalidad" value="VIRTUAL" name="modalidad">
-                        <span>VIRTUAL</span>
-                    </label>
-                    <label class="flex gap-2 cursor-pointer">
-                        <input type="radio" v-model="store.curso.modalidad" value="HIBRIDA" name="modalidad">
-                        <span>HIBRIDA</span>
-                    </label>
                 </div>
                 <Validate-Errors :errors="store.errorsDetails" v-if="store.errorsDetails != 0" />
                 <div class="flex justify-center gap-4">
@@ -186,9 +162,7 @@
         <template #close>
             <Icon @click="store.resetData" icon="fas fa-xmark" class="cursor-pointer text-white" />
         </template>
-        <div class="grid gap-4">
-            <Modulo />
-        </div>
+        <Modulo />
         <Validate-Errors :errors="store.errors" v-if="store.errors != 0" />
         <template #footer>
             <Button @click="store.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
@@ -208,20 +182,6 @@
         <template #footer>
             <Button @click="store.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
             <Button @click="store.selectedItem('curso')" text="Seleccionar" icon="fas fa-check" class="btn-primary"/>
-        </template>
-    </Modal>
-
-    <Modal :open="store.modal.sede" title="Sedes" icon="fas fa-school">
-        <template #close>
-            <Icon @click="store.resetData" icon="fas fa-xmark" class="cursor-pointer text-white" />
-        </template>
-        <div class="grid gap-4">
-            <Sede />
-        </div>
-        <Validate-Errors :errors="store.errors" v-if="store.errors != 0" />
-        <template #footer>
-            <Button @click="store.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
-            <Button @click="store.selectedItem('sede')" text="Seleccionar" icon="fas fa-check" class="btn-primary"/>
         </template>
     </Modal>
 
@@ -268,7 +228,7 @@
             </div>
             <Select v-model="asignaciones.curso.curso_id" title="*seleccione curso" :items="catalogos.catalogos_curso.cursos" :fields="['id','nombre']" :error="asignaciones.errors.hasOwnProperty('curso_id')" />
             <Select v-model="asignaciones.curso.instructor_id" title="*seleccione instructor" :items="catalogos.catalogos_curso.instructores" :fields="['id','nombre']" :error="asignaciones.errors.hasOwnProperty('instructor_id')" />
-            <Select v-model="asignaciones.curso.sede_id" title="*seleccione sede" :items="catalogos.catalogos_curso.sedes" :fields="['id','nombre_completo']" :error="asignaciones.errors.hasOwnProperty('sede_id')" />
+            <!-- <Select v-model="asignaciones.curso.sede_id" title="*seleccione sede" :items="catalogos.catalogos_curso.sedes" :fields="['id','nombre_completo']" :error="asignaciones.errors.hasOwnProperty('sede_id')" /> -->
             <Select v-model="asignaciones.curso.horario_id" title="*seleccione horario" :items="catalogos.catalogos_curso.horarios" :fields="['id','nombre_completo']" :error="asignaciones.errors.hasOwnProperty('horario_id')" />
         </div>
         <Validate-Errors :errors="asignaciones.errors" v-if="asignaciones.errors != 0" />
