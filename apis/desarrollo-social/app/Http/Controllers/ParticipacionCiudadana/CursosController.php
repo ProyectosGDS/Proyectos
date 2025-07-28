@@ -12,56 +12,47 @@ class CursosController extends Controller
 {
     public function index() {
         try {
-            
-            $query = "
-                SELECT
-                    DC.ID,
-                    C.NOMBRE MODULO_CURSO,
-                    S.NOMBRE SEDE,
-                    T.NOMBRE TEMPORALIDAD,
-                    DC.MODALIDAD,
-                    DC.ESTADO,
-                    DC.PUBLICO,
-                    'CURSO' TIPO
-                FROM DETALLES_CURSOS DC
-                    INNER JOIN TEMPORALIDADES T
-                        ON T.ID = DC.TEMPORALIDAD_ID
-                    INNER JOIN SEDES S
-                        ON S.ID = DC.SEDE_ID
-                    INNER JOIN CURSOS C
-                        ON C.ID = DC.CURSO_ID
-                WHERE DC.ESTADO = 'A'
-                AND DC.PUBLICO = 'S'
-                AND EXTRACT(YEAR FROM DC.FECHA_INICIAL) = ?
 
-                UNION ALL
+            $detalles_cursos = DB::connection('gds')->table('DETALLES_CURSOS DC')
+                ->join('TEMPORALIDADES T','T.ID','=','DC.TEMPORALIDAD_ID')
+                ->join('SEDES S','S.ID','=','DC.SEDE_ID')
+                ->join('CURSOS C','C.ID','=','DC.CURSO_ID')
+                ->select(
+                    "DC.ID",
+                    "C.NOMBRE AS MODULO_CURSO",
+                    "S.NOMBRE AS SEDE",
+                    "T.NOMBRE AS TEMPORALIDAD",
+                    "DC.MODALIDAD",
+                    "DC.ESTADO",
+                    "DC.PUBLICO",
+                    DB::raw("CAST('CURSO' AS VARCHAR2(50)) AS TIPO")
+                    
+                )
+                ->where('DC.ESTADO','A')
+                ->where('DC.PUBLICO','S')
+                ->whereYear('DC.FECHA_INICIAL',date('Y'));
 
-                SELECT DISTINCT
-                    M.ID,
-                    M.NOMBRE MODULO_CURSO,
-                    S.NOMBRE SEDE,
-                    T.NOMBRE TEMPORALIDAD,
-                    DC.MODALIDAD,
-                    M.ESTADO,
-                    M.PUBLICO,
-                    'MODULO' TIPO
-                FROM MODULOS M
-                    INNER JOIN CURSOS_MODULOS CM
-                        ON CM.MODULO_ID = M.ID
-                    INNER JOIN DETALLES_CURSOS DC
-                        ON CM.DETALLE_CURSO_ID = DC.ID
-                    INNER JOIN SEDES S
-                        ON DC.SEDE_ID = S.ID
-                    INNER JOIN TEMPORALIDADES T
-                        ON DC.TEMPORALIDAD_ID = T.ID
-                WHERE M.ESTADO = 'A'
-                AND M.PUBLICO = 'S'
-                AND EXTRACT(YEAR FROM M.FECHA_INICIAL) = ?
-            ";
+            $modulos = DB::connection('gds')->table('MODULOS M')
+                ->join('TEMPORALIDADES T','T.ID','=','M.TEMPORALIDAD_ID')
+                ->join('SEDES S','S.ID','=','M.SEDE_ID')
+                ->select(
+                    "M.ID",
+                    "M.NOMBRE AS MODULO_CURSO",
+                    "S.NOMBRE AS SEDE",
+                    "T.NOMBRE AS TEMPORALIDAD",
+                    "M.MODALIDAD",
+                    "M.ESTADO",
+                    "M.PUBLICO",
+                    DB::raw("CAST('MODULO' AS VARCHAR2(50)) AS TIPO")
+                    
+                )
+                ->where('M.ESTADO','A')
+                ->where('M.PUBLICO','S')
+                ->whereYear('M.FECHA_INICIAL',date('Y'))
+                ->unionAll($detalles_cursos)
+                ->get();
 
-            $cursos = DB::connection('gds')->select($query,[date('Y'),date('Y')]);
-
-            return response($cursos);
+            return response($modulos);
 
         } catch (\Throwable $th) {
             return response($th->getMessage(),422);

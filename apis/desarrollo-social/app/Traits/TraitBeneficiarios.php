@@ -25,8 +25,7 @@ trait TraitBeneficiarios
 
     public $bagValidations = [];
 
-    public function storeBeneficiario(Request $request)
-    {
+    public function storeBeneficiario(Request $request) {
 
         $validations = Validator::make($request->all(), [
             'cui' => ['required', 'numeric', 'digits:13', new ValidateCui, 'unique:beneficiarios,cui'],
@@ -477,8 +476,7 @@ trait TraitBeneficiarios
         }
     }
 
-    public function tokenRenapGenerated(): array
-    {
+    public function tokenRenapGenerated(): array {
         try {
             $token = $this->hasTokenGeneratedToday();
 
@@ -525,8 +523,7 @@ trait TraitBeneficiarios
         }
     }
 
-    public function hasTokenGeneratedToday(): ?renap_tokens
-    {
+    public function hasTokenGeneratedToday(): ?renap_tokens {
         return renap_tokens::whereDate('created_at', now()->toDateString())
             ->where('status', 1)
             ->first();

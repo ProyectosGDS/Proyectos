@@ -72,6 +72,9 @@ class ProgramasController extends Controller
         try {
             return response($programa->load([
                     'dependencia',
+                    'modulos' => function($query) {
+                        $query->where('estado','A');
+                    },
                     'modulos.programa',
                     'modulos.sede',
                     'modulos.temporalidad',
@@ -145,37 +148,37 @@ class ProgramasController extends Controller
         try {
 
             $query = "
-                SELECT
-                    DC.*,
-                    P.NOMBRE PROGRAMA,
-                    C.NOMBRE CURSO,
-                    I.NOMBRE INSTRUCTOR,
-                    UPPER(S.NOMBRE||' '||Z.DESCRIPCION||' '||D.NOMBRE||' '||S.DIRECCION) SEDE,
-                    UPPER(H.HORA_INICIAL||' A '||H.HORA_FINAL||' - '||CONCATENARDIAS(H.LUN,H.MAR,H.MIE,H.JUE,H.VIE,H.SAB,H.DOM)) HORARIO,
-                    T.NOMBRE TEMPORALIDAD,
-                    P.DEPENDENCIA_ID,
-                    C.IMPULSATEC
-                FROM DETALLES_CURSOS DC
-                LEFT JOIN CURSOS_MODULOS CM
-                    ON DC.ID = CM.DETALLE_CURSO_ID
-                    INNER JOIN PROGRAMAS P
-                        ON DC.PROGRAMA_ID = P.ID
-                    INNER JOIN CURSOS C
-                        ON DC.CURSO_ID = C.ID
-                    INNER JOIN INSTRUCTORES I
-                        ON DC.INSTRUCTOR_ID = I.ID
-                    INNER JOIN SEDES S
-                        ON DC.SEDE_ID = S.ID
-                            INNER JOIN ZONAS Z
-                                ON S.ZONA_ID = Z.ID
-                            LEFT JOIN DISTRITOS D
-                                ON S.DISTRITO_ID = D.ID
-                    INNER JOIN HORARIOS H
+                SELECT 
+                    DC.*, 
+                    P.NOMBRE PROGRAMA, 
+                    C.NOMBRE CURSO, 
+                    I.NOMBRE INSTRUCTOR, 
+                    UPPER(S.NOMBRE||' '||Z.DESCRIPCION||' '||D.NOMBRE||' '||S.DIRECCION) SEDE, 
+                    UPPER(H.HORA_INICIAL||' A '||H.HORA_FINAL||' - '||ADM_GDS.CONCATENARDIAS(H.LUN,H.MAR,H.MIE,H.JUE,H.VIE,H.SAB,H.DOM)) HORARIO, 
+                    T.NOMBRE TEMPORALIDAD, 
+                    P.DEPENDENCIA_ID, 
+                    C.IMPULSATEC 
+                FROM ADM_GDS.DETALLES_CURSOS DC 
+                    LEFT JOIN ADM_GDS.CURSOS_MODULOS CM 
+                        ON DC.ID = CM.DETALLE_CURSO_ID 
+                    INNER JOIN ADM_GDS.PROGRAMAS P 
+                        ON DC.PROGRAMA_ID = P.ID 
+                    INNER JOIN ADM_GDS.CURSOS C 
+                        ON DC.CURSO_ID = C.ID 
+                    INNER JOIN ADM_GDS.INSTRUCTORES I 
+                        ON DC.INSTRUCTOR_ID = I.ID 
+                    INNER JOIN ADM_GDS.SEDES S 
+                        ON DC.SEDE_ID = S.ID 
+                    INNER JOIN ADM_GDS.ZONAS Z 
+                        ON S.ZONA_ID = Z.ID 
+                    LEFT JOIN ADM_GDS.DISTRITOS D 
+                        ON S.DISTRITO_ID = D.ID 
+                    INNER JOIN ADM_GDS.HORARIOS H 
                         ON DC.HORARIO_ID = H.ID 
-                    INNER JOIN TEMPORALIDADES T
-                        ON DC.TEMPORALIDAD_ID = T.ID
-                WHERE CM.MODULO_ID IS NULL
-                AND DC.PROGRAMA_ID = ?
+                    INNER JOIN ADM_GDS.TEMPORALIDADES T 
+                        ON DC.TEMPORALIDAD_ID = T.ID 
+                WHERE CM.MODULO_ID IS NULL 
+                AND DC.PROGRAMA_ID = ? 
                 ORDER BY DC.ID DESC
             ";
 
