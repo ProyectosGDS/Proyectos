@@ -178,6 +178,7 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
         } else {
             detalles.value[objeto] = Object.keys(curso.value[objeto]).length ? [curso.value[objeto]] : []
         }
+        
         modal.value[objeto] = true
     }
 

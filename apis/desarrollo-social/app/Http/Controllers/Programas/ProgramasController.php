@@ -402,7 +402,7 @@ class ProgramasController extends Controller
         try {
 
             $query = "
-                SELECT
+                 SELECT
                     DA.*,
                     P.NOMBRE PROGRAMA,
                     A.NOMBRE ACTIVIDAD,
@@ -412,22 +412,22 @@ class ProgramasController extends Controller
                     TO_CHAR(DA.FECHA_INICIAL,'YYYY-MM-DD') ||' - '|| TO_CHAR(DA.FECHA_FINAL,'YYYY-MM-DD') FECHAS,
                     TA.NOMBRE TIPO,
                     EA.NOMBRE ESTADO
-                FROM DETALLES_ACTIVIDADES DA
-                    INNER JOIN PROGRAMAS P
+                FROM ADM_GDS.DETALLES_ACTIVIDADES DA
+                    INNER JOIN ADM_GDS.PROGRAMAS P
                             ON DA.PROGRAMA_ID = P.ID
-                    LEFT JOIN ZONAS Z
+                    LEFT JOIN ADM_GDS.ZONAS Z
                             ON DA.ZONA_ID = Z.ID
-                    LEFT JOIN DISTRITOS D
+                    LEFT JOIN ADM_GDS.DISTRITOS D
                             ON DA.DISTRITO_ID = D.ID
-                    INNER JOIN ACTIVIDADES A
+                    INNER JOIN ADM_GDS.ACTIVIDADES A
                             ON DA.ACTIVIDAD_ID = A.ID
-                    LEFT JOIN TIPOS_ACTIVIDADES TA
+                    LEFT JOIN ADM_GDS.TIPOS_ACTIVIDADES TA
                             ON DA.TIPO_ACTIVIDAD_ID = TA.ID
-                    LEFT JOIN ESTADOS_ACTIVIDADES EA
+                    LEFT JOIN ADM_GDS.ESTADOS_ACTIVIDADES EA
                             ON DA.ESTADO_ACTIVIDAD_ID = EA.ID
                 WHERE EXTRACT(YEAR FROM DA.FECHA_INICIAL) = ?
                 AND DA.PROGRAMA_ID = ?
-                ORDER BY DA.ID DESC         
+                ORDER BY DA.ID DESC        
             ";
 
             $actividades_programa = DB::connection('gds')->select($query,[$year,$programa_id]);
