@@ -251,7 +251,7 @@ class ProgramasController extends Controller
                 ->select(
                     'BC.ID AS INSCRIPCION_ID',
                     'B.CUI',
-                    DB::raw("CONCATENARNOMBRES(B.PRIMER_NOMBRE,B.SEGUNDO_NOMBRE,B.PRIMER_APELLIDO,B.SEGUNDO_APELLIDO) AS BENEFICIARIO"),
+                    DB::raw("ADM_GDS.CONCATENARNOMBRES(B.PRIMER_NOMBRE,B.SEGUNDO_NOMBRE,B.PRIMER_APELLIDO,B.SEGUNDO_APELLIDO) AS BENEFICIARIO"),
                     'B.CORREO',
                     'B.CELULAR',
                     'B.ESTADO AS STATUS',
@@ -283,7 +283,7 @@ class ProgramasController extends Controller
                 ->select(
                     'BA.ID AS INSCRIPCION_ID',
                     'B.CUI',
-                    DB::raw("CONCATENARNOMBRES(B.PRIMER_NOMBRE,B.SEGUNDO_NOMBRE,B.PRIMER_APELLIDO,B.SEGUNDO_APELLIDO) AS BENEFICIARIO"),
+                    DB::raw("ADM_GDS.CONCATENARNOMBRES(B.PRIMER_NOMBRE,B.SEGUNDO_NOMBRE,B.PRIMER_APELLIDO,B.SEGUNDO_APELLIDO) AS BENEFICIARIO"),
                     'B.CORREO',
                     'B.CELULAR',
                     'B.ESTADO AS STATUS',
@@ -312,7 +312,7 @@ class ProgramasController extends Controller
                 ->select(
                     'BM.ID AS INSCRIPCION_ID',
                     'B.CUI',
-                    DB::raw("CONCATENARNOMBRES(B.PRIMER_NOMBRE,B.SEGUNDO_NOMBRE,B.PRIMER_APELLIDO,B.SEGUNDO_APELLIDO) AS BENEFICIARIO"),
+                    DB::raw("ADM_GDS.CONCATENARNOMBRES(B.PRIMER_NOMBRE,B.SEGUNDO_NOMBRE,B.PRIMER_APELLIDO,B.SEGUNDO_APELLIDO) AS BENEFICIARIO"),
                     'B.CORREO',
                     'B.CELULAR',
                     'B.ESTADO AS STATUS',
