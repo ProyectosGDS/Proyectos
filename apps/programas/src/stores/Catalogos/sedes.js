@@ -13,6 +13,7 @@ export const useSedesStore = defineStore('sedes', () => {
         { title : 'dirección', key : 'direccion', class: 'uppercase text-xs' },
         { title : 'zona', key : 'zona.descripcion', class: 'uppercase text-xs' },
         { title : 'distrito', key : 'distrito.nombre', class: 'uppercase text-xs' },
+        { title : 'responsable', key : 'responsable' },
         { title : 'estado', key : 'estado', width : '10px', align : 'center' },
         { title : '', key : 'actions', width : '10px', align : 'center' },
     ]

@@ -59,6 +59,9 @@
                 <option value=""></option>
                 <option v-for="distrito in catalogos.distritos" :value="distrito.id">{{ distrito.nombre }}</option>
             </Input>
+            <div class="col-span-3">
+                <Input v-model="store.sede.responsable" option="label" title="responsable" maxlength="90" :error="store.errors.hasOwnProperty('responsable')" />
+            </div>
         </div>
         <Validate-Errors :errors="store.errors" v-if="store.errors != 0" />
         <template #footer>
@@ -94,6 +97,9 @@
                 <option value=""></option>
                 <option v-for="distrito in catalogos.distritos" :value="distrito.id">{{ distrito.nombre }}</option>
             </Input>
+            <div class="col-span-3">
+                <Input v-model="store.sede.responsable" option="label" title="responsable" maxlength="90" :error="store.errors.hasOwnProperty('responsable')" />
+            </div>
         </div>
         <Validate-Errors :errors="store.errors" v-if="store.errors != 0" />
         <template #footer>

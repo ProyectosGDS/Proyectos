@@ -27,6 +27,7 @@ class SedesController extends Controller
             'nombre' => 'required|string|max:100',
             'direccion' => 'required|string|max:100',
             'zona_id' => 'required',
+            'responsable' => 'nullable|string|max:90'
         ]);
 
         try {
@@ -36,6 +37,7 @@ class SedesController extends Controller
                 'direccion' => $request->direccion,
                 'zona_id' => $request->zona_id,
                 'distrito_id' => $request->distrito_id ?? null,
+                'responsable' => $request->responsable ?? null,
                 'estado' => 'A',
             ]);
 
@@ -59,6 +61,7 @@ class SedesController extends Controller
             'nombre' => 'required|string|max:100',
             'direccion' => 'required|string|max:100',
             'zona_id' => 'required',
+            'responsable' => 'nullable|string|max:90',
         ]);
 
         try {
@@ -68,6 +71,7 @@ class SedesController extends Controller
             $sede->zona_id = $request->zona_id;
             $sede->distrito_id = $request->distrito_id ?? null;
             $sede->estado = $request->estado;
+            $sede->responsable = $request->responsable ?? null;
             $sede->save();
 
             return response('curso modificado correctamente');  

@@ -17,6 +17,7 @@ class sedes extends Model
         'zona_id',
         'distrito_id',
         'estado',
+        'responsable',
     ];
 
     // RELACIONES INVERSAS

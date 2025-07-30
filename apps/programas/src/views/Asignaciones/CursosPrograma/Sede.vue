@@ -35,6 +35,9 @@
             <option value=""></option>
             <option v-for="distrito in catalogos.distritos" :value="distrito.id">{{ distrito.nombre }}</option>
         </Input>
+        <div class="col-span-3">
+            <Input v-model="sedes.sede.responsable" option="label" title="responsable" maxlength="90" :error="sedes.errors.hasOwnProperty('responsable')" />
+        </div>
     </div>
     <Validate-Errors :errors="sedes.errors" v-if="sedes.errors != 0" />
     <div class="flex justify-center">
