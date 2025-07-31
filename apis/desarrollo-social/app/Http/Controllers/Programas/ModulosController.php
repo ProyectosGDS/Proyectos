@@ -49,7 +49,8 @@ class ModulosController extends Controller
             'paga' => 'nullable',
             'fecha_inicial' => 'nullable|required_with:fecha_final|date|date_format:Y-m-d',
             'fecha_final' => 'nullable|required_with:fecha_inicial|date|date_format:Y-m-d|after:fecha_inicial',
-            'tarifa_menor' => 'required_if:paga,S'
+            'tarifa_menor' => 'required_if:paga,S',
+            'publico' => 'required'
         ]);
 
         try {
@@ -66,7 +67,7 @@ class ModulosController extends Controller
                 'fecha_inicial' => $request->fecha_inicial ?? null,
                 'fecha_final' => $request->fecha_final ?? null,
                 'capacidad' => $request->capacidad,
-                'publico' => 'S',
+                'publico' => $request->publico ?? 'S',
                 'paga' => $request->paga ?? 'N',
                 'tarifa_menor' => $request->tarifa_menor ?? null,
                 'tarifa_mayor' => $request->tarifa_mayor ?? null,
@@ -100,7 +101,8 @@ class ModulosController extends Controller
             'fecha_inicial' => 'nullable|required_with:fecha_final|date|date_format:Y-m-d',
             'fecha_final' => 'nullable|required_with:fecha_inicial|date|date_format:Y-m-d|after:fecha_inicial',
             'paga' => 'nullable',
-            'tarifa_menor' => 'required_if:paga,S'
+            'tarifa_menor' => 'required_if:paga,S',
+            'publico' => 'required'
         ]);
 
         try {

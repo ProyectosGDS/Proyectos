@@ -76,6 +76,19 @@
                         NO
                     </div>
                 </div>
+                <div class="flex justify-evenly gap-4">
+                    <div class="flex justify-evenly">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-500">PÚBLICO</span>
+                            <Switch v-model="modulos.modulo.publico" class="h-auto w-14 bg-red-400 has-[:checked]:bg-green-500" :values="['S','N']" />
+                            <span class="text-sm text-gray-500">PRIVADO</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-if="modulos.modulo.paga == 'S'" class="flex gap-4">
+                <Input option="label" title="Tarifa menor" type="number" v-model="modulos.modulo.tarifa_menor" :error="modulos.errors.hasOwnProperty('tarifa_menor')"  />
+                <Input option="label" title="Tarifa mayor" type="number" v-model="modulos.modulo.tarifa_mayor" :error="modulos.errors.hasOwnProperty('tarifa_mayor')"  />
             </div>
             
             <Validate-Errors :errors="modulos.errors" v-if="modulos.errors != 0" />
@@ -83,6 +96,7 @@
                 <Button @click="modulos.store" text="Crear módulo" icon="fas fa-folder-tree" class="btn-primary" :loading="modulos.loading.store"/>
             </div>
         </div>
+        {{ modulos.modulo }}
     </details>
     <Data-Table 
         :headers="modulos.headers" 

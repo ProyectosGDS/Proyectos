@@ -26,7 +26,9 @@ export const useModulosStore = defineStore('modulos', () => {
 
     const programa_id = ref(null)
     const modulos = ref([])
-    const modulo = ref({})
+    const modulo = ref({
+        publico : 'S'
+    })
     const requisitos = ref([])
     const selected_requirements = ref([])
     const copy_modulo = ref({})
@@ -163,7 +165,9 @@ export const useModulosStore = defineStore('modulos', () => {
     }
 
     const resetData = () => {
-        modulo.value = {}
+        modulo.value = {
+            publico : 'S'
+        }
         copy_modulo.value = {}
         errors.value = []
         modal.value = {

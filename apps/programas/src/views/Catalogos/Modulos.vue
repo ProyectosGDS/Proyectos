@@ -105,6 +105,15 @@
                         NO
                     </div>
                 </div>
+                <div class="flex justify-evenly gap-4">
+                    <div class="flex justify-evenly">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-500">PÚBLICO</span>
+                            <Switch v-model="store.modulo.publico" class="h-auto w-14 bg-red-400 has-[:checked]:bg-green-500" :values="['S','N']" />
+                            <span class="text-sm text-gray-500">PRIVADO</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <div v-if="store.modulo.paga == 'S'" class="flex gap-4">
