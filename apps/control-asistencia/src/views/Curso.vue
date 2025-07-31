@@ -43,7 +43,6 @@
                         <Icon @click="store.getBeneficiariosCurso()" icon="fas fa-arrows-rotate" title="Recargar" class="icon-button btn-secondary" :class="{'animate-spin' : catalogos.loading.beneficiarios }" />
                     </div>
                 </div>
-
             </div>
             <div class="grid pl-8 h-full overflow-y-auto">
                 <h1 class="text-2xl font-semibold text-color-1">Control de asistencia</h1>
@@ -66,9 +65,14 @@
                                 <input type="checkbox" v-model="store.asistencia" class="h-8 w-8 cursor-pointer" :value="beneficiario.beneficiario.id" >
                             </td>
                         </tr>
+                        <tr v-if="catalogos.beneficiarios.length === 0 ">
+                            <td align="center" colspan="4">
+                                No hay beneficiarios inscritos ....
+                            </td>
+                        </tr>
                     </template>
                 </Tabla>
-                <div class="flex items-center justify-center gap-3">
+                <div v-if="catalogos.beneficiarios.length" class="flex items-center justify-center gap-3">
                     <Button v-if="catalogos.programa != null && catalogos.curso.hasOwnProperty('id') && store.date" @click="store.download" text="Descargar listado" icon="fas fa-download" class="btn-secondary" :loading="store.loading.download" />
                     <Button @click="store.store" text="Guardar asistencias" icon="fas fa-list-check" class="btn-primary" :loading="store.loading.store" />
                 </div>

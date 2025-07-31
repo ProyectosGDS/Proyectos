@@ -68,13 +68,13 @@
                 <td class="title">ID MODULO</td>
                 <td><strong>{{ $modulo->id }}</strong></td>
                 <td class="title">SEDE:</td>
-                <td>{{ $curso->sede->nombre_completo }}</td>
+                <td>{{ $modulo->sede->nombre_completo }}</td>
             </tr>
             <tr>
                 <td class="title">SECCION</td>
-                <td>{{ $curso->seccion ?? '' }}</td>
+                <td>{{ $modulo->seccion ?? '' }}</td>
                 <td class="title">MODALIDAD</td>
-                <td>{{ $curso->modalidad ?? '' }}</td>
+                <td>{{ $modulo->modalidad ?? '' }}</td>
             </tr>
         </table>
     </header>

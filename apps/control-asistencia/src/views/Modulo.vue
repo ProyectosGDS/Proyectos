@@ -68,9 +68,14 @@
                                 <input type="checkbox" v-model="store.asistencia" class="h-8 w-8 cursor-pointer" :value="beneficiario.beneficiario.id" >
                             </td>
                         </tr>
+                        <tr v-if="catalogos.beneficiarios.length === 0">
+                            <td colspan="4" align="center">
+                                No hay beneficiarios inscritos .....
+                            </td>
+                        </tr>
                     </template>
                 </Tabla>
-                <div class="flex items-center justify-center gap-3">
+                <div v-if="catalogos.beneficiarios.length" class="flex items-center justify-center gap-3">
                     <Button v-if="catalogos.programa != null && catalogos.modulo.hasOwnProperty('id') && store.date" @click="store.download" text="Descargar listado" icon="fas fa-download" class="btn-secondary" :loading="store.loading.download" />
                     <Button @click="store.store" text="Guardar asistencias" icon="fas fa-list-check" class="btn-primary" :loading="store.loading.store" />
                 </div>

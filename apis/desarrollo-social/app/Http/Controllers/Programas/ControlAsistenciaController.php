@@ -157,7 +157,7 @@ class ControlAsistenciaController extends Controller
                 $fecha = $request->fecha;
                 $curso = $beneficiarios_inscritos->first()->curso->load(['curso','modulo','programa.dependencia','sede','horario','instructor','temporalidad']) ?? null;
                 $pdf = Pdf::loadView('Reports.PdfControlAsistenciaCurso',compact('beneficiarios_inscritos','fecha','curso'));
-
+                
             } else if($request->tipo == 'modulo') {
 
                 $beneficiarios_inscritos = beneficiarios_modulos::has('beneficiario')
@@ -171,9 +171,8 @@ class ControlAsistenciaController extends Controller
                     ->get();
                 
                 $fecha = $request->fecha;
-                $modulo = $beneficiarios_inscritos->first()->modulo->load(['programa.dependencia']) ?? null;
-                $curso = $modulo->cursos->first()->load(['sede']) ?? null;
-                $pdf = Pdf::loadView('Reports.PdfControlAsistenciaModulo',compact('beneficiarios_inscritos','fecha','modulo','curso'));
+                $modulo = $beneficiarios_inscritos->first()->modulo->load(['programa.dependencia','sede']) ?? null;
+                $pdf = Pdf::loadView('Reports.PdfControlAsistenciaModulo',compact('beneficiarios_inscritos','fecha','modulo'));
             }
 
 
