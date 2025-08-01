@@ -96,7 +96,6 @@
                 <Button @click="modulos.store" text="Crear módulo" icon="fas fa-folder-tree" class="btn-primary" :loading="modulos.loading.store"/>
             </div>
         </div>
-        {{ modulos.modulo }}
     </details>
     <Data-Table 
         :headers="modulos.headers" 
