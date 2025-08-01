@@ -31,14 +31,14 @@ class EventosController extends Controller
                         EE.NOMBRE ESTADO,
                         D.NOMBRE DEPENDENCIA,
                         U.NOMBRE USUARIO
-                    FROM EVENTOS E
-                        INNER JOIN TIPOS_EVENTOS TE
+                    FROM ADM_GDS.EVENTOS E
+                        INNER JOIN ADM_GDS.TIPOS_EVENTOS TE
                             ON E.TIPO_EVENTO_ID = TE.ID
-                        INNER JOIN ESTADOS_EVENTOS EE
+                        INNER JOIN ADM_GDS.ESTADOS_EVENTOS EE
                             ON E.ESTADO_EVENTO_ID = EE.ID
-                        INNER JOIN DEPENDENCIAS D
+                        INNER JOIN ADM_GDS.DEPENDENCIAS D
                             ON E.DEPENDENCIA_ID = D.ID
-                        INNER JOIN USUARIOS U
+                        INNER JOIN ADM_GDS.USUARIOS U
                             ON E.USUARIO_ID = U.ID 
                     WHERE EXTRACT(YEAR FROM E.FECHA_INICIAL) = ?
                 ";

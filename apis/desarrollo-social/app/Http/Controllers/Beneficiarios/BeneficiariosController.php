@@ -293,12 +293,12 @@ class BeneficiariosController extends Controller
                     bm.created_at fecha_inscripcion,
                     bm.estado,
                     'MODULO' tipo
-                FROM beneficiarios_modulos bm
-                INNER JOIN beneficiarios b
+                FROM ADM_GDS.beneficiarios_modulos bm
+                INNER JOIN ADM_GDS.beneficiarios b
                     ON bm.beneficiario_id = b.id
-                INNER JOIN modulos m
+                INNER JOIN ADM_GDS.modulos m
                     ON bm.modulo_id = m.id
-                INNER JOIN programas p
+                INNER JOIN ADM_GDS.programas p
                     ON m.programa_id = p.id
                 WHERE bm.beneficiario_id = ?
                 
@@ -311,14 +311,14 @@ class BeneficiariosController extends Controller
                     bc.created_at fecha_inscripcion,
                     bc.estado,
                     'CURSO' tipo
-                FROM beneficiarios_cursos bc
-                INNER JOIN beneficiarios b
+                FROM ADM_GDS.beneficiarios_cursos bc
+                INNER JOIN ADM_GDS.beneficiarios b
                     ON bc.beneficiario_id = b.id
-                INNER JOIN detalles_cursos dc
+                INNER JOIN ADM_GDS.detalles_cursos dc
                     ON bc.detalle_curso_id = dc.id
-                INNER JOIN cursos c
+                INNER JOIN ADM_GDS.cursos c
                     ON dc.curso_id = c.id
-                INNER JOIN programas p
+                INNER JOIN ADM_GDS.programas p
                     ON dc.programa_id = p.id
                 WHERE bc.beneficiario_id = ?
             ";

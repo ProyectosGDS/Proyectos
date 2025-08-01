@@ -33,18 +33,18 @@ class DetallesActividadesController extends Controller
                     CONCAT(da.hora_inicio,' A ',da.hora_final) hora,
                     ta.nombre tipo,
                     ea.nombre estado
-                FROM detalles_actividades da
-                    INNER JOIN programas p
+                FROM ADM_GDS.detalles_actividades da
+                    INNER JOIN ADM_GDS.programas p
                         ON da.programa_id = p.id
-                    INNER JOIN estados_actividades ea
+                    INNER JOIN ADM_GDS.estados_actividades ea
                         ON da.estado_actividad_id = ea.id
-                    INNER JOIN tipos_actividades ta
+                    INNER JOIN ADM_GDS.tipos_actividades ta
                         ON da.tipo_actividad_id = ta.id
-                    INNER JOIN actividades a
+                    INNER JOIN ADM_GDS.actividades a
                         ON da.actividad_id = a.id
-                    INNER JOIN zonas z
+                    INNER JOIN ADM_GDS.zonas z
                         ON da.zona_id = z.id
-                    INNER JOIN distritos d
+                    INNER JOIN ADM_GDS.distritos d
                         ON da.distrito_id = d.id
                     WHERE YEAR(da.fecha_inicial) = ?
             ";

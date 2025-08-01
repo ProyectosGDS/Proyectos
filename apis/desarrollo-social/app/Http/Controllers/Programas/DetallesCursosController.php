@@ -15,7 +15,7 @@ class DetallesCursosController extends Controller
             $perfil = strtolower(auth()->user()->perfil->nombre) == 'sysadmin' ? true : false;
 
             $query = "
-                select
+                SELECT
                     dc.id,
                     p.nombre programa,
                     m.nombre modulo,
@@ -32,27 +32,27 @@ class DetallesCursosController extends Controller
                     dc.publico,
                     dc.estado,
                     p.dependencia_id
-                from programas p
-                inner join modulos m
-                    on m.programa_id = p.id
-                    inner join cursos_modulos cm
-                        on cm.modulo_id = m.id 
-                    inner join detalles_cursos dc
-                            on cm.detalle_curso_id = dc.id
-                    inner join cursos c
-                            on dc.curso_id = c.id
-                    inner join instructores i
-                            on dc.instructor_id = i.id
-                    inner join sedes s
-                            on dc.sede_id = s.id
-                            inner join zonas z
-                                    on s.zona_id = z.id
-                            inner join distritos d
-                                    on s.distrito_id = d.id
-                    inner join horarios h
-                            on dc.horario_id = h.id 
-                    inner join temporalidades t
-                            on dc.temporalidad_id = t.id
+                FROM ADM_GDS.programas p
+                INNER JOIN ADM_GDS.modulos m
+                    ON m.programa_id = p.id
+                    INNER JOIN ADM_GDS.cursos_modulos cm
+                        ON cm.modulo_id = m.id 
+                    INNER JOIN ADM_GDS.detalles_cursos dc
+                            ON cm.detalle_curso_id = dc.id
+                    INNER JOIN ADM_GDS.cursos c
+                            ON dc.curso_id = c.id
+                    INNER JOIN ADM_GDS.instructores i
+                            ON dc.instructor_id = i.id
+                    INNER JOIN ADM_GDS.sedes s
+                            ON dc.sede_id = s.id
+                            INNER JOIN ADM_GDS.zonas z
+                                    ON s.zona_id = z.id
+                            INNER JOIN ADM_GDS.distritos d
+                                    ON s.distrito_id = d.id
+                    INNER JOIN ADM_GDS.horarios h
+                            ON dc.horario_id = h.id 
+                    INNER JOIN ADM_GDS.temporalidades t
+                            ON dc.temporalidad_id = t.id
             ";
 
             if ($perfil) {

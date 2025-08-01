@@ -496,10 +496,10 @@ class ProgramasController extends Controller
                     DC.ID,
                     C.NOMBRE,
                     DC.ESTADO
-                FROM DETALLES_CURSOS DC
-                LEFT JOIN CURSOS_MODULOS CM
+                FROM ADM_GDS.DETALLES_CURSOS DC
+                LEFT JOIN ADM_GDS.CURSOS_MODULOS CM
                     ON DC.ID = CM.DETALLE_CURSO_ID
-                INNER JOIN CURSOS C
+                INNER JOIN ADM_GDS.CURSOS C
                     ON DC.CURSO_ID = C.ID
                 WHERE CM.MODULO_ID IS NULL
                 AND DC.PROGRAMA_ID = ?
