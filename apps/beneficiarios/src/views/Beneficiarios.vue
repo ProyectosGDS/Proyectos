@@ -144,7 +144,7 @@
         <div class="col-span-2">
             <div class="flex gap-2">
                 <div class="relative flex-1">
-                    <Input @keyup="verifyCui" v-model="store.cui" option="label" title="Busqueda por cui" maxlength="13" type="search" :class="{'focus:border-red-400 border-red-400 focus:outline-red-400': !store.success, 'focus:border-green-500 border-green-500 focus:outline-green-400' : store.success }" required />
+                    <Input @keypress.enter="verifyCui" v-model="store.cui" option="label" title="Busqueda por cui" maxlength="13" type="search" :class="{'focus:border-red-400 border-red-400 focus:outline-red-400': !store.success, 'focus:border-green-500 border-green-500 focus:outline-green-400' : store.success }" required />
                     <Icon v-if="store.loading.search" icon="fas fa-spinner" class="animate-spin absolute top-3 right-3 text-gray-500" />
                 </div>
                 <Button @click="verifyCui" text="Buscar cui" icon="fas fa-search" :loading="store.loading.search" class="btn-primary flex-none" />
