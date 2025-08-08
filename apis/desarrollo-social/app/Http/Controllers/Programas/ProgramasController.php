@@ -9,6 +9,7 @@ use App\Models\adm_gds\detalles_actividades;
 use App\Models\adm_gds\detalles_cursos;
 use App\Models\adm_gds\modulos;
 use App\Models\adm_gds\programas;
+use App\Models\adm_gds\tarifas_cursos;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -43,6 +44,8 @@ class ProgramasController extends Controller
         $request->validate([
             'nombre' => 'required|string|max:80',
             'descripcion' => 'nullable|string|max:255',
+            'dependencia_id' => 'nullable|integer',
+            'escuela' => 'required_if:dependencia_id,5|string|max:255',
         ]);
 
         try {
@@ -59,6 +62,7 @@ class ProgramasController extends Controller
                 'descripcion' => $request->descripcion ?? null,
                 'dependencia_id' => $dependencia_id ?? auth()->user()->dependencia_id,
                 'estado' => 'A',
+                'escuela' => $request->escuela ?? null,
             ]);
 
             return response('Programa creado correctamente');
@@ -72,14 +76,12 @@ class ProgramasController extends Controller
         try {
             return response($programa->load([
                     'dependencia',
-                    'modulos' => function($query) {
-                        $query->where('estado','A');
-                    },
                     'modulos.programa',
                     'modulos.sede',
                     'modulos.temporalidad',
                     'modulos.requisitos',
-                    'modulos.cursos'
+                    'modulos.cursos',
+                    'modulos.tarifas'
                 ])
             );  
         } catch (\Throwable $th) {
@@ -92,6 +94,7 @@ class ProgramasController extends Controller
             'nombre' => 'required|string|max:80',
             'descripcion' => 'nullable|string|max:255',
             'dependencia_id' => 'required',
+            'escuela' => 'nullable|string|max:255'
         ]);
 
         try {
@@ -100,6 +103,8 @@ class ProgramasController extends Controller
             $programa->descripcion = $request->descripcion ?? null;
             $programa->dependencia_id = $request->dependencia_id;
             $programa->estado = $request->estado;
+            $programa->escuela = $request->escuela ?? null;
+
             $programa->save();
 
             return response('Programa modificado correctamente');  
@@ -119,72 +124,57 @@ class ProgramasController extends Controller
         }
     }
 
-    public function get_modulos (int $programa_id) {
+    public function get_escuelas() {
+        try {
+            return response(programas::$escuelas);
+        } catch (\Throwable $th) {
+            return response($th->getMessage());
+        }
+    }
+
+    public function get_modulos (programas $programa) {
         try {
 
-            $modulos = modulos::with([
-                    'programa',
-                    'cursos.sede',
-                ])
-                ->where('estado','A')
-                ->where('programa_id',$programa_id)
-                ->get();
-
-            $formattedModulos = $modulos->map(function (modulos $modulo) {
-                $modulo->setAttribute('curso', $modulo->cursos->first() ?? []);
-                unset($modulo->cursos); 
-                return $modulo;
-            });
-            
-
-            return response($formattedModulos);
+            return response($programa->load([
+                    'dependencia',
+                    'modulos.programa',
+                    'modulos.sede',
+                    'modulos.temporalidad',
+                    'modulos.requisitos',
+                    'modulos.cursos',
+                    'modulos.tarifas'
+                ])->modulos
+            );
 
         } catch (\Throwable $th) {
             return response($th->getMessage());
         }
     }
 
-    public function get_cursos (int $programa_id) {
+    public function get_cursos (int $programa, bool $all) {
         try {
 
-            $query = "
-                SELECT 
-                    DC.*, 
-                    P.NOMBRE PROGRAMA, 
-                    C.NOMBRE CURSO, 
-                    I.NOMBRE INSTRUCTOR, 
-                    UPPER(S.NOMBRE||' '||Z.DESCRIPCION||' '||D.NOMBRE||' '||S.DIRECCION) SEDE, 
-                    UPPER(H.HORA_INICIAL||' A '||H.HORA_FINAL||' - '||ADM_GDS.CONCATENARDIAS(H.LUN,H.MAR,H.MIE,H.JUE,H.VIE,H.SAB,H.DOM)) HORARIO, 
-                    T.NOMBRE TEMPORALIDAD, 
-                    P.DEPENDENCIA_ID, 
-                    C.IMPULSATEC 
-                FROM ADM_GDS.DETALLES_CURSOS DC 
-                    LEFT JOIN ADM_GDS.CURSOS_MODULOS CM 
-                        ON DC.ID = CM.DETALLE_CURSO_ID 
-                    INNER JOIN ADM_GDS.PROGRAMAS P 
-                        ON DC.PROGRAMA_ID = P.ID 
-                    INNER JOIN ADM_GDS.CURSOS C 
-                        ON DC.CURSO_ID = C.ID 
-                    INNER JOIN ADM_GDS.INSTRUCTORES I 
-                        ON DC.INSTRUCTOR_ID = I.ID 
-                    INNER JOIN ADM_GDS.SEDES S 
-                        ON DC.SEDE_ID = S.ID 
-                    INNER JOIN ADM_GDS.ZONAS Z 
-                        ON S.ZONA_ID = Z.ID 
-                    LEFT JOIN ADM_GDS.DISTRITOS D 
-                        ON S.DISTRITO_ID = D.ID 
-                    INNER JOIN ADM_GDS.HORARIOS H 
-                        ON DC.HORARIO_ID = H.ID 
-                    INNER JOIN ADM_GDS.TEMPORALIDADES T 
-                        ON DC.TEMPORALIDAD_ID = T.ID 
-                WHERE CM.MODULO_ID IS NULL 
-                AND DC.PROGRAMA_ID = ? 
-                ORDER BY DC.ID DESC
-            ";
+            $programas = programas::with([
+                'cursos' => function($query) use ($all){
+                    $query->whereDoesntHave('modulo')
+                    ->when(!$all, function($query) {
+                        $query->where('estado','A');
+                    })
+                    ->orderByDesc('id');
+                },
+                'cursos.horarios',
+                'cursos.sede',
+                'cursos.instructor',
+                'cursos.temporalidad',
+                'cursos.curso',
+                'cursos.tarifas',
+                'cursos.programa'
+            ])
+            ->where('estado','A')
+            ->where('id',$programa)
+            ->first();
 
-            $cursos_programa = DB::connection('gds')->select($query,[$programa_id]);
-
-            return response($cursos_programa);  
+            return response($programas->cursos);
 
         } catch (\Throwable $th) {
             return response($th->getMessage());
@@ -202,14 +192,13 @@ class ProgramasController extends Controller
             foreach ($request->cursos as $curso) {
 
                 if(!isset($curso['id'])) {
-                    detalles_cursos::create([
+                    $detalle_curso = detalles_cursos::create([
                         'seccion' => $curso['seccion'] ?? null,
                         'capacidad' => $curso['capacidad'],
                         'modalidad' => $curso['modalidad'],
                         'curso_id' => $curso['curso_id'],
                         'instructor_id' => $curso['instructor_id'],
                         'sede_id' => $curso['sede_id'],
-                        'horario_id' => $curso['horario_id'],
                         'programa_id' => $curso['programa_id'],
                         'temporalidad_id' => $curso['temporalidad_id'],
                         'fecha_inicial' => $curso['fecha_inicial'],
@@ -217,9 +206,22 @@ class ProgramasController extends Controller
                         'publico' => 'S',
                         'estado' => 'A',
                         'paga' => $curso['paga'] ?? 'N',
-                        'tarifa_menor' => $curso['tarifa_menor'] ?? null,
-                        'tarifa_mayor' => $curso['tarifa_mayor'] ?? null,
                     ]);
+
+                    $detalle_curso->horarios()->sync($curso['horarios']);
+
+                    if($curso['paga'] == 'S') {
+                        if(isset($detalle_curso->id)) {
+                            tarifas_cursos::create([
+                                'tipo' => 'CURSO',
+                                'curso_modulo_id' => $detalle_curso->id,
+                                'inscripcion' => $curso['inscripcion'] ?? null,
+                                'tarifa_menor' => $curso['tarifa_menor'],
+                                'tarifa_mayor' => $curso['tarifa_mayor'],
+                                'temporalidad' => $curso['temporalidad_tarifa'],
+                            ]);
+                        }
+                    }
 
                     $count_cursos ++;
                 }
@@ -255,6 +257,7 @@ class ProgramasController extends Controller
                     'B.CORREO',
                     'B.CELULAR',
                     'B.ESTADO AS STATUS',
+                    'P.ESCUELA',
                     'P.NOMBRE AS PROGRAMA',
                     'D.NOMBRE AS DEPENDENCIA',
                     'C.NOMBRE AS MODULO_CURSO',
@@ -287,6 +290,7 @@ class ProgramasController extends Controller
                     'B.CORREO',
                     'B.CELULAR',
                     'B.ESTADO AS STATUS',
+                    'P.ESCUELA',
                     'P.NOMBRE AS PROGRAMA',
                     'D.NOMBRE AS DEPENDENCIA',
                     'A.NOMBRE AS MODULO_CURSO',
@@ -316,6 +320,7 @@ class ProgramasController extends Controller
                     'B.CORREO',
                     'B.CELULAR',
                     'B.ESTADO AS STATUS',
+                    'P.ESCUELA',
                     'P.NOMBRE AS PROGRAMA',
                     'D.NOMBRE AS DEPENDENCIA',
                     'M.NOMBRE AS MODULO_CURSO',
@@ -548,5 +553,19 @@ class ProgramasController extends Controller
             return response($th->getMessage());
         }
     }
+
+    public function programas_escuelas(string $escuela) {
+        try {
+            $programas = programas::with(['modulos'])
+                ->where('estado','A')
+                ->where('escuela',$escuela)
+                ->get();
+
+            return response($programas);
+        } catch (\Throwable $th) {
+            return response($th->getMessage());
+        }
+    }
+
 
 }

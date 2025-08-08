@@ -8,9 +8,14 @@
     const auth = useAuthStore()
     const catalogos = useCatalogosStore()
 
+    const validateEscuela = () => {
+        return auth.user.dependencia_id == 5 || auth.user.perfil.toLowerCase() == 'sysadmin'
+    }
+
     onBeforeMount(() => {
         store.fetch()
         catalogos.getDependencias()
+        catalogos.getEscuelas()
     })
 
 </script>
@@ -44,6 +49,9 @@
             <Icon @click="store.resetData" icon="fas fa-xmark" class="cursor-pointer text-white" />
         </template>
         <div class="grid gap-4">
+            <Input v-if="validateEscuela()" v-model="store.programa.escuela" option="select" title="*Seleccione escuela" :error="store.errors.hasOwnProperty('escuela')">
+                <option v-for="escuela in catalogos.escuelas" :value="escuela">{{ escuela }}</option>
+            </Input>
             <Input v-model="store.programa.nombre" option="label" title="*Nombre" maxlength="80" :error="store.errors.hasOwnProperty('nombre')" />
             <Input v-if="auth.user.perfil.toLowerCase() == 'sysadmin'" v-model="store.programa.dependencia_id" option="select" title="*Seleccione dependencia" :error="store.errors.hasOwnProperty('dependencia_id')">
                 <option value=""></option>
@@ -70,6 +78,9 @@
                     <span class="text-sm text-gray-500">Inactivo</span>
                 </div>
             </div>
+            <Input v-if="validateEscuela()" v-model="store.programa.escuela" option="select" title="*Seleccione escuela" :error="store.errors.hasOwnProperty('escuela')">
+                <option v-for="escuela in catalogos.escuelas" :value="escuela">{{ escuela }}</option>
+            </Input>
             <Input v-model="store.programa.nombre" option="label" title="*Nombre" maxlength="80" :error="store.errors.hasOwnProperty('nombre')" />
             <Input v-if="auth.user.perfil.toLowerCase() == 'sysadmin'" v-model="store.programa.dependencia_id" option="select" title="*Seleccione dependencia" :error="store.errors.hasOwnProperty('dependencia_id')">
                 <option value=""></option>

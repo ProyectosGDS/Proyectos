@@ -82,7 +82,6 @@ class InscripcionesCursosController extends Controller
                         'detalle_curso_id' => $beneficiario['detalle_curso_id'],
                         'created_at' => now(),
                         'estado' => 'A',
-                        'tarifa' => $beneficiario['tarifa']
                     ]);
 
                     bitacora::create([
@@ -111,10 +110,11 @@ class InscripcionesCursosController extends Controller
 
             $beneficiarios_inscritos = beneficiarios_cursos::with([
                     'beneficiario',
-                    'curso.horario',
+                    'curso.horarios',
                     'curso.programa',
                     'curso.curso',
                     'curso.sede',
+                    'curso.tarifas'
                 ])->where('detalle_curso_id',$detalle_curso_id)
                 ->latest('id')
                 ->whereYear('created_at',$year)

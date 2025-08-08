@@ -24,7 +24,7 @@ export const useAuthStore = defineStore('auth', () => {
 			localStorage.setItem(btoa('permisos'),btoa(JSON.stringify(user.value.permisos)))
 			localStorage.setItem(btoa('menu'),btoa(JSON.stringify(user.value.menu)))
 			localStorage.setItem(btoa('dependencia_id'),btoa(JSON.stringify(user.value.dependencia_id)))
-			localStorage.setItem(btoa('id'),btoa(JSON.stringify(user.value.id)))
+			localStorage.setItem(btoa('usuario_id'),btoa(JSON.stringify(user.value.id)))
 			router.push({ name: 'Home' })
 		})
 		.catch(error => {
@@ -42,10 +42,10 @@ export const useAuthStore = defineStore('auth', () => {
 			axios.post('me')
 			.then(response =>{
 				user.value = JSON.parse(atob(response.data))
-				localStorage.setItem( btoa('permisos'), btoa(JSON.stringify(user.value.permisos)))
+				localStorage.setItem(btoa('permisos'), btoa(JSON.stringify(user.value.permisos)))
 				localStorage.setItem(btoa('menu'),btoa(JSON.stringify(user.value.menu)))
-				localStorage.setItem(btoa('id_dependencia'),btoa(JSON.stringify(user.value.id_dependencia)))
-				localStorage.setItem(btoa('id_usuario'),btoa(JSON.stringify(user.value.id_usuario)))
+				localStorage.setItem(btoa('dependencia_id'),btoa(JSON.stringify(user.value.dependencia_id)))
+				localStorage.setItem(btoa('usuario_id'),btoa(JSON.stringify(user.value.id)))
 			}) 		
 			.catch(error => {
 				resetData()

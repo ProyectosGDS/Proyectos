@@ -22,17 +22,20 @@ export const useCursosProgramaStore = defineStore('cursos-programa', () => {
         curso: {},
         instructor: {},
         sede: {},
-        horario: {},
+        horarios: [],
         publico: 'S',
         seccion : null,
         paga : 'N',
+        tarifas : {}
     })
+
+    const label_horario = ref('')
 
     const detalles = ref({
         curso: [],
         instructor: [],
         sede: [],
-        horario: [],
+        horarios: [],
     })
 
     const errors = ref([])
@@ -41,7 +44,7 @@ export const useCursosProgramaStore = defineStore('cursos-programa', () => {
         curso: false,
         instructor: false,
         sede: false,
-        horario: false,
+        horarios: false,
     })
 
 
@@ -53,7 +56,6 @@ export const useCursosProgramaStore = defineStore('cursos-programa', () => {
             Object.keys(curso.value.curso).length &&
             Object.keys(curso.value.instructor).length &&
             Object.keys(curso.value.sede).length &&
-            Object.keys(curso.value.horario).length &&
             curso.value.capacidad &&
             curso.value.modalidad &&
             curso.value.fecha_inicial &&
@@ -67,8 +69,7 @@ export const useCursosProgramaStore = defineStore('cursos-programa', () => {
                     item.curso_id == curso.value.curso.id &&
                     item.seccion == curso.value.seccion &&
                     item.instructor_id == curso.value.instructor.id &&
-                    item.sede_id == curso.value.sede.id &&
-                    item.horario_id == curso.value.horario.id
+                    item.sede_id == curso.value.sede.id
                 )
             })
 
@@ -82,8 +83,7 @@ export const useCursosProgramaStore = defineStore('cursos-programa', () => {
                     instructor: curso.value.instructor.nombre,
                     sede_id: curso.value.sede.id,
                     sede: curso.value.sede.nombre_completo,
-                    horario_id: curso.value.horario.id,
-                    horario: curso.value.horario.nombre_completo,
+                    horarios: curso.value.horarios.map(item => item.id),
                     temporalidad_id: temporalidad.id,
                     temporalidad: temporalidad.nombre,
                     modalidad: curso.value.modalidad,
@@ -92,18 +92,22 @@ export const useCursosProgramaStore = defineStore('cursos-programa', () => {
                     fecha_final: curso.value.fecha_final,
                     publico: 'S',
                     paga : curso.value.paga,
+                    inscripcion : curso.value.inscripcion,
                     tarifa_menor : curso.value.tarifa_menor,
                     tarifa_mayor : curso.value.tarifa_mayor,
+                    temporalidad_tarifa : curso.value.temporalidad_tarifa,
                 })
                 curso.value = {
                     curso: {},
                     instructor: {},
                     sede: {},
-                    horario: {},
+                    horarios: [],
                     publico: 'S',
                     paga : 'N',
+                    tarifas : {},
                 }
                 errors.value = []
+                label_horario.value = ''
                 return
             }
             
@@ -120,6 +124,12 @@ export const useCursosProgramaStore = defineStore('cursos-programa', () => {
     }
 
     const removeItem = (objeto) => {
+        if(objeto == 'horarios') {
+            label_horario.value = ''
+            curso.value.horarios = []
+            return
+        }
+
         curso.value[objeto] = {}
     }
 
@@ -130,17 +140,33 @@ export const useCursosProgramaStore = defineStore('cursos-programa', () => {
 
     const selectedItem = (objeto) => {
 
-        if (detalles.value[objeto].length != 1) {
+        if (detalles.value[objeto].length != 1 && objeto != 'horarios') {
             errors.value = { seleccion: ['Seleccione un solo registro'] }
             return
         }
 
-        curso.value[objeto] = detalles.value[objeto][0]
+        if (objeto == 'horarios') {
+            curso.value[objeto] = detalles.value[objeto]
+
+            if (detalles.value[objeto].length == 1) {
+                label_horario.value = detalles.value[objeto][0].nombre_completo
+            } else if (detalles.value[objeto].length > 1) {
+                label_horario.value = `SELECCIONASTE ${curso.value[objeto].length} HORARIOS`
+            }
+        } else {
+            curso.value[objeto] = detalles.value[objeto][0]
+        }
+
         resetData()
     }
 
     const openModal = (objeto) => {
-        detalles.value[objeto] = Object.keys(curso.value[objeto]).length ? [curso.value[objeto]] : []
+        if(objeto == 'horarios') {
+            detalles.value[objeto] = Object.keys(curso.value[objeto]).length ? curso.value[objeto] : []
+        }else {
+            detalles.value[objeto] = Object.keys(curso.value[objeto]).length ? [curso.value[objeto]] : []
+        }
+
         modal.value[objeto] = true
     }
 
@@ -169,6 +195,7 @@ export const useCursosProgramaStore = defineStore('cursos-programa', () => {
         search,
         editDetails,
         curso,
+        label_horario,
         detalles,
         errors,
         errorsDetails,

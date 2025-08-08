@@ -6,6 +6,7 @@
     import { useBeneficiariosStore } from '@/stores/Inscripciones/beneficiarios'
     import { useInscripcionesCursoStore } from '@/stores/Inscripciones/inscripciones-curso'
     import { useAuthStore } from '@/stores/auth'
+    import { useGlobalStore } from '@/stores/global'
 
     import Curso from './BeneficiarioCurso/Curso.vue'
 
@@ -13,6 +14,7 @@
     import Domicilio from './Beneficiario/Domicilio.vue'
 
     const auth = useAuthStore()
+    const global = useGlobalStore()
     const store = useBeneficiariosCursoStore()
     const beneficiarios = useBeneficiariosStore()
     const programas = useProgramasStore()
@@ -125,32 +127,24 @@
         
         return inscripcion.beneficiarios.filter((item) => {
             return searchables.some((column) => {
-                const value = getObjectValue(item, column)
+                const value = global.getNestedValue(item, column)
                 return String(value).toLowerCase().includes(store.search.toLowerCase())
             })
         })
     } , { cache: true } )
-
-    const getObjectValue  = (object, key) => {
-        const keys = key.split('.')
-        return keys.reduce((value, currentKey) => {
-            return value && value[currentKey]
-        }, object)
-    }
-
-    function currency (value) {
-        
-        return new Intl.NumberFormat("es-GT", {
-            'style': "currency",
-            'currency': "GTQ",
-            'minimumFractionDigits': 2,
-        }).format(value)
-    }   
-
+  
     onBeforeMount(() => {
+
+        const dependencia_id = JSON.parse(atob(localStorage.getItem(btoa('dependencia_id'))))
+
+        if(dependencia_id && dependencia_id == 5) {
+            catalogos.getEscuelas()
+        }else {
+            programas.fetch()
+        }
+
         const year = new Date()
         inscripcion.year = year.getFullYear()
-        programas.fetch()
         catalogos.getCatalogoBeneficiario()
     })
 
@@ -160,9 +154,15 @@
     <Card v-if="auth.checkPermission('ver inscribir curso')" class="bg-white p-4 xl:p-8">
         <div class="grid xl:grid-cols-2 xl:divide-x-2">
             <div class="space-y-4 xl:pr-8">
-                <Input v-model="inscripcion.year" option="select" title="*seleccione año" :error="store.errors.hasOwnProperty('year')">
-                    <option v-for="year in years" :value="year">{{ year }}</option>
-                </Input>
+                <div class="flex gap-3">
+                    <Input v-model="inscripcion.year" option="select" title="*seleccione año" :error="store.errors.hasOwnProperty('year')">
+                        <option v-for="year in years" :value="year">{{ year }}</option>
+                    </Input>
+                    <Input v-if="auth.user.dependencia_id == 5" @change="programas.getProgramasFromEscuelas(store.escuela)" v-model="store.escuela" option="select" title="*Seleccione una escuela" :error="store.errorsDetails.hasOwnProperty('escuela')">
+                        <option selected></option>
+                        <option v-for="escuela in catalogos.escuelas" :value="escuela">{{ escuela }}</option>
+                    </Input>
+                </div>
                 <Input @change="store.removeCurso" v-model="inscripcion.programa_id" option="select" title="*seleccione programas" :error="store.errors.hasOwnProperty('programa_id')">
                     <option value=""></option>
                     <template v-for="programa in programas.programas">
@@ -170,7 +170,7 @@
                     </template>
                 </Input>
                 <div class="flex items-center gap-2">
-                    <Input @click="store.openCursos" v-model="store.curso.curso" option="label" title="*seleccione curso" class="cursor-pointer" :error="store.errors.hasOwnProperty('curso_id')" readonly />
+                    <Input @click="store.openCursos" v-model="store.label_curso" option="label" title="*seleccione curso" class="cursor-pointer" :error="store.errors.hasOwnProperty('curso_id')" readonly />
                     <div class="grid gap-2">
                         <Icon @click="store.removeCurso" v-if="store.curso.curso" icon="fas fa-xmark" class="icon-button btn-danger" />
                         <Icon @click="inscripcion.fetch(store.curso.id)" v-if="store.curso.curso" icon="fas fa-arrows-rotate" class="icon-button btn-secondary" :class="{'animate-spin' : inscripcion.loading.fetch}" />
@@ -178,7 +178,7 @@
                 </div>
                 <div class="col-span-2">
                     <div class="relative">
-                        <Input @keyup="verifyCui()" v-model="beneficiarios.cui" option="label" title="*Cui" maxlength="13" type="search" :class="{'focus:border-red-400 border-red-400 focus:outline-red-400': !beneficiarios.success, 'focus:border-green-500 border-green-500 focus:outline-green-400' : beneficiarios.success }" required />
+                        <Input @keypress.enter="verifyCui()" v-model="beneficiarios.cui" option="label" title="*Cui" maxlength="13" type="search" :class="{'focus:border-red-400 border-red-400 focus:outline-red-400': !beneficiarios.success, 'focus:border-green-500 border-green-500 focus:outline-green-400' : beneficiarios.success }" required />
                         <Icon v-if="beneficiarios.loading.show" icon="fas fa-spinner" class="animate-spin absolute top-3 right-3 text-gray-500" />
                     </div>
                     <small :class="beneficiarios.success ? 'text-green-400' : 'text-red-400'">{{ beneficiarios.messageCui }}</small>
@@ -190,7 +190,6 @@
                     <DatosPersonales />
                     <Domicilio />
                 </div>
-
                 <Validate-Errors :errors="store.errorsDetails" v-if="store.errorsDetails != 0" />
                 <Validate-Errors :errors="beneficiarios.errors" v-if="beneficiarios.errors != 0" />
 
@@ -222,33 +221,57 @@
                     <div class="grid gap-4 pr-4">
                         <template v-for="(inscripcion,index) in beneficiarios_curso">
                             <div class="flex gap-2">
-                                <Card class="p-4 w-full" :class="{'bg-green-200' : inscripcion.id && inscripcion.estado == 'A', 'bg-red-200' : inscripcion.id && inscripcion.estado == 'I', 'bg-gray-200' : !inscripcion.hasOwnProperty('id') }">
-                                    <div class="grid xl:grid-cols-2 gap-1 text-xs uppercase">
+                                <Card class="p-4 w-full" :class="{'bg-green-200 text-green-700' : inscripcion.id && inscripcion.estado == 'A', 'bg-red-200 text-red-700' : inscripcion.id && inscripcion.estado == 'I', 'bg-gray-200' : !inscripcion.hasOwnProperty('id') }">
+                                    <div class="grid xl:grid-cols-2 gap-2 text-xs uppercase">
                                         <span>
-                                            <span class="font-medium">ID INSCRIPCIÓN: </span>
-                                            <span>{{ inscripcion.id ?? '' }}</span>
-                                        </span>
-                                        <span>
-                                            <span class="font-medium">FECHA INSCRIPCIÓN: </span>
-                                            <span>{{ inscripcion.created_at ?? '' }}</span>
-                                        </span>
-                                        <span>
-                                            <span class="font-medium">CUI: </span>
-                                            <span>{{ inscripcion.beneficiario.cui }}</span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-image-portrait" />
+                                                ID INSCRIPCIÓN: 
+                                                <span class="font-medium">{{ inscripcion.id ?? '' }}</span>
+                                            </span>
                                         </span>
                                         <span>
-                                            <span class="font-medium">CELULAR: </span>
-                                            <span>{{ inscripcion.beneficiario.celular }}</span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-calendar-days" />
+                                                FECHA INSCRIPCIÓN: 
+                                                <span class="font-medium">{{ global.parseValue(inscripcion.created_at,'date') ?? '' }}</span>
+                                            </span>
                                         </span>
-                                        
                                         <span>
-                                            <span class="font-medium">BENEFICIARIO: </span>
-                                            <span>{{ inscripcion.beneficiario.nombre_completo }}</span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-id-card" />
+                                                CUI: 
+                                                <span class="font-medium">{{ inscripcion.beneficiario.cui }}</span>
+                                            </span>
                                         </span>
-                                        <span v-if="inscripcion.tarifa">
-                                            <span class="font-medium">TARIFA: </span>
-                                            <span>{{ currency(inscripcion.tarifa) }}</span>
+                                        <span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-mobile" />
+                                                CELULAR: 
+                                                <span class="font-medium">{{ inscripcion.beneficiario.celular }}</span>
+                                            </span>
+                                        </span> 
+                                        <span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-user" />
+                                                BENEFICIARIO: 
+                                                <span class="font-medium">{{ inscripcion.beneficiario.nombre_completo }}</span>
+                                            </span>
+                                        </span>                                       
+                                        <span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-cake-candles" />
+                                                EDAD: 
+                                                <span class="font-medium">{{ inscripcion.beneficiario.edad + ' años' }}</span>
+                                            </span>
                                         </span>
+                                        <!-- <span v-if="inscripcion.tarifa">
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-dollar" />
+                                                {{ inscripcion.beneficiario.edad >= 18 ? 'TARIFA MAYOR: ' : 'TARIFA MENOR: ' }} 
+                                                <span class="font-medium">{{ global.parseValue(inscripcion.tarifa,'currency') }}</span>
+                                            </span>
+                                        </span> -->
                                     </div>
                                 </Card>
                                 <div class="grid">
@@ -311,6 +334,5 @@
             <Button @click="inscripcion.update" :text="inscripcion.inscripcion?.estado == 'A' ? 'Sí, habilitar' : 'Sí, deshabilitar'" :icon="inscripcion.inscripcion?.estado == 'A' ? 'fas fa-check' : 'fas fa-xmark'" class="btn-danger" :loading="inscripcion.loading.update" />
         </template>
     </Modal>
-
 </template>
 

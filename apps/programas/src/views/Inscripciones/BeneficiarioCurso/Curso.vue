@@ -13,7 +13,7 @@
     }
 
     onBeforeMount(() => {
-        cursos.fetch(beneficiarios_curso_store.programa_id)
+        cursos.fetch(beneficiarios_curso_store.programa_id,0)
     })
 
 </script>

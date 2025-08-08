@@ -6,8 +6,8 @@
     const store = useCursosProgramaStore()
     const horarios = useHorariosStore()
 
-    function selectHorario(item) {
-        store.detalles.horario = item
+    function selectHorarios(item) {
+        store.detalles.horarios = item
     }
 
     onBeforeMount(() => {
@@ -64,7 +64,7 @@
         :excel="false" 
         :rowsPerPage="5" 
         :multiSelect="true" 
-        @selectdAllItems="selectHorario" 
-        :itemsSelected="store.detalles.horario" 
+        @selectdAllItems="selectHorarios" 
+        :itemsSelected="store.detalles.horarios" 
     />
 </template>

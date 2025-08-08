@@ -1,5 +1,6 @@
 <script setup>
     import { computed, onBeforeMount } from 'vue'
+    import { useAuthStore } from '@/stores/auth'
     import { useCatalogosStore } from '@/stores/catalogos'
     import { useModuloStore } from '@/stores/modulo'
     import Modulos from './Modulos.vue'
@@ -7,6 +8,7 @@
 
     const catalogos = useCatalogosStore()
     const store = useModuloStore()
+    const auth = useAuthStore()
 
     const currentYear = new Date().getFullYear();
 
@@ -19,7 +21,12 @@
     })
 
     onBeforeMount(() => {
-        catalogos.getProgramas()
+        const dependencia_id = JSON.parse(atob(localStorage.getItem(btoa('dependencia_id'))))
+        if(dependencia_id && dependencia_id == 5) {
+            catalogos.getEscuelas()
+        }else{
+            catalogos.getProgramas()
+        }
     })
 </script>
 
@@ -31,13 +38,20 @@
                     <option v-for="year in years" :value="year">{{ year }}</option>
                 </Input>
                 <Input @change="store.getBeneficiariosModulo()" option="label" title="*Seleccione fecha de asistencia" type="date" v-model="store.date" />
-                <Input @change="store.resetData()" v-model="catalogos.programa" option="select" title="*Seleccione programa">
-                    <template v-for="programa in catalogos.programas">
-                        <option v-if="programa.modulos.length && programa.estado == 'A'" :value="programa.id">
-                            {{ programa.nombre }}
-                        </option>
-                    </template>
-                </Input>
+                <div class="flex gap-3">
+                    <Input v-if="auth.user.dependencia_id == 5" @change="catalogos.getProgramasFromEscuelas(store.escuela)" v-model="store.escuela" option="select" title="*Seleccione una escuela">
+                        <option selected></option>
+                        <option v-for="escuela in catalogos.escuelas" :value="escuela">{{ escuela }}</option>
+                    </Input>
+                    <Input @change="store.resetData()" v-model="catalogos.programa" option="select" title="*Seleccione programa">
+                        <option selected></option>
+                        <template v-for="programa in catalogos.programas">
+                            <option v-if="programa.modulos.length && programa.estado == 'A'" :value="programa.id">
+                                {{ programa.nombre }}
+                            </option>
+                        </template>
+                    </Input>
+                </div>
                 <div class="flex gap-2 items-center">
                     <Input @click="store.fetchModulos()" v-model="catalogos.modulo.nombre" option="label" title="*Seleccione modulo" readonly class="cursor-pointer" />
                     <div class="grid gap-2">

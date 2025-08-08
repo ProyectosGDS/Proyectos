@@ -12,8 +12,8 @@ export const useModulosStore = defineStore('modulos', () => {
     const headers = [
         { title : 'id', key : 'id', type : 'numeric' },
         { title : 'sede', key : 'sede.nombre', class: 'uppercase text-xs' },
-        { title : 'nombre', key : 'nombre', class: 'uppercase text-xs' },
-        { title : 'descripcion', key : 'descripcion', class: 'uppercase text-xs' },
+        { title : 'nombre', key : 'nombre', class: 'uppercase text-xs font-bold' },
+        { title : 'seccion', key : 'seccion', class: 'uppercase text-xs' },
         { title : 'programa', key : 'programa.nombre' },
         { title : 'inicia', key : 'fecha_inicial', type : 'date' },
         { title : 'termina', key : 'fecha_final', type : 'date' },
@@ -27,7 +27,9 @@ export const useModulosStore = defineStore('modulos', () => {
     const programa_id = ref(null)
     const modulos = ref([])
     const modulo = ref({
-        publico : 'S'
+        publico : 'S',
+        paga : 'N',
+        tarifas : {},
     })
     const requisitos = ref([])
     const selected_requirements = ref([])
@@ -166,7 +168,9 @@ export const useModulosStore = defineStore('modulos', () => {
 
     const resetData = () => {
         modulo.value = {
-            publico : 'S'
+            publico : 'S',
+            paga : 'N',
+            tarifas : {},
         }
         copy_modulo.value = {}
         errors.value = []
@@ -182,6 +186,7 @@ export const useModulosStore = defineStore('modulos', () => {
         modulo.value = item
         modal.value.requisitos = true
     }
+
 
     return {
         headers,
@@ -203,6 +208,6 @@ export const useModulosStore = defineStore('modulos', () => {
         edit,
         remove,
         assignRequirements,
-        resetData
+        resetData,
     }
 })

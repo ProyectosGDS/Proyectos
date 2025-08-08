@@ -80,7 +80,6 @@ class InscripcionesModulosController extends Controller
                     $inscripcion_modulo = beneficiarios_modulos::create([
                         'beneficiario_id' => $beneficiario['beneficiario_id'],
                         'modulo_id' => $beneficiario['modulo_id'],
-                        'tarifa' => $beneficiario['tarifa'],
                         'created_at' => now(),
                         'estado' => 'A'
                     ]);

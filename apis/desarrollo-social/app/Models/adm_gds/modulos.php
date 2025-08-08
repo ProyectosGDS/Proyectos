@@ -28,8 +28,6 @@ class modulos extends Model
         'publico',
         'capacidad',
         'paga',
-        'tarifa_menor',
-        'tarifa_mayor',
     ];
 
     // RELACIONES
@@ -45,6 +43,10 @@ class modulos extends Model
     public function beneficiarios() {
         return $this->belongsToMany(beneficiarios::class,'beneficiarios_modulos','modulo_id','beneficiario_id')
             ->where('BENEFICIARIOS_MODULOS.estado','A');
+    }
+
+    public function tarifas() {
+        return $this->hasOne(tarifas_cursos::class,'curso_modulo_id')->where('tipo','MODULO');
     }
 
     // RELACIONES INVERSAS

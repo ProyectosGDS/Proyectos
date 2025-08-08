@@ -128,6 +128,51 @@ export const useGlobalStore = defineStore('global', () => {
         return false;
     }
 
+    const parseValue = (value, type) => {
+
+        let result
+
+        switch (type) {
+            case 'numeric':
+                result = new Intl.NumberFormat("es-GT").format(value)
+                break;
+            case 'currency':
+                result = new Intl.NumberFormat("es-GT", {
+                    'style': "currency",
+                    'currency': "GTQ",
+                    'minimumFractionDigits': 2,
+                }).format(value)
+                break;
+            case 'date':
+                
+                    const date = new Date(value)
+                    const d = String(date.getDate()).padStart(2,'0')
+                    const m = String(date.getMonth() + 1).padStart(2,'0')
+                    const y = String(date.getFullYear())
+        
+                    result = value ? `${y}-${m}-${d}` : ''
+
+                break;
+            case 'datetime':
+                
+                const fecha = new Date(value)
+                const dia = fecha.getfecha().padStart(2,'0')
+                const mes = fecha.getMonth.padStart(2,'0')
+                const anio = fecha.getFullYear()
+                const h = fecha.getHours().padStart(2,'0')
+                const mi = fecha.getMinutes()
+                const s = fecha.getSeconds()
+
+                result = `${anio}-${mes}-${dia} ${h}:${mi}:${s}`
+
+                break;
+            default:
+                result = value
+                break;
+        }
+        return result
+    }
+
     return {
         openSidebar,
         updateOpenSidebar,
@@ -149,6 +194,8 @@ export const useGlobalStore = defineStore('global', () => {
         manejarError,
 
         checkIfCookieExists,
+        
+        parseValue,
 
     }
 })

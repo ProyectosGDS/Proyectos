@@ -2,13 +2,16 @@ import { defineStore } from 'pinia'
 import { useGlobalStore } from '@/stores/global'
 import { ref } from 'vue'
 import axios from 'axios'
+import { useAuthStore } from '../auth'
 
 export const useProgramasStore = defineStore('programas', () => {
     
     const global = useGlobalStore()
+    const auth = useAuthStore()
     
     const headers = [
         { title : 'id', key : 'id', type : 'numeric' },
+        { title : 'escuela', key : 'escuela' },
         { title : 'nombre', key : 'nombre', class: 'uppercase text-xs' },
         { title : 'descripcion', key : 'descripcion', class: 'uppercase text-xs' },
         { title : 'dependencia', key : 'dependencia.nombre' },
@@ -47,9 +50,30 @@ export const useProgramasStore = defineStore('programas', () => {
         }
     }
 
+    const getProgramasFromEscuelas = async (escuela) => {
+        programas.value = []
+        loading.value.fetch = true
+        try {
+            if(!escuela){
+                return
+            }
+            const response = await axios.get('programas/escuela/'+ escuela )
+            programas.value = response.data
+        } catch (error) {
+            programas.value = []
+            global.manejarError(error)
+            if(error.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.fetch = false
+        }
+    }
+
     const store = async () => {
         loading.value.store = true
         try {
+            programa.value.dependencia_id = auth.user.dependencia_id
             const response = await axios.post('programas', programa.value)
             fetch()
             global.setAlert(response.data,'success')
@@ -136,6 +160,7 @@ export const useProgramasStore = defineStore('programas', () => {
         update,
         destroy,
         edit,
+        getProgramasFromEscuelas,
         remove,
         resetData
     }

@@ -1,3 +1,4 @@
+
 <script setup>
     import { onBeforeMount } from 'vue'
     import { useHorariosStore } from '@/stores/Catalogos/horarios'
@@ -7,7 +8,7 @@
     const horarios = useHorariosStore()
 
     function selectHorario(item) {
-        store.detalles.horario = item
+        store.detalles.horarios = item
     }
 
     onBeforeMount(() => {
@@ -65,6 +66,6 @@
         :rowsPerPage="5" 
         :multiSelect="true" 
         @selectdAllItems="selectHorario" 
-        :itemsSelected="store.detalles.horario" 
+        :itemsSelected="store.detalles.horarios" 
     />
 </template>

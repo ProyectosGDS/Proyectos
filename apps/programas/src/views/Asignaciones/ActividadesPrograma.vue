@@ -6,6 +6,7 @@
     import { useCatalogosStore } from '@/stores/Catalogos/catalogos'
     import { useAuthStore } from '@/stores/auth'
     import { useAsignacionesActividadesProgramaStore } from '@/stores/Asignaciones/asignaciones-actividades-programa'
+    import { useGlobalStore } from '@/stores/global'
 
     import Actividad from './ActividadesPrograma/Actividad.vue'
     import Select from '@/components/Select.vue'
@@ -16,6 +17,7 @@
     const programas = useProgramasStore()
     const catalogos = useCatalogosStore()
     const auth = useAuthStore()
+    const global = useGlobalStore()
 
 
     const searchables = []
@@ -28,18 +30,11 @@
         
         return asignaciones.actividades.filter((item) => {
             return searchables.some((column) => {
-                const value = getObjectValue(item, column)
+                const value = global.getNestedValue(item, column)
                 return String(value).toLowerCase().includes(store.search.toLowerCase())
             })
         })
     } , { cache: true } )
-
-    const getObjectValue  = (object, key) => {
-        const keys = key.split('.')
-        return keys.reduce((value, currentKey) => {
-            return value && value[currentKey]
-        }, object)
-    }
 
     const currentYear = new Date().getFullYear();
 
@@ -70,7 +65,15 @@
     onBeforeMount(() => {
         const year = new Date()
         asignaciones.year = year.getFullYear()
-        programas.fetch()
+
+        const dependencia_id = JSON.parse(atob(localStorage.getItem(btoa('dependencia_id'))))
+
+        if(dependencia_id && dependencia_id == 5){
+            catalogos.getEscuelas()
+        }else{
+            programas.fetch()
+        }
+
         catalogos.getCatalogosActividad()
     })
 
@@ -80,9 +83,13 @@
     <Card v-if="auth.checkPermission('ver actividades programa')" class="bg-white p-4 xl:p-8">
         <div class="grid xl:grid-cols-2">
             <div class="space-y-4 xl:pr-8">
+                <Input v-model="asignaciones.year" option="select" title="*seleccione año" :error="store.errors.hasOwnProperty('year')">
+                    <option v-for="year in years" :value="year">{{ year }}</option>
+                </Input>
                 <div class="flex items-center gap-2">
-                    <Input v-model="asignaciones.year" option="select" title="*seleccione año" :error="store.errors.hasOwnProperty('year')">
-                        <option v-for="year in years" :value="year">{{ year }}</option>
+                    <Input v-if="auth.user.dependencia_id == 5" @change="programas.getProgramasFromEscuelas(store.escuela)" v-model="store.escuela" option="select" title="*Seleccione una escuela">
+                        <option selected></option>
+                        <option v-for="escuela in catalogos.escuelas" :value="escuela">{{ escuela }}</option>
                     </Input>
                     <Input @change="asignaciones.fetch(asignaciones.programa_id)" v-model="asignaciones.programa_id" option="select" title="*seleccione programas" :error="store.errors.hasOwnProperty('programa_id')">
                         <option value=""></option>
@@ -148,47 +155,77 @@
                         <template v-for="(asignacion,index) in searching_actividades">
                             <div class="flex gap-2">
                                 <Card class="p-4 w-full" :class="{'bg-green-200 text-green-700' : asignacion.id && asignacion.estado_actividad_id == 1, 'bg-orange-200 text-orange-700' : asignacion.id && asignacion.estado_actividad_id == 2,'bg-red-200 text-red-800' : asignacion.id && asignacion.estado_actividad_id == 3, 'bg-gray-200 text-black' : !asignacion.hasOwnProperty('id') }">
-                                    <div class="grid grid-cols-2 gap-1 text-xs uppercase">
+                                    <div class="grid grid-cols-2 gap-2 text-xs uppercase">
                                         <span>
-                                            <span class="font-medium">ID ASIGNACIÓN: </span>
-                                            <span>{{ asignacion.id ?? '' }}</span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-user" />
+                                                ID ASIGNACIÓN: 
+                                                <span class="font-medium">{{ asignacion.id ?? '' }}</span>
+                                            </span>
                                         </span>
                                         <span></span>
                                         <span>
-                                            <span class="font-medium">TIPO: </span>
-                                            <span>{{ asignacion.tipo }}</span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-arrows-rotate" />
+                                                TIPO: 
+                                                <span class="font-medium">{{ asignacion.tipo }}</span>
+                                            </span>
                                         </span>
                                         <span>
-                                            <span class="font-medium">ESTADO: </span>
-                                            <span>{{ asignacion.estado }}</span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-flag" />
+                                                ESTADO: 
+                                                <span class="font-medium">{{ asignacion.estado }}</span>
+                                            </span>
                                         </span>
                                         <span>
-                                            <span class="font-medium">ACTIVIDAD: </span>
-                                            <span>{{ asignacion.actividad }}</span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-bicycle" />
+                                                ACTIVIDAD: 
+                                                <span class="font-medium">{{ asignacion.actividad }}</span>
+                                            </span>
                                         </span>
                                         <span>
-                                            <span class="font-medium">RESPONSABLE: </span>
-                                            <span>{{ asignacion.responsable ?? '' }}</span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-building-user" />
+                                                RESPONSABLE: 
+                                                <span class="font-medium">{{ asignacion.responsable ?? '' }}</span>
+                                            </span>
                                         </span>
                                         <span>
-                                            <span class="font-medium">HORARIO: </span>
-                                            <span>{{ asignacion.horario ?? '' }}</span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-clock" />
+                                                HORARIO: 
+                                                <span class="font-medium">{{ asignacion.horario ?? '' }}</span>
+                                            </span>
                                         </span>
                                         <span>
-                                            <span class="font-medium">FECHA: </span>
-                                            <span>{{ asignacion.fechas ?? '' }}</span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-calendar-days" />
+                                                FECHA: 
+                                                <span class="font-medium">{{ asignacion.fechas ?? '' }}</span>
+                                            </span>
                                         </span>
                                         <span>
-                                            <span class="font-medium">ZONA: </span>
-                                            <span>{{ asignacion.zona ?? '' }}</span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-location-dot" />
+                                                ZONA: 
+                                                <span class="font-medium">{{ asignacion.zona ?? '' }}</span>
+                                            </span>
                                         </span>
                                         <span>
-                                            <span class="font-medium">DISTRITO: </span>
-                                            <span>{{ asignacion.distrito ?? '' }}</span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-tag" />
+                                                DISTRITO: 
+                                                <span class="font-medium">{{ asignacion.distrito ?? '' }}</span>
+                                            </span>
                                         </span>
                                         <span class="col-span-2">
-                                            <span class="font-medium">DIRECCIÓN: </span>
-                                            <span>{{ asignacion.direccion ?? '' }}</span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-map-location" />
+                                                DIRECCIÓN: 
+                                                <span class="font-medium">{{ asignacion.direccion ?? '' }}</span>
+                                            </span>
                                         </span>
                                     </div>
                                 </Card>

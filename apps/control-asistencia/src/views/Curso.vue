@@ -1,5 +1,6 @@
 <script setup>
     import { computed, onBeforeMount } from 'vue'
+    import { useAuthStore } from '@/stores/auth'
     import { useCatalogosStore } from '@/stores/catalogos'
     import { useCursoStore } from '@/stores/curso'
     import Cursos from './Cursos.vue'
@@ -7,6 +8,7 @@
 
     const catalogos = useCatalogosStore()
     const store = useCursoStore()
+    const auth = useAuthStore()
 
     const currentYear = new Date().getFullYear();
 
@@ -19,7 +21,12 @@
     })
 
     onBeforeMount(() => {
-        catalogos.getProgramas()
+        const dependencia_id = JSON.parse(atob(localStorage.getItem(btoa('dependencia_id'))))
+        if(dependencia_id && dependencia_id == 5) {
+            catalogos.getEscuelas()
+        }else{
+            catalogos.getProgramas()
+        }
     })
 </script>
 
@@ -31,13 +38,20 @@
                     <option v-for="year in years" :value="year">{{ year }}</option>
                 </Input>
                 <Input @change="store.getBeneficiariosCurso()" option="label" title="*Seleccione fecha de asistencia" type="date" v-model="store.date" />
-                <Input @change="store.resetData()" v-model="catalogos.programa" option="select" title="*Seleccione programa">
-                    <option v-for="programa in catalogos.programas" :key="programa.id" :value="programa.id">
-                        {{ programa.nombre }}
-                    </option>
-                </Input>
+                <div class="flex gap-3">
+                    <Input v-if="auth.user.dependencia_id == 5" @change="catalogos.getProgramasFromEscuelas(store.escuela)" v-model="store.escuela" option="select" title="*Seleccione una escuela">
+                        <option selected></option>
+                        <option v-for="escuela in catalogos.escuelas" :value="escuela">{{ escuela }}</option>
+                    </Input>
+                    <Input @change="store.resetData()" v-model="catalogos.programa" option="select" title="*Seleccione programa">
+                        <option selected></option>
+                        <option v-for="programa in catalogos.programas" :key="programa.id" :value="programa.id">
+                            {{ programa.nombre }}
+                        </option>
+                    </Input>
+                </div>
                 <div class="flex gap-2 items-center">
-                    <Input @click="store.fetchCursos()" v-model="catalogos.curso.curso" option="label" title="*Seleccione curso" readonly class="cursor-pointer" />
+                    <Input @click="store.fetchCursos()" v-model="store.label_curso" option="label" title="*Seleccione curso" readonly class="cursor-pointer" />
                     <div class="grid gap-2">
                         <Icon @click="store.resetData()" icon="fas fa-xmark" class="icon-button btn-danger" title="Limpiar" />
                         <Icon @click="store.getBeneficiariosCurso()" icon="fas fa-arrows-rotate" title="Recargar" class="icon-button btn-secondary" :class="{'animate-spin' : catalogos.loading.beneficiarios }" />

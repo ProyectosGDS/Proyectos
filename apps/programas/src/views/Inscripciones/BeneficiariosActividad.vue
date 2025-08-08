@@ -6,6 +6,7 @@
     import { useBeneficiariosStore } from '@/stores/Inscripciones/beneficiarios'
     import { useInscripcionesActividadStore } from '@/stores/Inscripciones/inscripciones-actividad'
     import { useAuthStore } from '@/stores/auth'
+    import { useGlobalStore } from '@/stores/global'
 
     import Actividad from './BeneficiarioActividad/Actividad.vue'
 
@@ -13,6 +14,7 @@
     import Domicilio from './Beneficiario/Domicilio.vue'
 
     const auth = useAuthStore()
+    const global = useGlobalStore()
     const store = useBeneficiariosActividadStore()
     const beneficiarios = useBeneficiariosStore()
     const programas = useProgramasStore()
@@ -22,6 +24,7 @@
     function verifyCui () {
         const cui = beneficiarios.cui;
         clearCui()
+
         if(!cui){
             beneficiarios.messageCui = 'Ingrese cui'
             beneficiarios.success = false
@@ -122,23 +125,23 @@
         
         return inscripcion.beneficiarios.filter((item) => {
             return searchables.some((column) => {
-                const value = getObjectValue(item, column)
+                const value = global.getNestedValue(item, column)
                 return String(value).toLowerCase().includes(store.search.toLowerCase())
             })
         })
     } , { cache: true } )
 
-    const getObjectValue  = (object, key) => {
-        const keys = key.split('.')
-        return keys.reduce((value, currentKey) => {
-            return value && value[currentKey]
-        }, object)
-    }
-
     onBeforeMount(() => {
         const year = new Date()
         inscripcion.year = year.getFullYear()
-        programas.fetch()
+        const dependencia_id = JSON.parse(atob(localStorage.getItem(btoa('dependencia_id'))))
+
+        if(dependencia_id && dependencia_id == 5) {
+            catalogos.getEscuelas()
+        }else{
+            programas.fetch()
+        }
+
         catalogos.getCatalogoBeneficiario()
     })
 
@@ -151,12 +154,18 @@
                 <Input v-model="inscripcion.year" option="select" title="*seleccione año" :error="store.errors.hasOwnProperty('year')">
                     <option v-for="year in years" :value="year">{{ year }}</option>
                 </Input>
-                <Input @change="store.removeCurso" v-model="inscripcion.programa_id" option="select" title="*seleccione programas" :error="store.errors.hasOwnProperty('programa_id')">
-                    <option value=""></option>
-                    <template v-for="programa in programas.programas">
-                        <option v-if="programa.estado == 'A'" :value="programa.id">{{ programa.nombre }}</option>
-                    </template>
-                </Input>
+                <div class="flex gap-3">
+                    <Input v-if="auth.user.dependencia_id == 5" @change="programas.getProgramasFromEscuelas(store.escuela)" v-model="store.escuela" option="select" title="*Seleccione una escuela">
+                        <option selected></option>
+                        <option v-for="escuela in catalogos.escuelas" :value="escuela">{{ escuela }}</option>
+                    </Input>
+                    <Input @change="store.removeCurso" v-model="inscripcion.programa_id" option="select" title="*seleccione programas" :error="store.errors.hasOwnProperty('programa_id')">
+                        <option value=""></option>
+                        <template v-for="programa in programas.programas">
+                            <option v-if="programa.estado == 'A'" :value="programa.id">{{ programa.nombre }}</option>
+                        </template>
+                    </Input>
+                </div>
                 <div class="flex items-center gap-2">
                     <Input @click="store.openActividades" v-model="store.actividad.actividad" option="label" title="*seleccione actividad" class="cursor-pointer" :error="store.errors.hasOwnProperty('actividad_id')" readonly />
                     <div class="grid gap-2">
@@ -166,7 +175,7 @@
                 </div>
                 <div class="col-span-2">
                     <div class="relative">
-                        <Input @keyup="verifyCui()" v-model="beneficiarios.cui" option="label" title="*Cui" maxlength="13" type="search" :class="{'focus:border-red-400 border-red-400 focus:outline-red-400': !beneficiarios.success, 'focus:border-green-500 border-green-500 focus:outline-green-400' : beneficiarios.success }" required />
+                        <Input @keypress.enter="verifyCui()" v-model="beneficiarios.cui" option="label" title="*Cui" maxlength="13" type="search" :class="{'focus:border-red-400 border-red-400 focus:outline-red-400': !beneficiarios.success, 'focus:border-green-500 border-green-500 focus:outline-green-400' : beneficiarios.success }" required />
                         <Icon v-if="beneficiarios.loading.show" icon="fas fa-spinner" class="animate-spin absolute top-3 right-3 text-gray-500" />
                     </div>
                     <small :class="beneficiarios.success ? 'text-green-400' : 'text-red-400'">{{ beneficiarios.messageCui }}</small>
@@ -209,28 +218,43 @@
                     <div class="grid gap-4">
                         <template v-for="(inscripcion,index) in beneficiarios_actividad">
                             <div class="flex gap-2 pr-4">
-                                <Card class="p-4 w-full" :class="{'bg-green-200' : inscripcion.id && inscripcion.estado == 'A', 'bg-red-200' : inscripcion.id && inscripcion.estado == 'I', 'bg-gray-200' : !inscripcion.hasOwnProperty('id') }">
-                                    <div class="grid xl:grid-cols-2 gap-1 text-xs uppercase">
+                                <Card class="p-4 w-full" :class="{'bg-green-200 text-green-700' : inscripcion.id && inscripcion.estado == 'A', 'bg-red-200 text-red-700' : inscripcion.id && inscripcion.estado == 'I', 'bg-gray-200' : !inscripcion.hasOwnProperty('id') }">
+                                    <div class="grid xl:grid-cols-2 gap-2 text-xs uppercase">
                                         <span>
-                                            <span class="font-medium">ID INSCRIPCIÓN: </span>
-                                            <span>{{ inscripcion.id ?? '' }}</span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-circle" />
+                                                ID INSCRIPCIÓN: 
+                                                <span class="font-medium">{{ inscripcion.id ?? '' }}</span>
+                                            </span>
                                         </span>
                                         <span>
-                                            <span class="font-medium">FECHA INSCRIPCIÓN: </span>
-                                            <span>{{ inscripcion.created_at ?? '' }}</span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-calendar-days" />
+                                                FECHA INSCRIPCIÓN: 
+                                                <span class="font-medium">{{ inscripcion.created_at ?? '' }}</span>
+                                            </span>
                                         </span>
                                         <span>
-                                            <span class="font-medium">CUI: </span>
-                                            <span>{{ inscripcion.beneficiario.cui }}</span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-id-card" />
+                                                CUI: 
+                                                <span class="font-medium">{{ inscripcion.beneficiario.cui }}</span>
+                                            </span>
                                         </span>
                                         <span>
-                                            <span class="font-medium">CELULAR: </span>
-                                            <span>{{ inscripcion.beneficiario.celular }}</span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-mobile" />
+                                                CELULAR: 
+                                                <span class="font-medium">{{ inscripcion.beneficiario.celular }}</span>
+                                            </span>
                                         </span>
                                         
                                         <span>
-                                            <span class="font-medium">BENEFICIARIO: </span>
-                                            <span>{{ inscripcion.beneficiario.nombre_completo }}</span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-user" />
+                                                BENEFICIARIO: 
+                                                <span class="font-medium">{{ inscripcion.beneficiario.nombre_completo }}</span>
+                                            </span>
                                         </span>
                                     </div>
                                 </Card>

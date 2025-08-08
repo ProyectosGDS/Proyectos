@@ -120,7 +120,7 @@
                 </div>
             </template>
             <template #deleted_at="{item}">
-                <Icon :icon="item.deleted_at ? 'fas fa-x-mark' : 'fas fa-check'" :class="item.deleted_at ? 'text-red-500' : 'text-green-500'" />
+                <Icon :icon="(item.deleted_at != null) ? 'fas fa-xmark' : 'fas fa-check'" :class="(item.deleted_at != null) ? 'text-red-500' : 'text-green-500'" />
             </template>
             <template #actions="{item}">
                 <Drop-Down-Button icon="fas fa-ellipsis-v" >

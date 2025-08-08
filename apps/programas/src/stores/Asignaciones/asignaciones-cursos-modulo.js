@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { useGlobalStore } from '@/stores/global'
 import { useProgramasStore } from '@/stores/Catalogos/programas'
 import { useCursosModuloStore } from '@/stores/Asignaciones/cursos-modulo'
+import { useHorariosStore } from '../Catalogos/horarios'
 import { ref } from 'vue'
 import axios from 'axios'
 
@@ -10,6 +11,7 @@ export const useAsignacionesCursosModuloStore = defineStore('asignaciones-cursos
     const global = useGlobalStore()
     const programas = useProgramasStore()
     const cursosModulo = useCursosModuloStore()
+    const storeHorarios = useHorariosStore()
 
     const headers = [
         { title : 'id', key : 'detalle_curso_id', type : 'numeric' },
@@ -28,6 +30,7 @@ export const useAsignacionesCursosModuloStore = defineStore('asignaciones-cursos
     const modulo_id = ref(null)
     const modulos = ref([])
     const cursos = ref([])
+    const horarios = ref([])
     const copy_cursos = ref([])
     const curso = ref({})
     const copy_curso = ref({})
@@ -42,6 +45,7 @@ export const useAsignacionesCursosModuloStore = defineStore('asignaciones-cursos
         edit : false,
         delete : false,
         disabled : false,
+        horarios : false,
     })
 
     const fetch = async (modulo_id) => {
@@ -69,6 +73,24 @@ export const useAsignacionesCursosModuloStore = defineStore('asignaciones-cursos
             curso.value = response.data
             copy_curso.value = JSON.parse(JSON.stringify(response.data))
             modal.value.edit = true
+        } catch (error) {
+            global.manejarError(error)
+            if(error.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.show = false
+        }
+    }
+
+    const showHorarios = async (id) => {
+        storeHorarios.fetch()
+        loading.value.show = true
+        try {
+            const response = await axios.get('detalles-curso/' + id)
+            curso.value = response.data
+            horarios.value = response.data.horarios
+            modal.value.horarios = true
         } catch (error) {
             global.manejarError(error)
             if(error.status === 422) {
@@ -153,6 +175,27 @@ export const useAsignacionesCursosModuloStore = defineStore('asignaciones-cursos
         modal.value.delete = true
     }
 
+    const syncHorarios = async () => {
+        loading.value.update = true
+        try {
+            if(global.hasChanged(curso.value, copy_curso.value)) {
+                const response = await axios.post('detalles-curso/sync-horarios/' + curso.value.id, {
+                    horarios : horarios.value
+                })
+                fetch(cursosModulo.modulo.id)
+                global.setAlert(response.data,'success')
+            }
+            resetData()
+        } catch (error) {
+            global.manejarError(error)
+            if(error.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.update = false
+        }
+    }
+
     const validateDuplicateCourseList = () => {
 
         let error = false
@@ -225,6 +268,10 @@ export const useAsignacionesCursosModuloStore = defineStore('asignaciones-cursos
             loading.value.excel = false
         }
     }
+
+    const selectHorario = (item) => {
+        horarios.value = item
+    }
     
     return {
         headers,
@@ -232,6 +279,7 @@ export const useAsignacionesCursosModuloStore = defineStore('asignaciones-cursos
         modulos,
         cursos,
         curso,
+        horarios,
         copy_curso,
         loading,
         errors,
@@ -239,6 +287,7 @@ export const useAsignacionesCursosModuloStore = defineStore('asignaciones-cursos
         
         fetch,
         show,
+        showHorarios,
         store,
         update,
         disabledCurso,
@@ -248,5 +297,7 @@ export const useAsignacionesCursosModuloStore = defineStore('asignaciones-cursos
         disabled,
         resetData,
         exportExcel,
+        selectHorario,
+        syncHorarios,
     }
 })

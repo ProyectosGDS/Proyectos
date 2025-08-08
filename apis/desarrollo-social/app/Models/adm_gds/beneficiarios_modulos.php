@@ -15,7 +15,6 @@ class beneficiarios_modulos extends Model
         'modulo_id',
         'created_at',
         'estado',
-        'tarifa',
     ];
 
 

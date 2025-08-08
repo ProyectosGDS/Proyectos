@@ -2,25 +2,28 @@ import { defineStore } from 'pinia'
 import { useGlobalStore } from '../global'
 import { ref } from 'vue'
 import axios from 'axios'
+import { useHorariosStore } from '../Catalogos/horarios'
 
 export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-cursos-programa', () => {
     
     const global = useGlobalStore()
+    const storeHorarios = useHorariosStore()
 
     const headers = [
         { title : 'id', key : 'id', type : 'numeric' },
-        { title : 'programa', key : 'programa' },
-        { title : 'curso', key : 'curso' },
+        { title : 'escuela', key : 'programa.escuela' },
+        { title : 'programa', key : 'programa.nombre' },
+        { title : 'curso', key : 'curso.nombre' },
         { title : 'seccion', key : 'seccion', width : '10px', align : 'center' },
-        { title : 'instructor', key : 'instructor', class: 'uppercase text-xs' },
-        { title : 'sede', key : 'sede' },
-        { title : 'horario', key : 'horario' },
-        { title : 'temporalidad', key : 'temporalidad', class: 'uppercase text-xs', width : '10px', align : 'center' },
+        { title : 'instructor', key : 'instructor.nombre', class: 'uppercase text-xs' },
+        { title : 'sede', key : 'sede.nombre_completo' },
+        { title : 'horario', key : 'horarios.nombre_completo' },
+        { title : 'temporalidad', key : 'temporalidad.nombre', class: 'uppercase text-xs', width : '10px', align : 'center' },
         { title : 'modalidad', key : 'modalidad', width : '10px', align : 'center' },
         { title : 'capacidad', key : 'capacidad', width : '10px', align : 'center' },
         { title : 'inicia', key : 'fecha_inicial', type : 'date' },
         { title : 'termina', key : 'fecha_final', type : 'date' },
-        { title : 'impulsatec', key : 'impulsatec', width : '10px', align : 'center' },
+        { title : 'impulsatec', key : 'curso.impulsatec', width : '10px', align : 'center' },
         { title : 'público', key : 'publico', width : '10px', align : 'center' },
         { title : 'paga', key : 'paga', width : '10px', align : 'center' },
         { title : 'estado', key : 'estado', width : '10px', align : 'center' },
@@ -41,18 +44,22 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
         excel : false,
         destroy : false
     })
+
+    const horarios = ref([])
+
     const errors = ref([])
     const modal = ref({
         edit : false,
         delete : false,
         requisitos : false,
+        horarios:  false,
     })
 
-    const fetch = async (programa_id) => {
+    const fetch = async (programa_id, all = true) => {
         loading.value.fetch = true
         try {
             if(programa_id != '') {
-                const response = await axios.get('programas/get-cursos/' + programa_id)
+                const response = await axios.get('programas/get-cursos/' + programa_id + '/' + all)
                 cursos.value = response.data
             }
         } catch (error) {
@@ -70,8 +77,27 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
         try {
             const response = await axios.get('detalles-curso/' + id)
             curso.value = response.data
+            curso.value.tarifas = !response.data.tarifas ? {} : response.data.tarifas
             copy_curso.value = JSON.parse(JSON.stringify(curso.value))
             modal.value.edit = true
+        } catch (error) {
+            global.manejarError(error)
+            if(error.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.show = false
+        }
+    }
+
+    const editHorarios = async (id) => {
+        storeHorarios.fetch()
+        loading.value.show = true
+        try {
+            const response = await axios.get('detalles-curso/' + id)
+            curso.value = response.data
+            horarios.value = response.data.horarios ?? []
+            modal.value.horarios = true
         } catch (error) {
             global.manejarError(error)
             if(error.status === 422) {
@@ -155,6 +181,25 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
         }
     }
 
+    const syncHorarios = async () => {
+        loading.value.update = true
+        try {
+            const response = await axios.post('detalles-curso/sync-horarios/' + curso.value.id, {
+                horarios : horarios.value
+            })
+            fetch(programa_id.value)
+            global.setAlert(response.data,'success')
+            resetData()
+        } catch (error) {
+            global.manejarError(error)
+            if(error.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.update = false
+        }
+    }
+
     const assign = async () => {
         loading.value.update = true
         try {
@@ -225,6 +270,10 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
         update()
     }
 
+    const selectHorarios = (item) => {
+        horarios.value = item
+    }
+
     const resetData = () => {
         curso.value = {}
         copy_curso.value = {}
@@ -232,7 +281,9 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
         modal.value = {
             new : false,
             edit : false,
-            delete : false
+            delete : false,
+            requisitos : false,
+            horarios:  false,
         }
     }
 
@@ -283,6 +334,7 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
         loading,
         errors,
         modal,
+        horarios,
         
         fetch,
         show,
@@ -295,6 +347,9 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
         assignRequirements,
         validateDuplicateCourseList,
         exportExcel,
-        resetData
+        resetData,
+        selectHorarios,
+        editHorarios,
+        syncHorarios,
     }
 })

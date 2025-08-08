@@ -27,6 +27,7 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
     const programa_id = ref('')
     const modulo = ref({})
     const nombre_completo = ref('')
+    const escuela = ref('')
     const curso = ref({
         curso: [],
         instructor: {},
@@ -38,7 +39,7 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
         curso: [],
         instructor: [],
         sede: [],
-        horario: [],
+        horarios: [],
     })
 
     const errors = ref([])
@@ -47,7 +48,7 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
         curso: false,
         instructor: false,
         sede: false,
-        horario: false,
+        horarios: false,
         modulo: false,
     })
 
@@ -95,7 +96,7 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
                             temporalidad: item.temporalidad,
                             seccion: item.seccion ?? null,
                             instructor: {},
-                            horario: {},
+                            horarios: [],
                         },
                         modulo : modulo.value,
                     })
@@ -105,7 +106,7 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
                     curso: [],
                     instructor: {},
                     sede: {},
-                    horario: {},
+                    horarios: [],
                 }
                 label_curso.value = ''
                 errors.value = []
@@ -184,18 +185,30 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
 
     const openModalDetails = (objeto, index) => {
         indice.value = index
-        detalles.value[objeto] = Object.keys(asignaciones.cursos[index]['curso'][objeto]).length ? [asignaciones.cursos[index]['curso'][objeto]] : []
+
+        if (objeto == 'horarios') {
+            detalles.value[objeto] = Object.keys(asignaciones.cursos[index]['curso'][objeto]).length ? asignaciones.cursos[index]['curso'][objeto] : []
+        } else {
+            detalles.value[objeto] = Object.keys(asignaciones.cursos[index]['curso'][objeto]).length ? [asignaciones.cursos[index]['curso'][objeto]] : []
+        }
+
+
         modal.value[objeto] = true
     }
 
     const selectDetails = (objeto) => {
 
-        if (detalles.value[objeto].length != 1) {
+        if (detalles.value[objeto].length != 1 && objeto != 'horarios') {
             errors.value = { seleccion: ['Seleccione un solo registro'] }
             return
         }
 
-        asignaciones.cursos[indice.value]['curso'][objeto] = detalles.value[objeto][0]
+        if (objeto == 'horarios') {
+            asignaciones.cursos[indice.value]['curso'][objeto] = detalles.value[objeto]
+        } else {
+            asignaciones.cursos[indice.value]['curso'][objeto] = detalles.value[objeto][0]
+        }
+
         resetData()
     }
 
@@ -205,7 +218,7 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
 
         asignaciones.cursos.forEach((item, index) => {
             if(!item.detalle_curso_id && !item.modulo_id) {
-                if((Object.keys(item.curso.instructor).length == 0) || (Object.keys(item.curso.horario).length == 0)) {
+                if((Object.keys(item.curso.instructor).length == 0) || (item.curso.horarios.length == 0)) {
                     IndexesError.value.push(index)
                     return
                 }
@@ -250,6 +263,7 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
         modulo,
         nombre_completo,
         curso,
+        escuela,
         detalles,
         errors,
         errorsDetails,
@@ -266,6 +280,6 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
         selectedItem,
         selectDetails,
         resetData,
-        validateDataCourse,
+        validateDataCourse
     }
 })

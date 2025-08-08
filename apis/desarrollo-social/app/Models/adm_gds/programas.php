@@ -14,7 +14,17 @@ class programas extends Model
         'nombre',
         'descripcion',
         'dependencia_id',
-        'estado'
+        'estado',
+        'escuela'
+    ];
+
+    public static $escuelas = [
+        'ESCUELA DE AJEDREZ',
+        'ESCUELA DE ARTES VISUALES',
+        'ESCUELA DE DANZA CLASICA',
+        'ESCUELA DE DANZA CREATIVA',
+        'ESCUELA DE ESCULTURA',
+        'ESCUELA DE MUSICA',
     ];
 
     // RELACIONES

@@ -25,6 +25,10 @@ class horarios extends Model
 
     ];
 
+    protected $hidden = [
+        'pivot',
+    ];
+
     // RELACIONES
     public function cursos () {
         return $this->hasMany(detalles_cursos::class,'horario_id');

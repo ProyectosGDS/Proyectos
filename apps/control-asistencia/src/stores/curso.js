@@ -16,6 +16,9 @@ export const useCursoStore = defineStore('curso', () => {
     const modal = ref({
         cursos : false,
     })
+
+    const label_curso = ref('')
+
     const loading = ref({
         store : false,
         download : false,
@@ -30,6 +33,7 @@ export const useCursoStore = defineStore('curso', () => {
         catalogos.beneficiarios = []
         catalogos.curso = {}
         catalogos.errors = []
+        label_curso.value = ''
         modal.value = {
             cursos: false,
         }
@@ -45,6 +49,7 @@ export const useCursoStore = defineStore('curso', () => {
         }
 
         catalogos.curso = catalogos.cursos[0]
+        label_curso.value = catalogos.curso.curso.nombre
         getBeneficiariosCurso()
         modal.value.cursos = false
         catalogos.errors = []
@@ -160,6 +165,7 @@ export const useCursoStore = defineStore('curso', () => {
         date,
         modal,
         loading,
+        label_curso,
 
         fetchCursos,
         store,

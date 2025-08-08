@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\adm_gds\cursos_modulos;
 use App\Models\adm_gds\detalles_cursos;
 use App\Models\adm_gds\modulos;
+use App\Models\adm_gds\tarifas_cursos;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -39,18 +40,20 @@ class ModulosController extends Controller
     public function store (Request $request) {
         $request->validate([
             'nombre' => 'required|string|max:80',
-            'descripcion' => 'nullable|string|max:255',
+            'descripcion' => 'required|string|max:1000',
             'programa_id' => 'required',
             'seccion' => 'nullable|string|max:45',
             'sede_id' => 'required',
             'modalidad' => 'required|string|max:25',
             'temporalidad_id' => 'required',
             'capacidad' => 'required',
-            'paga' => 'nullable',
-            'fecha_inicial' => 'nullable|required_with:fecha_final|date|date_format:Y-m-d',
-            'fecha_final' => 'nullable|required_with:fecha_inicial|date|date_format:Y-m-d|after:fecha_inicial',
-            'tarifa_menor' => 'required_if:paga,S',
-            'publico' => 'required'
+            'paga' => 'required|in:S,N',
+            'fecha_inicial' => 'required|required_with:fecha_final|date|date_format:Y-m-d',
+            'fecha_final' => 'required|required_with:fecha_inicial|date|date_format:Y-m-d|after:fecha_inicial',
+            'publico' => 'required',
+            'tarifas.tarifa_menor' => 'required_if:paga,S|decimal:2',
+            'tarifas.tarifa_mayor' => 'required_if:paga,S|decimal:2',
+            'tarifas.temporalidad' => 'required_if:paga,S|string|max:50',
         ]);
 
         try {
@@ -69,9 +72,20 @@ class ModulosController extends Controller
                 'capacidad' => $request->capacidad,
                 'publico' => $request->publico ?? 'S',
                 'paga' => $request->paga ?? 'N',
-                'tarifa_menor' => $request->tarifa_menor ?? null,
-                'tarifa_mayor' => $request->tarifa_mayor ?? null,
             ]);
+
+            if($request->paga == 'S') {
+                if(isset($modulo->id)) {
+                    tarifas_cursos::create([
+                        'tipo' => 'MODULO',
+                        'curso_modulo_id' => $modulo->id,
+                        'inscripcion' =>  $request->tarifas['inscripcion'] ?? null,
+                        'tarifa_menor' => $request->tarifas['tarifa_menor'],
+                        'tarifa_mayor' => $request->tarifas['tarifa_mayor'],
+                        'temporalidad' => $request->tarifas['temporalidad'],
+                    ]);
+                }
+            }
 
             return response('Módulo creado correctamente');
 
@@ -91,36 +105,41 @@ class ModulosController extends Controller
     public function update (Request $request, modulos $modulo) {
         $request->validate([
             'nombre' => 'required|string|max:80',
-            'descripcion' => 'nullable|string|max:255',
+            'descripcion' => 'required|string|max:1000',
             'programa_id' => 'required',
             'seccion' => 'nullable|string|max:45',
             'sede_id' => 'required',
             'modalidad' => 'required|string|max:25',
             'temporalidad_id' => 'required',
-            'capacidad' => 'required',
-            'fecha_inicial' => 'nullable|required_with:fecha_final|date|date_format:Y-m-d',
-            'fecha_final' => 'nullable|required_with:fecha_inicial|date|date_format:Y-m-d|after:fecha_inicial',
-            'paga' => 'nullable',
-            'tarifa_menor' => 'required_if:paga,S',
-            'publico' => 'required'
+            'capacidad' => 'required|int',
+            'fecha_inicial' => 'required|required_with:fecha_final|date|date_format:Y-m-d',
+            'fecha_final' => 'required|required_with:fecha_inicial|date|date_format:Y-m-d|after:fecha_inicial',
+            'paga' => 'required|in:S,N',
+            'publico' => 'required|in:S,N',
+            'tarifas.tarifa_menor' => 'required_if:paga,S|decimal:2',
+            'tarifas.tarifa_mayor' => 'required_if:paga,S|decimal:2',
+            'tarifas.temporalidad' => 'required_if:paga,S|string|max:50',
         ]);
 
         try {
             $modulo->nombre = mb_strtoupper($request->nombre);
-            $modulo->descripcion = $request->descripcion ?? null;
+            $modulo->descripcion = $request->descripcion;
             $modulo->programa_id = $request->programa_id;
             $modulo->sede_id = $request->sede_id;
             $modulo->seccion = $request->seccion ?? null;
             $modulo->temporalidad_id = $request->temporalidad_id;
             $modulo->modalidad = $request->modalidad;
             $modulo->estado = $request->estado;
-            $modulo->fecha_inicial = $request->fecha_inicial ?? null;
-            $modulo->fecha_final = $request->fecha_final ?? null;
-            $modulo->publico = $request->publico;
+            $modulo->fecha_inicial = $request->fecha_inicial;
+            $modulo->fecha_final = $request->fecha_final;
+            $modulo->publico = $request->publico ?? 'N';
             $modulo->capacidad = $request->capacidad;
             $modulo->paga = $request->paga;
-            $modulo->tarifa_menor = $request->tarifa_menor ?? null;
-            $modulo->tarifa_mayor = $request->tarifa_mayor ?? null;
+            $modulo->tarifas->inscripcion = $request->tarifas['inscripcion'];
+            $modulo->tarifas->tarifa_menor = $request->tarifas['tarifa_menor'];
+            $modulo->tarifas->tarifa_mayor = $request->tarifas['tarifa_mayor'];
+            $modulo->tarifas->temporalidad = $request->tarifas['temporalidad'];
+            $modulo->tarifas->save();
             $modulo->save();
 
             return response('Módulo modificado correctamente');  
@@ -149,7 +168,7 @@ class ModulosController extends Controller
                     'curso.curso',
                     'curso.instructor',
                     'curso.sede',
-                    'curso.horario',
+                    'curso.horarios',
                     'curso.temporalidad',
                 ])
                 ->where('modulo_id',$modulo_id)
@@ -182,25 +201,21 @@ class ModulosController extends Controller
                             'curso_id'          => $curso['curso']['curso']['id'],
                             'instructor_id'     => $curso['curso']['instructor']['id'],
                             'sede_id'           => $curso['curso']['sede']['id'],
-                            'horario_id'        => $curso['curso']['horario']['id'],
                             'temporalidad_id'   => $curso['curso']['temporalidad']['id'],
-                            'seccion'           => $curso['curso']['seccion'],
-                            'capacidad'         => null,
-                            'modalidad'         => $curso['curso']['modalidad'],
                         ],
                         [
-                            'fecha_inicial' => null,
-                            'fecha_final' => null,
-                            'publico' => null,
                             'estado' => 'A',
                         ]
                     );
 
-                    if($nuevo_curso) {
+                    if(isset($nuevo_curso->id)) {
                         cursos_modulos::create([
                             'modulo_id' => $curso['modulo']['id'],
                             'detalle_curso_id' => $nuevo_curso->id,
                         ]);
+
+                        $nuevo_curso->horarios()->sync(collect($curso['curso']['horarios'])->pluck('id'));
+
                     } else {
                         DB::connection('gds')->rollBack();
                         return response([

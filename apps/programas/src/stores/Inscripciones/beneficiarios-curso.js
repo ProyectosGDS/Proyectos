@@ -17,6 +17,7 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
     const curso = ref({})
     const detalles = ref([])
     const search = ref('')
+    const label_curso = ref('')
 
     const modal = ref({
         cursos: false,
@@ -40,6 +41,7 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
 
         curso.value = detalles.value[0]
         inscripcion.fetch(curso.value.id)
+        label_curso.value = curso.value?.curso?.nombre
         resetData()
         
     }
@@ -47,6 +49,7 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
     const removeCurso = () => {
         curso.value = {}
         inscripcion.beneficiarios = []
+        label_curso.value = ''
     }
 
     const removeInscripcion = (item,index) => {
@@ -78,12 +81,12 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
             const new_beneficiario = inscripcion.beneficiarios.filter(item => item.beneficiario.cui === beneficiariosStore.beneficiario.cui )            
 
             if(!Object.keys(new_beneficiario).length > 0) {
+                let tarifas = curso.value.paga == 'S' ? curso.value.tarifas : {}
                 inscripcion.beneficiarios.unshift({
-                    programa_id : programas.programa,
                     detalle_curso_id : curso.value.id,
                     beneficiario_id : beneficiariosStore.beneficiario.id,
                     beneficiario : beneficiariosStore.beneficiario,
-                    tarifa : beneficiariosStore.beneficiario.edad >= 18 ? curso.value.tarifa_mayor : curso.value.tarifa_menor,
+                    // tarifa : curso.value.paga == 'S' ? (beneficiariosStore.beneficiario.edad >= 18 ? tarifas.tarifa_mayor : tarifas.tarifa_menor) : null,
                 })
     
                 beneficiariosStore.resetData()
@@ -118,12 +121,13 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
 
                     beneficiariosStore.nuevo_registro = false
 
+                    let tarifas = curso.value.paga == 'S' ? curso.value.tarifas : {}
+
                     inscripcion.beneficiarios.unshift({
-                        programa_id : programas.programa,
                         detalle_curso_id : curso.value.id,
                         beneficiario_id : beneficiariosStore.beneficiario.id,
                         beneficiario : beneficiariosStore.beneficiario,
-                        tarifa : beneficiariosStore.beneficiario.edad >= 18 ? curso.value.tarifa_mayor : curso.value.tarifa_menor,
+                        // tarifa : curso.value.paga == 'S' ? (beneficiariosStore.beneficiario.edad >= 18 ? tarifas.tarifa_mayor : tarifas.tarifa_menor) : null,
                     })
 
                     beneficiariosStore.resetData()
@@ -150,10 +154,12 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
         detalles.value = []
     }
 
+
     return {
         beneficiario_curso,
         search,
         curso,
+        label_curso,
         detalles,
         modal,
         errors,

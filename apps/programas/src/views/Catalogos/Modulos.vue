@@ -12,10 +12,19 @@
     const catalogos = useCatalogosStore()
     
     onBeforeMount(() => {
-        programas.fetch()
+
+        const dependencia_id = JSON.parse(atob(localStorage.getItem(btoa('dependencia_id'))))
+
+        if(dependencia_id && dependencia_id == 5){
+            catalogos.getEscuelas()
+        } else {
+            programas.fetch()
+        }
+
         store.getRequirements()
         catalogos.getSedes()
         catalogos.getTemporalidades()
+        catalogos.getTemporalidadesTarifas()
     })
 
 </script>
@@ -28,7 +37,11 @@
             </Tool-Tip>
         </div>
         <div class="flex items-center gap-4 p-4">
-            <Input v-model="store.programa_id" @change="store.fetch(store.programa_id)" option="select" class="flex-1" title="*Seleccione programa para cargar módulos" :error="store.errors.hasOwnProperty('programa_id')">
+            <Input v-if="auth.user.dependencia_id == 5" @change="programas.getProgramasFromEscuelas(store.escuela)" v-model="store.escuela" option="select" title="*Seleccione una escuela" :error="store.errors.hasOwnProperty('escuela')">
+                <option selected></option>
+                <option v-for="escuela in catalogos.escuelas" :value="escuela">{{ escuela }}</option>
+            </Input>
+            <Input v-model="store.programa_id" option="select" class="flex-1" title="*Seleccione programa para cargar módulos" :error="store.errors.hasOwnProperty('programa_id')">
                 <option value=""></option>
                 <template v-for="programa in programas.programas">
                     <option v-if="programa.estado == 'A'" :value="programa.id">{{ programa.nombre }}</option>
@@ -59,6 +72,10 @@
             <Icon @click="store.resetData" icon="fas fa-xmark" class="cursor-pointer text-white" />
         </template>
         <div class="grid gap-4">
+            <Input v-if="auth.user.dependencia_id == 5" @change="programas.getProgramasFromEscuelas(store.escuela)" v-model="store.escuela" option="select" title="*Seleccione una escuela" :error="store.errors.hasOwnProperty('escuela')">
+                <option selected></option>
+                <option v-for="escuela in catalogos.escuelas" :value="escuela">{{ escuela }}</option>
+            </Input>
             <Input v-model="store.modulo.programa_id" option="select" title="*Seleccione programa" :error="store.errors.hasOwnProperty('programa_id')">
                 <option value=""></option>
                 <template v-for="programa in programas.programas">
@@ -66,7 +83,7 @@
                 </template>
             </Input>
             <Input v-model="store.modulo.nombre" option="label" title="*Nombre módulo" maxlength="80" :error="store.errors.hasOwnProperty('nombre')" />
-            <Input v-model="store.modulo.descripcion" option="text-area" title="Descripción" placeholder="Describe el modulo ..." rows="7" maxlength="255" :error="store.errors.hasOwnProperty('descripcion')" />
+            <Input v-model="store.modulo.descripcion" option="text-area" title="*Descripción" placeholder="Describe el modulo ..." rows="7" maxlength="1000" :error="store.errors.hasOwnProperty('descripcion')" />
             <div class="grid xl:flex gap-4">
                 <Select v-model="store.modulo.sede_id" title="*seleccione sede" :items="catalogos.sedes" :fields="['id','nombre_completo']" :error="store.errors.hasOwnProperty('sede_id')" />
                 <Input v-model="store.modulo.temporalidad_id" option="select" title="*seleccione temporalidad" :error="store.errors.hasOwnProperty('temporalidad_id')">
@@ -79,8 +96,8 @@
                 <Input v-model="store.modulo.capacidad" option="label" title="*Capacidad" type="number" min="1" :error="store.errors.hasOwnProperty('capacidad')" />
             </div>
             <div class="grid xl:flex gap-4">
-                <Input v-model="store.modulo.fecha_inicial" option="label" title="inicia" type="date" :error="store.errors.hasOwnProperty('fecha_inicial')" />
-                <Input v-model="store.modulo.fecha_final" option="label" title="termina" type="date" :error="store.errors.hasOwnProperty('fecha_final')" />
+                <Input v-model="store.modulo.fecha_inicial" option="label" title="*inicia" type="date" :error="store.errors.hasOwnProperty('fecha_inicial')" />
+                <Input v-model="store.modulo.fecha_final" option="label" title="*termina" type="date" :error="store.errors.hasOwnProperty('fecha_final')" />
             </div>
             <div class="grid xl:flex justify-evenly gap-4 items-center">
                 <div class="flex justify-evenly gap-3 text-color-4">
@@ -116,9 +133,16 @@
                 </div>
             </div>
             
-            <div v-if="store.modulo.paga == 'S'" class="flex gap-4">
-                <Input option="label" title="Tarifa menor" type="number" v-model="store.modulo.tarifa_menor" :error="store.errors.hasOwnProperty('tarifa_menor')"  />
-                <Input option="label" title="Tarifa mayor" type="number" v-model="store.modulo.tarifa_mayor" :error="store.errors.hasOwnProperty('tarifa_mayor')"  />
+            <div v-if="store.modulo.paga == 'S'" class="grid lg:grid-cols-3 gap-4">
+                <Input option="label" title="Inscripción" type="number" v-model="store.modulo.tarifas.inscripcion" :error="store.errors.hasOwnProperty('tarifas.inscripcion')"  />
+                <Input option="label" title="Tarifa menor" type="number" v-model="store.modulo.tarifas.tarifa_menor" :error="store.errors.hasOwnProperty('tarifas.tarifa_menor')" />
+                <Input option="label" title="Tarifa mayor" type="number" v-model="store.modulo.tarifas.tarifa_mayor" :error="store.errors.hasOwnProperty('tarifas.tarifa_mayor')" />
+                <div class="lg:col-span-3">
+                    <Input option="select" title="Seleccione temporalidad" v-model="store.modulo.tarifas.temporalidad" :error="store.errors.hasOwnProperty('tarifas.temporalidad')" >
+                        <option selected></option>
+                        <option v-for="tempo in catalogos.tempo_tarifas">{{ tempo }}</option>
+                    </Input>
+                </div>
             </div>
         </div>
         <Validate-Errors :errors="store.errors" v-if="store.errors != 0" />
@@ -147,7 +171,7 @@
                 </template>
             </Input>
             <Input v-model="store.modulo.nombre" option="label" title="*Nombre módulo" maxlength="80" :error="store.errors.hasOwnProperty('nombre')" />
-            <Input v-model="store.modulo.descripcion" option="text-area" title="Descripción" placeholder="Describe el modulo ..." rows="7" maxlength="255" :error="store.errors.hasOwnProperty('descripcion')" />
+            <Input v-model="store.modulo.descripcion" option="text-area" title="*Descripción" placeholder="Describe el modulo ..." rows="7" maxlength="255" :error="store.errors.hasOwnProperty('descripcion')" />
             <div class="grid xl:flex gap-4">
                 <Select v-model="store.modulo.sede_id" title="*seleccione sede" :items="catalogos.sedes" :fields="['id','nombre_completo']" :error="store.errors.hasOwnProperty('sede_id')" />
                 <Input v-model="store.modulo.temporalidad_id" option="select" title="*seleccione temporalidad" :error="store.errors.hasOwnProperty('temporalidad_id')">
@@ -160,8 +184,8 @@
                 <Input v-model="store.modulo.capacidad" option="label" title="*Capacidad" type="number" min="1" :error="store.errors.hasOwnProperty('capacidad')" />
             </div>
             <div class="grid grid-cols-2 gap-4">
-                <Input v-model="store.modulo.fecha_inicial" option="label" title="inicia" type="date" :error="store.errors.hasOwnProperty('fecha_inicial')" />
-                <Input v-model="store.modulo.fecha_final" option="label" title="termina" type="date" :error="store.errors.hasOwnProperty('fecha_final')" />
+                <Input v-model="store.modulo.fecha_inicial" option="label" title="*inicia" type="date" :error="store.errors.hasOwnProperty('fecha_inicial')" />
+                <Input v-model="store.modulo.fecha_final" option="label" title="*termina" type="date" :error="store.errors.hasOwnProperty('fecha_final')" />
             </div>
             <Input v-model="store.modulo.capacidad" option="label" title="Capacidad" type="number" min="1" :error="store.errors.hasOwnProperty('capacidad')" />
             <div class="grid xl:flex justify-evenly gap-4 items-center">
@@ -187,19 +211,26 @@
                         NO
                     </div>
                 </div>
-            </div>
-            <div class="flex justify-evenly gap-4">
-                <div class="flex justify-evenly">
-                    <div class="flex items-center gap-2">
-                        <span class="text-sm text-gray-500">PÚBLICO</span>
-                        <Switch v-model="store.modulo.publico" class="h-auto w-14 bg-red-400 has-[:checked]:bg-green-500" :values="['S','N']" />
-                        <span class="text-sm text-gray-500">PRIVADO</span>
+                <div class="flex justify-evenly gap-4">
+                    <div class="flex justify-evenly">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-500">PÚBLICO</span>
+                            <Switch v-model="store.modulo.publico" class="h-auto w-14 bg-red-400 has-[:checked]:bg-green-500" :values="['S','N']" />
+                            <span class="text-sm text-gray-500">PRIVADO</span>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div v-if="store.modulo.paga == 'S'" class="flex gap-4">
-                <Input option="label" title="Tarifa menor" type="number" v-model="store.modulo.tarifa_menor" :error="store.errors.hasOwnProperty('tarifa_menor')"  />
-                <Input option="label" title="Tarifa mayor" type="number" v-model="store.modulo.tarifa_mayor" :error="store.errors.hasOwnProperty('tarifa_mayor')"  />
+            <div v-if="store.modulo.paga == 'S'" class="grid lg:grid-cols-3 gap-4">
+                <Input option="label" title="Inscripción" type="number" v-model="store.modulo.tarifas.inscripcion" :error="store.errors.hasOwnProperty('tarifas.inscripcion')"  />
+                <Input option="label" title="Tarifa menor" type="number" v-model="store.modulo.tarifas.tarifa_menor" :error="store.errors.hasOwnProperty('tarifas.tarifa_menor')" />
+                <Input option="label" title="Tarifa mayor" type="number" v-model="store.modulo.tarifas.tarifa_mayor" :error="store.errors.hasOwnProperty('tarifas.tarifa_mayor')" />
+                <div class="lg:col-span-3">
+                    <Input option="select" title="Seleccione temporalidad" v-model="store.modulo.tarifas.temporalidad" :error="store.errors.hasOwnProperty('tarifas.temporalidad')" >
+                        <option selected></option>
+                        <option v-for="tempo in catalogos.tempo_tarifas">{{ tempo }}</option>
+                    </Input>
+                </div>
             </div>
         </div>
         <Validate-Errors :errors="store.errors" v-if="store.errors != 0" />

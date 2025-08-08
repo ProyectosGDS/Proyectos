@@ -21,6 +21,8 @@ export const useCatalogosStore = defineStore('catalogos', () => {
     const temporalidades = ref([])
     const tipos_actividades = ref([])
     const sedes = ref([])
+    const escuelas = ref([])
+    const tempo_tarifas = ref([])
 
     const loading = ref({
         dependencia : false,
@@ -32,6 +34,8 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         grupos_zonas : false,
         tipos_actividades : false,
         sedes : false,
+        escuelas : false,
+        tempo_tarifas : false,
     })
     const errors = ref([])
 
@@ -211,6 +215,36 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         }
     }
 
+    const getEscuelas = async () => {
+        loading.value.escuelas = true
+        try {                
+            const response = await axios.get('programas/get-escuelas')
+            escuelas.value = response.data
+        } catch (error) {
+            global.manejarError(error)
+            if(error.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.escuelas = false
+        }
+    }
+
+    const getTemporalidadesTarifas = async () => {
+        loading.value.tempo_tarifas = true
+        try {                
+            const response = await axios.get('temporalidades-tarifa')
+            tempo_tarifas.value = response.data
+        } catch (error) {
+            global.manejarError(error)
+            if(error.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.tempo_tarifas = false
+        }
+    }
+
 
     return {
         catalogo_beneficiario,
@@ -225,6 +259,8 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         grupos_zonas,
         temporalidades,
         sedes,
+        escuelas,
+        tempo_tarifas,
         errors,
         loading,
 
@@ -239,5 +275,7 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         getGruposZonas,
         getTiposActividades,
         getSedes,
+        getEscuelas,
+        getTemporalidadesTarifas,
     }
 })

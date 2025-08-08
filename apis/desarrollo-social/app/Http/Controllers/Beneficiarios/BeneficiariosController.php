@@ -227,6 +227,26 @@ class BeneficiariosController extends Controller
         }
     }
 
+    public function destroy(beneficiarios $beneficiario) {
+        try {
+            $beneficiario->deleted_at = now();
+            $beneficiario->save();
+
+            bitacora::create([
+                    'accion' => bitacora::$acciones[17],
+                    'tabla' => 'BENEFICIARIOS',
+                    'descripcion' => 'SE DESHABILITO AL BENEFICIARIO',
+                    'created_at' => now(),
+                    'usuario_id' => auth()->user()->id,
+                    'beneficiario_id' => $beneficiario->id,
+                ]);
+
+            return response('Beneficiario desactivado correctamente.');
+        } catch (\Throwable $th) {
+            return response($th->getMessage());
+        }
+    }
+
     public function consultaBackUp(Request $request) {
         $request->validate([
             'cui' => ['required','numeric','digits:13',new ValidateCui ],

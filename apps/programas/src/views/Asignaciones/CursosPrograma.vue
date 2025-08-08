@@ -7,6 +7,8 @@
     import { useAuthStore } from '@/stores/auth'
     import { useAsignacionesCursosProgramaStore } from '@/stores/Asignaciones/asignaciones-cursos-programa'
     import { useRequisitosStore } from '@/stores/Catalogos/requisitos'
+    import { useGlobalStore } from '@/stores/global'
+    import { useHorariosStore } from '@/stores/Catalogos/horarios'
 
     import Curso from './CursosPrograma/Curso.vue'
     import Instructor from './CursosPrograma/Instructor.vue'
@@ -21,6 +23,9 @@
     const catalogos = useCatalogosStore()
     const requisitos = useRequisitosStore()
     const auth = useAuthStore()
+    const global = useGlobalStore()
+    const horarios = useHorariosStore()
+
 
 
     const searchables = []
@@ -33,24 +38,26 @@
         
         return asignaciones.cursos.filter((item) => {
             return searchables.some((column) => {
-                const value = getObjectValue(item, column)
+                const value = global.getNestedValue(item, column)
                 return String(value).toLowerCase().includes(store.search.toLowerCase())
             })
         })
     } , { cache: true } )
 
-    const getObjectValue  = (object, key) => {
-        const keys = key.split('.')
-        return keys.reduce((value, currentKey) => {
-            return value && value[currentKey]
-        }, object)
-    }
 
     
     onBeforeMount(() => {
-        programas.fetch()
+        const dependencia_id = JSON.parse(atob(localStorage.getItem(btoa('dependencia_id'))))
+        
+        if(dependencia_id && dependencia_id == 5) {
+            catalogos.getEscuelas()
+        }else {
+            programas.fetch()
+        }
+
         catalogos.getCatalogosCurso()
         requisitos.fetch()
+        catalogos.getTemporalidadesTarifas()
     })
 
 </script>
@@ -60,6 +67,10 @@
         <div class="grid xl:grid-cols-2">
             <div class="space-y-4 xl:pr-8">
                 <div class="flex items-center gap-2">
+                    <Input v-if="auth.user.dependencia_id == 5" @change="programas.getProgramasFromEscuelas(store.escuela)" v-model="store.escuela" option="select" title="*Seleccione una escuela" :error="store.errorsDetails.hasOwnProperty('escuela')">
+                        <option selected></option>
+                        <option v-for="escuela in catalogos.escuelas" :value="escuela">{{ escuela }}</option>
+                    </Input>
                     <Input @change="asignaciones.fetch(asignaciones.programa_id)"  v-model="asignaciones.programa_id" option="select" title="*seleccione programas" :error="store.errorsDetails.hasOwnProperty('programa_id')">
                         <option value=""></option>
                         <template v-for="programa in programas.programas">
@@ -81,8 +92,8 @@
                     <Icon @click="store.removeItem('sede')" v-if="store.curso.sede.nombre_completo" icon="fas fa-xmark" class="icon-button btn-danger" />
                 </div>
                 <div class="flex items-center gap-2">
-                    <Input @click="store.openModal('horario')" v-model="store.curso.horario.nombre_completo" option="label" title="*seleccione horario" class="cursor-pointer" :error="store.errorsDetails.hasOwnProperty('horario_id')" readonly />
-                    <Icon @click="store.removeItem('horario')" v-if="store.curso.horario.nombre_completo" icon="fas fa-xmark" class="icon-button btn-danger" />
+                    <Input @click="store.openModal('horarios')" v-model="store.label_horario" option="label" title="*seleccione horarios" class="cursor-pointer" :error="store.errorsDetails.hasOwnProperty('horario_id')" readonly />
+                    <Icon @click="store.removeItem('horarios')" v-if="store.label_horario" icon="fas fa-xmark" class="icon-button btn-danger" />
                 </div>
                 <Input v-model="store.curso.temporalidad" option="select" title="*seleccione temporalidad" :error="store.errorsDetails.hasOwnProperty('temporalidad_id')">
                     <option value=""></option>
@@ -118,9 +129,16 @@
                         </div>
                     </div>
                 </div>
-                <div v-if="store.curso.paga == 'S'" class="flex gap-4">
-                    <Input option="label" title="Tarifa menor" type="number" v-model="store.curso.tarifa_menor" :error="store.errors.hasOwnProperty('tarifa_menor')"  />
-                    <Input option="label" title="Tarifa mayor" type="number" v-model="store.curso.tarifa_mayor" :error="store.errors.hasOwnProperty('tarifa_mayor')"  />
+                <div v-if="store.curso.paga == 'S'" class="grid lg:grid-cols-3 gap-4">
+                    <Input option="label" title="Inscripción" type="number" v-model="store.curso.inscripcion" :error="store.errors.hasOwnProperty('inscripcion')"  />
+                    <Input option="label" title="Tarifa menor" type="number" v-model="store.curso.tarifa_menor" :error="store.errors.hasOwnProperty('tarifa_menor')" />
+                    <Input option="label" title="Tarifa mayor" type="number" v-model="store.curso.tarifa_mayor" :error="store.errors.hasOwnProperty('tarifa_mayor')" />
+                    <div class="lg:col-span-3">
+                        <Input option="select" title="Seleccione temporalidad tarifa" v-model="store.curso.temporalidad_tarifa" :error="store.errors.hasOwnProperty('temporalidad_tarifa')" >
+                            <option selected></option>
+                            <option v-for="tempo in catalogos.tempo_tarifas">{{ tempo }}</option>
+                        </Input>
+                    </div>
                 </div>
                 <Validate-Errors :errors="store.errorsDetails" v-if="store.errorsDetails != 0" />
                 <div class="flex justify-center gap-4">
@@ -146,51 +164,88 @@
                     <div class="grid gap-4">
                         <template v-for="(asignacion,index) in searching_cursos">
                             <div class="flex gap-2">
-                                <Card class="p-4 w-full" :class="{'bg-green-200' : asignacion.id && asignacion.estado == 'A', 'bg-red-200' : asignacion.id && asignacion.estado == 'I', 'bg-gray-200' : !asignacion.hasOwnProperty('id') }">
-                                    <div class="grid grid-cols-2 gap-1 text-xs uppercase">
+                                <Card class="p-4 w-full" :class="{'bg-green-200 text-green-700' : asignacion.id && asignacion.estado == 'A', 'bg-red-200 text-red-700' : asignacion.id && asignacion.estado == 'I', 'bg-gray-200' : !asignacion.hasOwnProperty('id') }">
+                                    <div class="grid grid-cols-2 gap-2 text-xs uppercase">
                                         <span>
-                                            <span class="font-medium">ID ASIGNACIÓN: </span>
-                                            <span>{{ asignacion.id ?? '' }}</span>
+                                            <span class="flex gap-1 items-center">
+                                                <Icon icon="fas fa-user" />
+                                                ID ASIGNACIÓN:
+                                                <span class="font-medium">{{ asignacion.id ?? '' }}</span>
+                                            </span>
                                         </span>
                                         <span>
-                                            <span class="font-medium">TEMPORALIDAD: </span>
-                                            <span>{{ asignacion.temporalidad }}</span>
+                                            <span class="flex gap-1 items-center">
+                                                <Icon icon="fas fa-business-time" />
+                                                TEMPORALIDAD:
+                                                <span class="font-medium">{{ asignacion.temporalidad?.nombre }}</span>
+                                            </span>
                                         </span>
                                         <span>
-                                            <span class="font-medium">CURSO: </span>
-                                            <span>{{ asignacion.curso }}</span>
+                                            <span class="flex gap-1 items-center">
+                                                <Icon icon="fas fa-book" />
+                                                CURSO:
+                                                <span class="font-medium">{{ asignacion.curso?.nombre }}</span>
+                                            </span>
                                         </span>
                                         <span>
-                                            <span class="font-medium">INSTRUCTOR: </span>
-                                            <span>{{ asignacion.instructor }}</span>
+                                            <span class="flex gap-1 items-center">
+                                                <Icon icon="fas fa-person-chalkboard" />
+                                                INSTRUCTOR:
+                                                <span class="font-medium">{{ asignacion.instructor?.nombre }}</span>
+                                            </span>
                                         </span>
                                         <span>
-                                            <span class="font-medium">HORARIO: </span>
-                                            <span>{{ asignacion.horario }}</span>
+                                            <span class="flex gap-1 items-center">
+                                                <Icon icon="fas fa-dollar-sign" />
+                                                PAGA:
+                                                <span class="font-medium">{{ asignacion.paga == 'S' ? 'Sí' : 'No' }}</span>
+                                            </span>
                                         </span>
                                         <span>
-                                            <span class="font-medium">SECCIÓN: </span>
-                                            <span>{{ asignacion.seccion }}</span>
+                                            <span class="flex gap-1 items-center">
+                                                <Icon icon="fas fa-folder-tree" />
+                                                SECCIÓN:
+                                                <span class="font-medium">{{ asignacion.seccion }}</span>
+                                            </span>
                                         </span>
                                         <span>
-                                            <span class="font-medium">CAPACIDAD: </span>
-                                            <span>{{ asignacion.capacidad }}</span>
+                                            <span class="flex gap-1 items-center">
+                                                <Icon icon="fas fa-people-group" />
+                                                CAPACIDAD:
+                                                <span class="font-medium">{{ asignacion.capacidad }}</span>
+                                            </span>
                                         </span>
                                         <span>
-                                            <span class="font-medium">MODALIDAD: </span>
-                                            <span>{{ asignacion.modalidad }}</span>
+                                            <span class="flex gap-1 items-center">
+                                                <Icon icon="fas fa-arrows-rotate" />
+                                                MODALIDAD:
+                                                <span class="font-medium">{{ asignacion.modalidad }}</span>
+                                            </span>
+                                        </span>
+                                        <span>
+                                            <span class="flex gap-1 items-center">
+                                                <Icon icon="fas fa-clock" />
+                                                HORARIOS:
+                                            </span>
+                                            <ul class=" list-decimal pl-4">
+                                                <li v-for="horario in asignacion.horarios">
+                                                    {{ horario.nombre_completo }}
+                                                </li>
+                                            </ul>
+                                        </span>
+                                        <span>
+                                            <span class="flex gap-1 items-center">
+                                                <Icon icon="fas fa-calendar-days" />
+                                                INICIA - TERMINA:
+                                            </span>
+                                            <span class="font-medium">{{ global.parseValue(asignacion.fecha_inicial,'date') + ' A ' + global.parseValue(asignacion.fecha_final,'date') }}</span>
                                         </span>
                                         <span class="col-span-2">
-                                            <span class="font-medium">SEDE: </span>
-                                            <span>{{ asignacion.sede }}</span>
-                                        </span>
-                                        <span>
-                                            <span class="font-medium">INICIA: </span>
-                                            <span>{{ asignacion.fecha_inicial ?? '' }}</span>
-                                        </span>
-                                        <span>
-                                            <span class="font-medium">TERMINA: </span>
-                                            <span>{{ asignacion.fecha_final ?? '' }}</span>
+                                            <span class="flex gap-1 items-center">
+                                                <Icon icon="fas fa-school" />
+                                                SEDE:
+                                            </span>
+                                            <span class="font-medium">{{ asignacion.sede?.nombre_completo }}</span>
                                         </span>
                                     </div>
                                 </Card>
@@ -202,6 +257,9 @@
                                     <template v-if="asignacion.hasOwnProperty('id')">
                                         <Icon v-if="auth.checkPermission('asignar requisitos curso')" @click="asignaciones.assignRequirements(asignacion)" icon="fas fa-list-check" class="icon-button btn-secondary" title="Asignar requisitos" />
                                     </template>
+                                    
+                                    <Icon @click="asignaciones.editHorarios(asignacion.id)" icon="fas fa-clock" title="Editar horario" class="icon-button btn-secondary" />
+                                    
                                     <template v-if="asignacion.hasOwnProperty('id')">
                                         <Icon v-if="auth.checkPermission('editar cursos programa')" @click="asignaciones.show(asignacion.id)" icon="fas fa-pencil" title="editar" class="icon-button btn-secondary" />
                                     </template>
@@ -260,7 +318,7 @@
         </template>
     </Modal>
 
-    <Modal :open="store.modal.horario" title="Horarios" icon="fas fa-clock">
+    <Modal :open="store.modal.horarios" title="Horarios" icon="fas fa-clock">
         <template #close>
             <Icon @click="store.resetData" icon="fas fa-xmark" class="horarior-pointer text-white" />
         </template>
@@ -270,9 +328,11 @@
         <Validate-Errors :errors="store.errors" v-if="store.errors != 0" />
         <template #footer>
             <Button @click="store.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
-            <Button @click="store.selectedItem('horario')" text="Seleccionar" icon="fas fa-check" class="btn-primary"/>
+            <Button @click="store.selectedItem('horarios')" text="Seleccionar" icon="fas fa-check" class="btn-primary"/>
         </template>
     </Modal>
+
+    <!-- EDITAR -->
 
     <Modal :open="asignaciones.modal.delete">
         <div class="flex items-center justify-center gap-4">
@@ -310,7 +370,6 @@
             <Select v-model="asignaciones.curso.curso_id" title="*seleccione curso" :items="catalogos.catalogos_curso.cursos" :fields="['id','nombre']" :error="asignaciones.errors.hasOwnProperty('curso_id')" />
             <Select v-model="asignaciones.curso.instructor_id" title="*seleccione instructor" :items="catalogos.catalogos_curso.instructores" :fields="['id','nombre']" :error="asignaciones.errors.hasOwnProperty('instructor_id')" />
             <Select v-model="asignaciones.curso.sede_id" title="*seleccione sede" :items="catalogos.catalogos_curso.sedes" :fields="['id','nombre_completo']" :error="asignaciones.errors.hasOwnProperty('sede_id')" />
-            <Select v-model="asignaciones.curso.horario_id" title="*seleccione horario" :items="catalogos.catalogos_curso.horarios" :fields="['id','nombre_completo']" :error="asignaciones.errors.hasOwnProperty('horario_id')" />
             <Input v-model="asignaciones.curso.temporalidad_id" option="select" title="*seleccione temporalidad" :error="asignaciones.errors.hasOwnProperty('temporalidad_id')">
                 <option value=""></option>
                 <option v-for="temporalidad in catalogos.catalogos_curso.temporalidades" :value="temporalidad.id">{{ temporalidad.nombre }}</option>
@@ -322,26 +381,26 @@
                 <Input v-model="asignaciones.curso.fecha_final" option="label" title="termina" type="date" :error="asignaciones.errors.hasOwnProperty('fecha_final')" />
             </div>
             <div class="flex justify-evenly">
+                <div class="flex justify-evenly items-center gap-4">
+                    <div class="flex justify-evenly gap-3 text-color-4">
+                        <label class="flex gap-2 cursor-pointer">
+                            <input type="radio" v-model="asignaciones.curso.modalidad" value="PRESENCIAL" name="modalidad">
+                            <span>PRESENCIAL</span>
+                        </label>
+                        <label class="flex gap-2 cursor-pointer">
+                            <input type="radio" v-model="asignaciones.curso.modalidad" value="VIRTUAL" name="modalidad">
+                            <span>VIRTUAL</span>
+                        </label>
+                        <label class="flex gap-2 cursor-pointer">
+                            <input type="radio" v-model="asignaciones.curso.modalidad" value="HIBRIDA" name="modalidad">
+                            <span>HIBRIDA</span>
+                        </label>
+                    </div>
+                </div>
                 <div class="flex items-center gap-2">
                     <span class="text-sm text-gray-500">PÚBLICO</span>
                     <Switch v-model="asignaciones.curso.publico" class="h-auto w-14 bg-red-400 has-[:checked]:bg-green-500" :values="['S','N']" />
                     <span class="text-sm text-gray-500">PRIVADO</span>
-                </div>
-            </div>
-            <div class="flex justify-evenly items-center gap-4">
-                <div class="flex justify-evenly gap-3 text-color-4">
-                    <label class="flex gap-2 cursor-pointer">
-                        <input type="radio" v-model="asignaciones.curso.modalidad" value="PRESENCIAL" name="modalidad">
-                        <span>PRESENCIAL</span>
-                    </label>
-                    <label class="flex gap-2 cursor-pointer">
-                        <input type="radio" v-model="asignaciones.curso.modalidad" value="VIRTUAL" name="modalidad">
-                        <span>VIRTUAL</span>
-                    </label>
-                    <label class="flex gap-2 cursor-pointer">
-                        <input type="radio" v-model="asignaciones.curso.modalidad" value="HIBRIDA" name="modalidad">
-                        <span>HIBRIDA</span>
-                    </label>
                 </div>
                 <div>
                     <h1 class="uppercase text-color-4 text-center">*DE PAGA</h1>
@@ -352,9 +411,17 @@
                     </div>
                 </div>
             </div>
-            <div v-if="asignaciones.curso.paga == 'S'" class="flex gap-4">
-                <Input option="label" title="Tarifa menor" type="number" v-model="asignaciones.curso.tarifa_menor" :error="asignaciones.errors.hasOwnProperty('tarifa_menor')"  />
-                <Input option="label" title="Tarifa mayor" type="number" v-model="asignaciones.curso.tarifa_mayor" :error="asignaciones.errors.hasOwnProperty('tarifa_mayor')"  />
+            
+            <div v-if="asignaciones.curso.paga == 'S'" class="grid lg:grid-cols-3 gap-4">
+                <Input option="label" title="Inscripción" type="number" v-model="asignaciones.curso.tarifas.inscripcion" :error="asignaciones.errors.hasOwnProperty('tarifas.inscripcion')"  />
+                <Input option="label" title="Tarifa menor" type="number" v-model="asignaciones.curso.tarifas.tarifa_menor" :error="asignaciones.errors.hasOwnProperty('tarifas.tarifa_menor')" />
+                <Input option="label" title="Tarifa mayor" type="number" v-model="asignaciones.curso.tarifas.tarifa_mayor" :error="asignaciones.errors.hasOwnProperty('tarifas.tarifa_mayor')" />
+                <div class="lg:col-span-3">
+                    <Input option="select" title="Seleccione temporalidad tarifa" v-model="asignaciones.curso.tarifas.temporalidad" :error="asignaciones.errors.hasOwnProperty('tarifas.temporalidad')" >
+                        <option selected></option>
+                        <option v-for="tempo in catalogos.tempo_tarifas">{{ tempo }}</option>
+                    </Input>
+                </div>
             </div>
         </div>
         <Validate-Errors :errors="asignaciones.errors" v-if="asignaciones.errors != 0" />
@@ -364,6 +431,30 @@
         </template>
     </Modal>
     
+    <Modal :open="asignaciones.modal.horarios" title="Editar horarios del curso" icon="fas fa-clock">
+        <template #close>
+            <Icon @click="asignaciones.resetData" icon="fas fa-xmark" class="cursor-pointer text-white" />
+        </template>
+        <div>
+            <Data-Table 
+                :headers="horarios.headers" 
+                :data="horarios.horarios"
+                :loading="horarios.loading.fetch"
+                :excel="false" 
+                :rowsPerPage="5" 
+                :multiSelect="true" 
+                @selectdAllItems="asignaciones.selectHorarios"
+                :itemsSelected="asignaciones.horarios" 
+            />
+        </div>
+        
+        <Validate-Errors :errors="asignaciones.errors" v-if="asignaciones.errors != 0" />
+        <template #footer>
+            <Button @click="asignaciones.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
+            <Button @click="asignaciones.syncHorarios" text="Actualizar" icon="fas fa-arrows-rotate" class="btn-primary" :loading="asignaciones.loading.update" />
+        </template>
+    </Modal>
+
     <Modal :open="asignaciones.modal.requisitos" title="Asignar requisitos a curso" icon="fas fa-list-check">
         <template #close>
             <Icon @click="asignaciones.resetData" icon="fas fa-xmark" class="cursor-pointer text-white" />

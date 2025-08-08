@@ -14,6 +14,7 @@ use App\Http\Controllers\Programas\ProgramasController;
 use App\Http\Controllers\Programas\RequisitosController;
 use App\Http\Controllers\Programas\SedesController;
 use App\Models\adm_gds\estados_actividades;
+use App\Models\adm_gds\tarifas_cursos;
 use App\Models\adm_gds\temporalidades;
 use App\Models\adm_gds\tipos_actividades;
 use Illuminate\Support\Facades\Route;
@@ -26,9 +27,11 @@ Route::get('temporalidades',function(){
 Route::get('programas/modulos-cursos',[ProgramasController::class,'get_modulos_cursos']);
 Route::get('programas/beneficiarios-modulo-curso',[ProgramasController::class,'get_beneficiarios_modulo_curso']);
 Route::get('programas/get-actividades/{programa_id}/{year}',[ProgramasController::class,'get_actividades']);
-Route::get('programas/get-cursos/{programa_id}',[ProgramasController::class,'get_cursos']);
-Route::get('programas/get-modulos/{programa_id}',[ProgramasController::class,'get_modulos']);
+Route::get('programas/get-cursos/{programa}/{all}',[ProgramasController::class,'get_cursos']);
+Route::get('programas/get-modulos/{programa}',[ProgramasController::class,'get_modulos']);
 Route::get('programas/get-beneficiarios/{programa_id}/{year}',[ProgramasController::class,'get_beneficiarios']);
+Route::get('programas/get-escuelas',[ProgramasController::class,'get_escuelas']);
+Route::get('programas/escuela/{escuela}',[ProgramasController::class,'programas_escuelas']);
 Route::post('programas/store-cursos',[ProgramasController::class,'store_cursos']);
 Route::post('programas/store-actividades',[ProgramasController::class,'store_actividades']);
 Route::apiResource('programas',ProgramasController::class);
@@ -37,12 +40,12 @@ Route::get('modulos/get-cursos/{modulo_id}',[ModulosController::class,'get_curso
 Route::post('modulos/store-cursos',[ModulosController::class,'store_cursos']);
 Route::post('modulos/asignar-requisitos/{modulo}',[ModulosController::class,'assign_requirements']);
 Route::apiResource('modulos',ModulosController::class);
-
 Route::apiResource('cursos',CursosController::class);
 
 Route::get('detalles-curso/get-requisitos/{curso}',[DetallesCursosController::class,'getRequirements']);
 Route::post('detalles-curso/disabled/{curso}',[DetallesCursosController::class,'disabled']);
 Route::post('detalles-curso/asignar-requisitos/{curso}',[DetallesCursosController::class,'assigRequirements']);
+Route::post('detalles-curso/sync-horarios/{curso}',[DetallesCursosController::class,'syncHorarios']);
 Route::apiResource('detalles-curso',DetallesCursosController::class)->parameters(['detalles-curso' => 'curso']);
 
 Route::apiResource('instructores',InstructoresController::class)->parameters(['instructores' => 'instructor']);
@@ -67,7 +70,6 @@ Route::apiResource('inscripciones-actividad',InscripcionesActividadesController:
 
 Route::apiResource('requisitos',RequisitosController::class);
 
-
 Route::get('tipos-actividades',function() {
     try {
         return response(tipos_actividades::all());
@@ -79,6 +81,14 @@ Route::get('tipos-actividades',function() {
 Route::get('estados-actividades',function() {
     try {
         return response(estados_actividades::all());
+    } catch (\Throwable $th) {
+        return response($th->getMessage());
+    }
+});
+
+Route::get('temporalidades-tarifa',function(){
+    try {
+        return response(tarifas_cursos::$temporalidad);
     } catch (\Throwable $th) {
         return response($th->getMessage());
     }

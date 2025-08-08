@@ -15,7 +15,6 @@ class beneficiarios_cursos extends Model
         'detalle_curso_id',
         'created_at',
         'estado',
-        'tarifa',
     ];
 
 

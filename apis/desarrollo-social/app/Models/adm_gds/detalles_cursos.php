@@ -21,7 +21,6 @@ class detalles_cursos extends Model
         'curso_id',
         'instructor_id',
         'sede_id',
-        'horario_id',
         'programa_id',
         'temporalidad_id',
         'estado',
@@ -29,11 +28,19 @@ class detalles_cursos extends Model
         'fecha_final',
         'publico',
         'paga',
-        'tarifa_menor',
-        'tarifa_mayor',
     ];
 
+    
     // RELACIONES
+
+    public function tarifas() {
+        return $this->hasOne(tarifas_cursos::class,'curso_modulo_id')->where('tipo','CURSO');
+    }
+
+    public function horarios() {
+        return $this->belongsToMany(horarios::class,'cursos_horarios','detalle_curso_id','horario_id');
+    }
+
     public function modulo() {
         return $this->belongsToMany(modulos::class,'cursos_modulos','detalle_curso_id','modulo_id');
     }
@@ -48,9 +55,6 @@ class detalles_cursos extends Model
         return $this->belongsTo(programas::class,'programa_id');
     }
 
-    public function horario() {
-        return $this->belongsTo(horarios::class,'horario_id');
-    }
 
     public function sede() {
         return $this->belongsTo(sedes::class,'sede_id');
