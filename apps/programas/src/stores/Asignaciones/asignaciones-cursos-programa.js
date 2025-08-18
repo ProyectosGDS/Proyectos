@@ -254,10 +254,10 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
                 item.curso_id == curso.value.curso_id && 
                 item.sede_id == curso.value.sede_id &&
                 item.instructor_id == curso.value.instructor_id &&
-                item.horario_id == curso.value.horario_id &&
+                item.seccion == curso.value.seccion &&
                 item.id != curso.value.id
             ) {
-                errors.value = { detalles: ['El curso: '+item.curso+' ya existen en el listado'] }
+                errors.value = { detalles: ['El curso: '+item.curso.nombre+' ya existen en el listado'] }
                 error = true
                 return
             }

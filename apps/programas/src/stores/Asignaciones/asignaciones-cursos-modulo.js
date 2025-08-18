@@ -205,7 +205,7 @@ export const useAsignacionesCursosModuloStore = defineStore('asignaciones-cursos
                 item.curso.curso_id == curso.value.curso_id && 
                 item.curso.sede_id == curso.value.sede_id &&
                 item.curso.instructor_id == curso.value.instructor_id &&
-                item.curso.horario_id == curso.value.horario_id &&
+                item.curso.seccion == curso.value.seccion &&
                 item.curso.id != curso.value.id
             ) {
                 errors.value = { detalles: ['El curso: '+item.curso.curso.nombre+' ya existen en el listado'] }
