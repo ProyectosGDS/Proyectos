@@ -1,117 +1,166 @@
 <script setup>
-    import { ref,computed, onMounted, watchEffect} from 'vue'
     import axios from 'axios'
+    import { ref, onMounted, computed } from 'vue'
     import Tabla from './Tabla.vue'
-    import LoadingBar from './LoadingBar.vue'
-    import { useGlobalStore } from '@/stores/global'
-
-    const global = useGlobalStore()
+    import { onClickOutside } from '@vueuse/core'
 
     const props = defineProps({
-        headers:{
+        headers : {
             type : Array,
-            default : () => []
-        }, 
-        src: {
-            type : String,
-            default : ''
+            default : () => [],
+            required : true
         },
-        color:{
+        url : {
             type : String,
-            default:'bg-color-1 text-color-4'
+            default : '',
+            required : true
         },
-        reload : {
+        multiselect : {
             type : Boolean,
             default : false
         }
     })
 
-    const emits = defineEmits(['reloadData'])
+    const emits = defineEmits(['selected'])
 
-    const page = ref(1)
-    const search = ref('')
     const data = ref([])
-    const paginate = ref({
-        current_page : 0,
-        from : 0,
-        last_page : 0,
+    const loading = ref({
+        fetch : false,
+        export : false
+    })
+    const pagination = ref({
+        page : 1,
         per_page : 10,
-        to : 0,
-        total : 0,
+        total : null,
+        last_page : null,
+        from : null,
+        to : null,
+        current_page : null
     })
-    const order = ref('desc')
-    const column = ref('')
-    const loading = ref(false)
+    const selectedItems = ref([])
+    const search = ref('')
+    const filters = ref([
+        { field : '', operator : '', value : '' }
+    ])
 
-    const displayedPages =  computed(() => {
+    const operator = ['=', '!=', '>', '<', '>=', '<=','in','not in', 'null', 'not null', 'between', 'not between', 'like', 'not like']
+    const openFilters = ref(false)
+    const hoveredColumn = ref(null);
+    const target = ref(null)
 
-        const totalDisplayedPages = 6
-        const halfDisplayedPages = Math.floor(totalDisplayedPages / 2)
-        let startPage = Math.max(1 - halfDisplayedPages, paginate.value.current_page)
-        let endPage = Math.min(startPage + totalDisplayedPages - 1, paginate.value.last_page)
-
-        if (endPage - startPage + 1 < totalDisplayedPages) {
-            startPage = Math.max(endPage - totalDisplayedPages + 1, 1)
-        }
-
-
-        return Array(endPage - startPage + 1).fill().map((_, index) => startPage + index)
-
+    const fields = computed(() => {
+        return props.headers.map(header => {
+            if(header.exclude) return
+            return header.key.toUpperCase()
+        })
     })
 
-    const fetch = async (page) => {
-        loading.value = true
-        try {
-            const response = await axios.get(props.src,{
-                params : {
-                    page : page,
-                    per_page : paginate.value.per_page,
-                    search : search.value,
-                    order : order.value,
-                    column : column.value
+    const sortData = ref({
+        field_first : fields.value[0],
+        field : fields.value[0],
+        direction : 'asc'
+    })
+
+    const processedFilters = computed(() => {
+        return filters.value.map(filter => {
+            const { operator, value } = filter
+            const arrayOperators = ['between', 'not between', 'in', 'not in']
+
+            if (arrayOperators.includes(operator) && typeof value === 'string') {
+                return {
+                    ...filter,
+                    value: convertToArray(value)
                 }
-            })
+            }
+            return filter
+        })
+    })
 
-            const { data: rows, ...pagination } = response.data
-            data.value = rows
-            paginate.value = pagination
+    const convertToArray = (value) => {
+        return value.split(',').map(item => {
+            item = item.trim()
 
-            if(props.reload == true ) {
-                emits('reloadData',false)
+            if (!isNaN(item)) {
+                const num = Number(item)
+                return num.toString() === item ? num : item
             }
 
-        } catch (error) {
-            global.manejarError(error)
-        } finally {
-            loading.value = false
-        }
+            if (/^\d{4}-\d{2}-\d{2}$/.test(item)) {
+                return item
+            }
+
+            return item
+        })
     }
 
-    const changePage = (pag) => {
-        page.value = pag
-        fetch(page.value)
+    const fetch = async () => {
+        loading.value.fetch = true
+        
+        try {
+            const response = await axios.get(props.url,{
+                params : {
+                    
+                    page : pagination.value.page == 0 ? pagination.value.page = 1 : pagination.value.page,
+                    per_page : pagination.value.per_page,
+                    sort : sortData.value,
+                    searching : {
+                        search : search.value,
+                        fields : fields.value,
+                        filters : processedFilters.value,
+                    }
+                }
+            })
+            
+            const { data: rows, ...paginate } = response.data
+            
+            data.value = rows
+
+            Object.assign(pagination.value,paginate)
+
+        } catch (error) {
+            console.error(error)
+        } finally {
+            loading.value.fetch = false
+        }
     }
 
     const nextPage = () => {
-        if (page.value < paginate.value.last_page) {
-            page.value = page.value + 1
-            fetch(page.value)
+        if(parseInt(pagination.value.page) <= parseInt(pagination.value.last_page)) {
+            pagination.value.page ++
+            fetch()
         }
     }
 
-    const previousPage = () => {
-        if (page.value > 1) {
-            page.value = page.value - 1
-            fetch(page.value)
+    const lastPage = () => {
+        pagination.value.page = pagination.value.last_page
+        fetch()
+    }
+
+    const firstPage = () => {
+        pagination.value.page = 1
+        fetch()
+    }
+
+    const previusPage = () => {
+        if(parseInt(pagination.value.page) >= 2){
+            pagination.value.page --
+            fetch()
         }
     }
 
-    const sort = (colum_name) => {
-        column.value = colum_name
-        order.value = (order.value == 'asc') ? 'desc' : 'asc'
-        fetch(page.value)
+    const sort = (column_name) => {
+        sortData.value.field = column_name
+        sortData.value.direction = sortData.value.direction == 'asc' ? 'desc' : 'asc'
+        fetch()
     }
 
+    const getObjectValue  = (object, key) => {
+        const keys = key.split('.')
+        return keys.reduce((value, currentKey) => {
+            return value && value[currentKey]
+        }, object)
+    }
+    
     const typeValue = (value, type) => {
 
         let result
@@ -120,6 +169,7 @@
             case 'numeric':
                 result = new Intl.NumberFormat("es-GT").format(value)
                 break
+
             case 'currency':
                 result = new Intl.NumberFormat("es-GT", {
                     'style': "currency",
@@ -127,6 +177,7 @@
                     'minimumFractionDigits': 2,
                 }).format(value)
                 break
+
             case 'date':
                 
                     const date = new Date(value)
@@ -137,199 +188,274 @@
                     result = value ? `${y}-${m}-${d}` : ''
 
                 break
+
             case 'datetime':
                 
                 const fecha = new Date(value)
-                const dia = fecha.getfecha().padStart(2,'0')
-                const mes = fecha.getMonth.padStart(2,'0')
-                const anio = fecha.getFullYear()
-                const h = fecha.getHours().padStart(2,'0')
-                const mi = fecha.getMinutes()
-                const s = fecha.getSeconds()
+                const dia = fecha.getDate().toString().padStart(2,'0')
+                const mes = fecha.getMonth().toString().padStart(2,'0')
+                const anio = fecha.getFullYear().toString()
+                const h = fecha.getHours().toString().padStart(2,'0')
+                const mi = fecha.getMinutes().toString().padStart(2,'0')
+                const s = fecha.getSeconds().toString().padStart(2,'0')
 
                 result = `${anio}-${mes}-${dia} ${h}:${mi}:${s}`
 
                 break
+
+            case 'time':
+                
+                const f = new Date(value)
+                const hours = f.getHours().toString().padStart(2,'0')
+                const minutes = f.getMinutes().toString().padStart(2,'0')
+                const seconds = f.getSeconds().toString().padStart(2,'0')
+
+                result = `${hours}:${minutes}:${seconds}`
+
+                break
+
+            case 'phone':
+                if(value == null) return ''
+                
+                const phone = value.toString()
+                result = `${phone.substring(0,4)} - ${phone.substring(4,8)}`
+
+                break
+
             default:
                 result = value
                 break
         }
+
         return result
     }
 
-    const getObjectValue = (object, key) => {
-        const keys = key.split('.')
-        return keys.reduce((value, currentKey) => {
-            return value && value[currentKey]
-        }, object)
+    const selected = () => {
+        emits('selected',selectedItems.value)
     }
 
-    watchEffect(() => {
+    const changePerPage = () => {
+        pagination.value.page = 1
+        fetch()
+    }
 
-        if(props.reload) {
-            fetch()
+    const exportData = async (type) => {
+
+        loading.value.export = true
+
+        try {
+
+            const response = await axios.post('exportar-excel',
+                {
+                    columns: props.headers,
+                    data: filteredData.value
+                },
+                {
+                    responseType: 'blob'
+                })
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', `reporte.${type}`)
+
+            document.body.appendChild(link)
+            link.click();
+
+            window.URL.revokeObjectURL(url)
+            document.body.removeChild(link)
+
+
+        } catch (error) {
+            global.manejarError(error);
+
+        } finally {
+
+            loading.value.export = false
         }
-    })
-    
-    onMounted(() => {
-        if (!props.reload) {
-            fetch()
+    }
+
+    const deleteFilter = (index) => {
+        
+        if(index == 0) {
+            filters.value[0] = { field : '', operator : '', value : '' }
+            return
         }
 
-        setTimeout(() => {
-            if (data.value.length === 0 && props.loading === true) {
-                props.loading = false
-            }
-        }, 2000)
-    })
+        filters.value.splice(index, 1)
+    }
 
+    onClickOutside(target, () => openFilters.value = false)
+
+    onMounted(() => fetch())
 
 </script>
 
 <template>
-    <section class="px-4 lg:px-7">
-        <div class="md:flex md:items-center md:justify-between">
-            <div  class="text-color-4 flex items-center">
+    <div class="grid gap-5 w-full p-8 border border-gray-300 bg-white rounded-lg">
+        <div class="flex justify-between items-center">
+            <div class="flex gap-3">
                 <span>Mostrar</span>
-                <select v-model="paginate.per_page" @change="fetch" class="text-center w-full focus:outline-none ring-0">
-                    <option>5</option>
-                    <option>10</option>
-                    <option>25</option>
-                    <option>50</option>
-                    <option>100</option>
+                <select @change="changePerPage()" v-model="pagination.per_page" class="text-center focus:outline-none">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="500">500</option>
+                    <option value="1000">1000</option>
                 </select>
                 <span>registros</span>
             </div>
-            <div class="flex items-center gap-1">
-                <Input icon="fas fa-search" class="h-10" type="search" placeholder="Buscar ..." v-model="search" @keyup="fetch" />
+            <div class="flex items-center gap-2">
+                <Input @keypress.enter="fetch()" v-model="search" icon="fas fa-search" type="search" placeholder=" Buscar..."/>
+                <div class="relative" ref="target">
+                    <Icon @click="openFilters = !openFilters" icon="fas fa-filter" class="icon-btn text-gray-400 text-lg" title="Filtros avanzados" :class="{'text-green-500' : filters.length > 0 && filters[0].value != ''}" />
+                    <Transition name="fade">
+                        <div v-show="openFilters" class="bg-white border text-gray-600 border-gray-400 shadow-xl rounded-lg space-y-2 absolute top-9 -right-16 z-10 p-2 grid justify-items-center">
+                            <Button @click="filters.push({ field : '', operator : '', value : '' })" text="+" icon="fas fa-filter" class="btn-secondary" title="Agregar filtro" />
+                            <div class="grid gap-2">
+                                <div class="flex justify-around font-semibold uppercase">
+                                    <label>Columna</label>
+                                    <label>Operador</label>
+                                    <label>Valores</label>
+                                </div>
+                                <div v-for="(filter,index) in filters" :key="index" class="flex gap-2 items-center">
+                                    <select v-model="filter.field" class="form-control uppercase">
+                                        <template v-for="field in props.headers">
+                                            <option v-if="!field.exclude" :value="field.key">{{ field.title }}</option>
+                                        </template>
+                                    </select>
+                                    <select v-model="filter.operator" class="form-control uppercase">
+                                        <option v-for="op in operator" :key="op" :value="op">{{ op }}</option>
+                                    </select>
+                                    <input v-model="filter.value" type="text" class="form-control">
+                                    <Icon @click="deleteFilter(index)" icon="fas fa-times" class="icon-btn text-red-500" title="Eliminar filtro" />
+                                </div>
+                            </div>
+                            <Button @click="fetch()" icon="fas fa-check" text="Aplicar filtro" class="btn-secondary" :loading="loading.fetch" />
+                        </div>
+                    </Transition>
+                </div>
+                <Icon @click="fetch()" icon="fas fa-arrows-rotate" class="icon-btn text-gray-400 hover:text-blue-500 text-lg" title="Recargar" :class="loading.fetch ? 'animate-spin' : ''" />
             </div>
         </div>
 
-        <!-- MOBILE CARDS -->
-        <div class="grid gap-4 lg:hidden py-4">
-            <Card v-for="item in data" :key="item.id" class="bg-violet-50 p-2">
-                <table class="w-full">
-                    <tr v-for="head in props.headers" class="hover:bg-violet-200">
-                        <td class="px-4 font-semibold uppercase text-sm select-none" :width="head.width" align="left" :hidden="head.hidden">
-                            <p class="text-color-4">{{ head.title }}</p>
-                        </td>
-                        <td :align="head.align ?? 'center'" :width="head.width" :hidden="head.hidden">
-                            <slot :name="head.key" :item="item">
-                                <p :class="head.class ?? 'text-sm'">
-                                    {{ typeValue(getObjectValue(item, head.key), head.type) }}
-                                </p>
-                            </slot>
-                        </td>
-                    </tr>
-                </table>
-            </Card>
-        </div>
-
-        <!-- END MOBILE CARDS -->
-
-        <Tabla class="hidden lg:block">
+        <Loading-Bar v-if="loading.fetch" class="h-1 bg-blue-300" />
+        
+        <Tabla>
             <template #thead>
-                <tr>
-                    <th v-for="(head, index) in props.headers"
-                        @click="(head.sort == false) ? null : sort(head.key)" 
-                        :key="index" 
-                        class="px-4 py-3.5 text-color-4 text-sm font-normal cursor-pointer select-none" 
-                        :width="head.width" 
-                        :align="head.align ?? 'left'"
-                        :hidden="head.hidden">
-                        {{ head.title }}
+                <tr class="bg-gray-50">
+                    <th v-if="props.multiselect"></th>
+                    <th v-for="(header,colIndex) in props.headers" @click="(header.hidden || header.exclude) ? () => {} : sort(header.key.toUpperCase())"
+                        @mouseenter="hoveredColumn = colIndex "
+                        @mouseleave="hoveredColumn = null"
+                        :align="header.align ?? 'left'"
+                        :class="[
+                            header.class ?? 'uppercase',
+                            hoveredColumn === colIndex  ? 'bg-gray-100' : '',
+                        ]"
+                        :width="header.width ?? 'auto'"
+                        :key="header.key">
+
+                        <div v-if="!header.hidden" class="flex gap-1 items-center">
+                            <span v-if="sortData.field === header.key.toUpperCase()">
+                                {{ sortData.direction === 'asc' ? '▲' : '▼' }}
+                            </span>
+                            {{ header.title }}
+                            <Icon v-if="!header.exclude" icon="fas fa-sort" class="text-[10px]" />
+                        </div>
                     </th>
                 </tr>
             </template>
             <template #tbody>
-                <tr v-if="loading">
-                    <td align="center" :colspan="props.headers.length" class="px-10">
-                        <Loading-Bar class="h-1 bg-color-4" />
-                        <span class="animate-ping">Cargando data ....</span>
-                    </td>
-                </tr>
-                <tr v-for="item in data" :key="item.id" class="hover:bg-violet-50 text-gray-800 select-none">
-                    <td v-for="(head,index) in props.headers" class="px-4" :class="head.class" :align="head.align" :width="head.width" :key="index">
-                        <slot :name="head.key" :item="item">
-                            {{ typeValue(getObjectValue(item,head.key),head.type) }}
-                            <span v-if="head.text">
-                                {{ head.text }}
-                            </span>
-                        </slot>
-                    </td>
-                </tr>
-                <tr v-if="data.length === 0 && loading === false">
-                    <td align="center" :colspan="props.headers.length">
-                        No hay data ....
-                    </td>
-                </tr>
-            </template>
-            <template #tfoot>
+                <slot name="tbody" :items="data">
+                    <tr v-for="(item,index) in data" class="hover:bg-gray-100" :class="{'bg-gray-100' : selectedItems.includes(item)}" >
+                        <td v-if="props.multiselect">
+                            <input @change="selected()" type="checkbox" class="hover:scale-125 cursor-pointer" v-model="selectedItems" :value="item">
+                        </td>
+                        <td v-for="(header,colIndex) in props.headers" 
+                            :key="index" 
+                            :title="item[header.key]" 
+                            :class="[
+                                header.class ?? 'uppercase',
+                                hoveredColumn === colIndex  ? 'bg-gray-100' : ''
+                            ]"
+                            :width="header.width ?? 'auto'" 
+                            :align="header.align ?? 'left'" >
+
+                            <slot :name="header.key" :item="item">
+                                {{ typeValue(getObjectValue(item, header.key), header.type )}}
+                                <span v-if="header.text">
+                                    {{ header.text }}
+                                </span>
+                            </slot>
+                            
+                        </td>
+                    </tr>
+                </slot>
             </template>
         </Tabla>
-
-        <div class="flex items-center justify-between">
-            <div class="flex flex-1 justify-between md:hidden">
-                <a @click="previousPage" 
-                    class=" select-none relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200">
-                    Anterior
-                </a>
-                <a @click="nextPage" 
-                    class=" select-none relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200">
-                    Siguiente
-                </a>
+        
+        <div class="flex justify-between">
+            <div class="flex gap-3">
+                <span>Mostrando</span>
+                <span>{{ pagination.from }}</span>
+                <span>al</span>
+                <span>{{ pagination.to }}</span>
+                <span>de</span>
+                <span>{{ pagination.total }}</span>
+                <span>registros</span>
             </div>
-
-            <div class="hidden md:flex md:flex-1 sm:items-center sm:justify-between">
-                <div>
-                    <p class="text-xs text-color-4">
-                        Mostrando
-                        <span class="font-medium">{{ paginate.from }}</span>
-                        a
-                        <span class="font-medium">{{ paginate.to  }}</span>
-                        de
-                        <span class="font-medium">{{ paginate.total }}</span>
-                        resultados
-                    </p>
-                </div>
-                <div v-show="displayedPages.length > 1">
-                    <nav class="flex gap-x-2">
-                        <a v-if="page > 4" @click="changePage(1)"
-                            class="cursor-pointer relative flex items-center px-3 py-1.5 font-semibold text-color-4 rounded-full hover:bg-gray-200">
-                            <Icon icon="fas fa-angles-left" class="text-xs" />
-                        </a>
-                        <a v-if="page != 1" @click="previousPage" 
-                        class="cursor-pointer relative flex items-center px-3 py-1.5 text-sm font-semibold text-color-4 rounded-full hover:bg-gray-200">
-                            <span class="sr-only">Previous</span>
-                            <Icon icon="fas fa-angle-left" class="text-xs" />
-                        </a>
-                        <a :class=" page === paginate.current_page ? ' z-10 ' + props.color : '' " 
-                            v-for="page in displayedPages" :key="page" @click="changePage(page)" 
-                            class="cursor-pointer select-none relative flex items-center px-3 py-1.5 text-color-4 text-sm font-semibold rounded-full hover:bg-gray-200 hover:text-color-4">
-                            {{ page }}
-                        </a>
-                        <a v-if="page != paginate.last_page" @click="nextPage" 
-                        class="cursor-pointer relative flex items-center px-3 py-1.5 text-sm font-semibold text-color-4 rounded-full hover:bg-gray-200">
-                            <span class="sr-only">Next</span>
-                            <Icon icon="fas fa-angle-right" class="text-xs" />
-                        </a>
-                        <a v-if="page != (paginate.last_page)" @click="changePage(paginate.last_page)"  
-                            class="cursor-pointer relative flex items-center px-3 py-1.5 font-semibold text-color-4 rounded-full hover:bg-gray-200">
-                            <Icon icon="fas fa-angles-right" class="text-xs" />
-                        </a>
-                    </nav>
-                </div>
+            <div class="flex select-none items-center gap-2">
+                <Icon @click="firstPage" icon="fas fa-backward-fast" class="icon-btn text-lg" title="Primera" />
+                <Icon @click="previusPage" icon="fas fa-caret-left" class="icon-btn text-lg" title="Anterior" />
+                <span>Página</span>
+                <input type="number" min="1" :max="pagination.lastPage" v-model="pagination.page" @keypress.enter="fetch" class="w-14 text-center focus:outline-none">
+                <span> / </span>
+                <input type="text" v-model="pagination.last_page" class="w-14 text-center focus:outline-none" readonly>
+                <Icon @click="nextPage" icon="fas fa-caret-right" class="icon-btn text-lg" title="Siguiente"/>
+                <Icon @click="lastPage" icon="fas fa-forward-fast" class="icon-btn text-lg" title="Última" />
             </div>
+            <div></div>
         </div>
-
-    </section>
+        <Loading-Bar v-if="loading.fetch && pagination.per_page >= 25" class="h-1 bg-blue-300" />
+    </div>
 </template>
+
 <style scoped>
-    td {
-        @apply py-1 text-gray-800;
+    @reference 'tailwindcss';
+    
+    th {
+        @apply font-medium cursor-pointer px-2 py-4;
     }
 
-    th {
-        @apply font-semibold uppercase;
+    td {
+        @apply p-2;
     }
+
+    .icon-btn {
+        @apply cursor-pointer hover:scale-125;
+    }
+
+    .fade-enter-active,
+    .fade-leave-active {
+        transition: opacity 0.2s ease;
+    }
+
+    .fade-enter-from,
+    .fade-leave-to {
+        opacity: 0;
+    }
+
+    .form-control {
+        @apply
+            text-center 
+            focus:outline-none 
+            border rounded-lg 
+            border-gray-400
+            p-1
+        }
+
 </style>

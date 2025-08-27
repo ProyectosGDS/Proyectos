@@ -4,9 +4,13 @@ namespace App\Models\adm_gds;
 
 use DateTime;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\SearchableTrait;
 
 class beneficiarios extends Model
 {
+
+    use SearchableTrait;
+
     protected $connection = 'gds';
     protected $table = 'BENEFICIARIOS';
     protected $appends = ['nombre_completo','edad'];

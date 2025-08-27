@@ -10,14 +10,14 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
     const headers = [
         { title : 'id', key : 'id', type : 'numeric' },
         { title : 'cui', key : 'cui' },
-        { title : 'beneficiario', key : 'nombre_completo' },
+        { title : 'beneficiario', key : 'nombre_completo', exclude : true },
         { title : 'sexo', key : 'sexo', width : '10px', align : 'center' },
         { title : 'fecha nacimiento', key : 'fecha_nacimiento', type : 'date' },
-        { title : 'edad', key : 'edad', text : ' años' },
+        { title : 'edad', key : 'edad', text : ' años', exclude : true, width : '70px', align : 'center' },
         { title : 'interlocutor', key : 'interlocutor' },
-        { title : 'estado', key : 'estado' },
+        { title : 'estado', key : 'estado', width : '10px', align : 'center' },
         { title : 'activo', key : 'deleted_at', width : '10px', align : 'center' },
-        { title : '', key : 'actions', width : '10px', align : 'center' },
+        { title : '', key : 'actions', width : '10px', align : 'center', exclude : true },
     ]
 
     const headersHistorial = [

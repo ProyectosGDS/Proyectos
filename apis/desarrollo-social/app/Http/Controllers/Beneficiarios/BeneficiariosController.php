@@ -18,29 +18,25 @@ class BeneficiariosController extends Controller
     use TraitBeneficiarios;
 
     public function index(Request $request) {
-        
-        $search = $request->input('search') ?? '';
-        $column = $request->input('column') ?? 'id';
-        $order = $request->input('order') ?? 'desc';
-        $per_page = $request->input('per_page') ?? 10;
+
+        $per_page = $request->input('per_page',10);
 
         try {
 
-            $beneficiarios = beneficiarios::where(function ($query) use ($search) {
-                $query->where('cui','LIKE','%'.$search.'%')
-                    ->orWhereRaw(
-                        "LOWER(ADM_GDS.CONCATENARNOMBRES(PRIMER_NOMBRE,SEGUNDO_NOMBRE,PRIMER_APELLIDO,SEGUNDO_APELLIDO)) LIKE ?",
-                        ["%" . strtolower($search) . "%"]
-                    )
-                    ->orWhere('interlocutor','LIKE','%'. $search .'%')
-                    ->orWhere('celular','LIKE','%'. $search .'%')
-                    ->orWhere('correo','LIKE','%'. $search .'%');
-            })
-            ->orderBy(($column === 'nombre_completo') ? 'primer_nombre' : $column, $order)
-            ->paginate($per_page);
+            $beneficiarios = beneficiarios::advancedFilter($request)
+                ->paginate($per_page);
+
+            if ($beneficiarios->isEmpty() && $request->searching['search']) {
+                $fallbackQuery = beneficiarios::whereRaw(
+                    "LOWER(CONCATENARNOMBRES(PRIMER_NOMBRE, SEGUNDO_NOMBRE, PRIMER_APELLIDO, SEGUNDO_APELLIDO)) LIKE LOWER(?)",
+                    ["%{$request->searching['search']}%"]
+                );
+
+                $beneficiarios = $fallbackQuery->paginate($per_page);
+            }
 
             return response($beneficiarios);
-
+            
         } catch (\Throwable $th) {
             return response($th->getMessage());
         }

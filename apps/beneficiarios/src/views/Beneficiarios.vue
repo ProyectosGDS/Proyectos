@@ -106,9 +106,11 @@
                 <Button @click="store.modal.new = true" icon="fas fa-plus" class="btn-primary" />
             </Tool-Tip>
         </div>
-        <DataTableServerSide v-if="auth.checkPermission('ver beneficiarios')" :headers="store.headers" src="beneficiarios" :reload="store.reload" @reloadData="refresh">
+        <DataTableServerSide v-if="auth.checkPermission('ver beneficiarios')" :headers="store.headers" url="beneficiarios" class="text-color-1 text-xs border-none" >
             <template #sexo="{item}">
-                <Icon :icon="item.sexo == 'M' ? 'fas fa-person' : 'fas fa-person-dress'" :class="item.sexo == 'M' ? 'text-blue-400' : 'text-fuchsia-400'" />
+                <Icon :icon="item.sexo == 'M' ? 'fas fa-person' : (item.sexo == 'F' ? 'fas fa-person-dress' : '')" 
+                      :class="item.sexo == 'M' ? 'text-blue-400' : (item.sexo == 'F' ? 'text-fuchsia-400' : '')" 
+                />
             </template>
             <template #nombre_completo="{item}">
                 <div class="grid">
@@ -120,7 +122,9 @@
                 </div>
             </template>
             <template #deleted_at="{item}">
-                <Icon :icon="(item.deleted_at != null) ? 'fas fa-xmark' : 'fas fa-check'" :class="(item.deleted_at != null) ? 'text-red-500' : 'text-green-500'" />
+                <Icon :icon="(item.deleted_at != null) ? 'fas fa-xmark' : 'fas fa-check'" 
+                      :class="(item.deleted_at != null) ? 'text-red-500' : 'text-green-500'"
+                />
             </template>
             <template #actions="{item}">
                 <Drop-Down-Button icon="fas fa-ellipsis-v" >
