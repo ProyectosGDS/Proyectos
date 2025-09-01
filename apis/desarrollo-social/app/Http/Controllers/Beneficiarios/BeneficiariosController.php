@@ -28,7 +28,7 @@ class BeneficiariosController extends Controller
 
             if ($beneficiarios->isEmpty() && $request->searching['search']) {
                 $fallbackQuery = beneficiarios::whereRaw(
-                    "LOWER(CONCATENARNOMBRES(PRIMER_NOMBRE, SEGUNDO_NOMBRE, PRIMER_APELLIDO, SEGUNDO_APELLIDO)) LIKE LOWER(?)",
+                    "LOWER(ADM_GDS.CONCATENARNOMBRES(PRIMER_NOMBRE, SEGUNDO_NOMBRE, PRIMER_APELLIDO, SEGUNDO_APELLIDO)) LIKE LOWER(?)",
                     ["%{$request->searching['search']}%"]
                 );
 
