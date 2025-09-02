@@ -43,7 +43,7 @@ import UserPhoto from './UserPhoto.vue'
                             Perfil
                         </a>
                     </li>
-                    <!-- <li class="font-medium">
+                    <li class="font-medium">
                         <a href="#" @click="openModalHelp = true" class="flex items-center transform transition-colors duration-200 border-r-4 border-transparent hover:border-blue-700">
                             <div class="mr-3">
                                 <i class="fas fa-gears"></i>
@@ -51,7 +51,7 @@ import UserPhoto from './UserPhoto.vue'
                             Ayuda ?
                         </a>
                     </li>
-                    <hr> -->
+                    <hr>
                     <li @click="auth.logout()" class="font-medium cursor-pointer">
                         <div class="flex gap-2 items-center transform transition-colors duration-200 border-r-4 border-transparent hover:border-red-600" >
                             <Icon icon="fas fa-arrow-right-from-bracket" class="text-red-500" />
@@ -65,7 +65,7 @@ import UserPhoto from './UserPhoto.vue'
     </div>
     <Modal :open="openModalHelp" title="Manual de usuario del módulo" class="w-1/3" icon="fas fa-file-pdf" >
         
-        <iframe src="/public/docs/help.pdf" class="w-full h-[42rem]"></iframe>
+        <iframe src="docs/Manual.pdf" class="w-full h-[42rem]"></iframe>
 
         <template #footer>
             <Button text="Cerrar" class="btn-danger shadow-red-800" icon="fas fa-xmark"  @click="openModalHelp = false" />

@@ -246,6 +246,7 @@ class ProgramasController extends Controller
             $beneficiarios_cursos = DB::connection('gds')
                 ->table('BENEFICIARIOS_CURSOS BC')
                 ->join('BENEFICIARIOS B','BC.BENEFICIARIO_ID','=','B.ID')
+                ->join('DOMICILIOS DO','DO.BENEFICIARIO_ID','=','B.ID')
                 ->join('DETALLES_CURSOS DC','BC.DETALLE_CURSO_ID','=','DC.ID')
                 ->join('CURSOS C','DC.CURSO_ID','=','C.ID')
                 ->join('PROGRAMAS P','DC.PROGRAMA_ID','=','P.ID')
@@ -256,10 +257,14 @@ class ProgramasController extends Controller
                     DB::raw("ADM_GDS.CONCATENARNOMBRES(B.PRIMER_NOMBRE,B.SEGUNDO_NOMBRE,B.PRIMER_APELLIDO,B.SEGUNDO_APELLIDO) AS BENEFICIARIO"),
                     'B.CORREO',
                     'B.CELULAR',
+                    'B.SEXO',
+                    DB::raw("TRUNC(MONTHS_BETWEEN(SYSDATE, B.FECHA_NACIMIENTO) / 12) AS EDAD"),
+                    'DO.ZONA_ID AS ZONA',
                     'B.ESTADO AS STATUS',
                     'P.ESCUELA',
                     'P.NOMBRE AS PROGRAMA',
                     'D.NOMBRE AS DEPENDENCIA',
+                    'DC.ID AS ID_MODULO_CURSO', 
                     'C.NOMBRE AS MODULO_CURSO',
                     'BC.CREATED_AT AS FECHA_INSCRIPCION',
                     'BC.ESTADO',
@@ -278,6 +283,7 @@ class ProgramasController extends Controller
             $beneficiarios_actividades = DB::connection('gds')
                 ->table('BENEFICIARIOS_ACTIVIDADES BA')
                 ->join('BENEFICIARIOS B','BA.BENEFICIARIO_ID','=','B.ID')
+                ->join('DOMICILIOS DO','DO.BENEFICIARIO_ID','=','B.ID')
                 ->join('DETALLES_ACTIVIDADES DA','BA.DETALLE_ACTIVIDAD_ID','=','DA.ID')
                 ->join('ACTIVIDADES A','DA.ACTIVIDAD_ID','=','A.ID')
                 ->join('PROGRAMAS P','DA.PROGRAMA_ID','=','P.ID')
@@ -289,10 +295,14 @@ class ProgramasController extends Controller
                     DB::raw("ADM_GDS.CONCATENARNOMBRES(B.PRIMER_NOMBRE,B.SEGUNDO_NOMBRE,B.PRIMER_APELLIDO,B.SEGUNDO_APELLIDO) AS BENEFICIARIO"),
                     'B.CORREO',
                     'B.CELULAR',
+                    'B.SEXO',
+                    DB::raw("TRUNC(MONTHS_BETWEEN(SYSDATE, B.FECHA_NACIMIENTO) / 12) AS EDAD"),
+                    'DO.ZONA_ID AS ZONA',
                     'B.ESTADO AS STATUS',
                     'P.ESCUELA',
                     'P.NOMBRE AS PROGRAMA',
                     'D.NOMBRE AS DEPENDENCIA',
+                    'DA.ID AS ID_MODULO_CURSO',
                     'A.NOMBRE AS MODULO_CURSO',
                     'BA.CREATED_AT AS FECHA_INSCRIPCION',
                     'BA.ESTADO',
@@ -310,6 +320,7 @@ class ProgramasController extends Controller
             $beneficiarios_inscritos = DB::connection('gds')
                 ->table('BENEFICIARIOS_MODULOS BM')
                 ->join('BENEFICIARIOS B','BM.BENEFICIARIO_ID','=','B.ID')
+                ->join('DOMICILIOS DO','DO.BENEFICIARIO_ID','=','B.ID')
                 ->join('MODULOS M','BM.MODULO_ID','=','M.ID')
                 ->join('PROGRAMAS P','M.PROGRAMA_ID','=','P.ID')
                 ->join('DEPENDENCIAS D','P.DEPENDENCIA_ID','=','D.ID')
@@ -319,10 +330,14 @@ class ProgramasController extends Controller
                     DB::raw("ADM_GDS.CONCATENARNOMBRES(B.PRIMER_NOMBRE,B.SEGUNDO_NOMBRE,B.PRIMER_APELLIDO,B.SEGUNDO_APELLIDO) AS BENEFICIARIO"),
                     'B.CORREO',
                     'B.CELULAR',
+                    'B.SEXO',
+                    DB::raw("TRUNC(MONTHS_BETWEEN(SYSDATE, B.FECHA_NACIMIENTO) / 12) AS EDAD"),
+                    'DO.ZONA_ID AS ZONA',
                     'B.ESTADO AS STATUS',
                     'P.ESCUELA',
                     'P.NOMBRE AS PROGRAMA',
                     'D.NOMBRE AS DEPENDENCIA',
+                    'M.ID AS ID_MODULO_CURSO',
                     'M.NOMBRE AS MODULO_CURSO',
                     'BM.CREATED_AT AS FECHA_INSCRIPCION',
                     'BM.ESTADO',

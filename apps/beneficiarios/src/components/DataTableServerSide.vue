@@ -18,6 +18,10 @@
         multiselect : {
             type : Boolean,
             default : false
+        },
+        excel : {
+            type : Boolean,
+            default : false,
         }
     })
 
@@ -239,26 +243,28 @@
         fetch()
     }
 
-    const exportData = async (type) => {
+    const exportData = async () => {
 
         loading.value.export = true
 
         try {
 
-            const response = await axios.post('exportar-excel',
-                {
-                    columns: props.headers,
-                    data: filteredData.value
-                },
-                {
-                    responseType: 'blob'
-                })
+            let table = document.getElementById('export-table').cloneNode(true)
+            table.querySelectorAll("table, th, td").forEach(el => {
+                el.setAttribute("style", "border:1px solid gray");
+            });
+            table.querySelectorAll(".no-export").forEach(el => el.remove());
 
-            const url = window.URL.createObjectURL(new Blob([response.data]));
+            let blob = new Blob(
+                ['\ufeff', table.outerHTML],
+                { type: 'application/vnd.ms-excel' }
+            );
+
+            let url = URL.createObjectURL(blob);
 
             const link = document.createElement('a')
             link.href = url
-            link.setAttribute('download', `reporte.${type}`)
+            link.setAttribute('download', 'reporte.xls')
 
             document.body.appendChild(link)
             link.click();
@@ -339,12 +345,13 @@
                     </Transition>
                 </div>
                 <Icon @click="fetch()" icon="fas fa-arrows-rotate" class="icon-btn text-gray-400 hover:text-blue-500 text-lg" title="Recargar" :class="loading.fetch ? 'animate-spin' : ''" />
+                <Icon v-if="props.excel" @click="exportData()" icon="fas fa-file-excel" class="icon-btn text-gray-400 hover:text-green-500 text-lg" title="Descargar excel"/>
             </div>
         </div>
 
         <Loading-Bar v-if="loading.fetch" class="h-1 bg-blue-300" />
         
-        <Tabla>
+        <Tabla id="export-table">
             <template #thead>
                 <tr class="bg-gray-50">
                     <th v-if="props.multiselect"></th>

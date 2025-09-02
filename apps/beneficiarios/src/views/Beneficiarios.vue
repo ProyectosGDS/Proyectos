@@ -106,18 +106,19 @@
                 <Button @click="store.modal.new = true" icon="fas fa-plus" class="btn-primary" />
             </Tool-Tip>
         </div>
-        <DataTableServerSide v-if="auth.checkPermission('ver beneficiarios')" :headers="store.headers" url="beneficiarios" class="text-color-1 text-xs border-none" >
+        <DataTableServerSide v-if="auth.checkPermission('ver beneficiarios')" :headers="store.headers" url="beneficiarios" class="text-color-1 text-xs border-none" :excel="auth.checkPermission('exportar excel beneficiarios')">
             <template #sexo="{item}">
                 <Icon :icon="item.sexo == 'M' ? 'fas fa-person' : (item.sexo == 'F' ? 'fas fa-person-dress' : '')" 
                       :class="item.sexo == 'M' ? 'text-blue-400' : (item.sexo == 'F' ? 'text-fuchsia-400' : '')" 
                 />
+                <span class="invisible">{{ item.sexo }}</span>
             </template>
             <template #nombre_completo="{item}">
                 <div class="grid">
                     <span>{{ item.nombre_completo }}</span>
                     <div class="grid text-gray-500">
-                        <small>Correo : {{ item.correo }}</small>
-                        <small>Celular: {{ item.celular }}</small>
+                        <div>Correo : {{ item.correo }}</div>
+                        <div>Celular: {{ item.celular }}</div>
                     </div>
                 </div>
             </template>
@@ -125,16 +126,19 @@
                 <Icon :icon="(item.deleted_at != null) ? 'fas fa-xmark' : 'fas fa-check'" 
                       :class="(item.deleted_at != null) ? 'text-red-500' : 'text-green-500'"
                 />
+                <span class="invisible">{{ item.deleted_at != null ? 'No' : 'Si'  }}</span>
             </template>
             <template #actions="{item}">
                 <Drop-Down-Button icon="fas fa-ellipsis-v" >
-                    <ul>
+                    <ul class="no-export">
                         <li v-if="auth.checkPermission('editar beneficiario')" @click="store.show(item.id)" class="text-color-4">Editar</li>
                         <li v-if="auth.checkPermission('cambio estado beneficiario')" @click="store.status(item)" class="text-color-4">Cambiar estado</li>
                         <li v-if="auth.checkPermission('observaciones beneficiario')" @click="bitacora.observacion(item)" class="text-color-4">Observación</li>
                         <li v-if="auth.checkPermission('ver bitacora beneficiario')" @click="bitacora.show(item.id)" class="text-color-4">Historial</li>
                         <li @click="store.historial(item.cui)" class="text-color-4">Consulta historica</li>
-                        <li v-if="auth.checkPermission('eliminar beneficiario')" @click="store.remove(item)" class="text-red-400">Desactivar</li>
+                        <template v-if="item.deleted_at == null">
+                            <li v-if="auth.checkPermission('eliminar beneficiario')" @click="store.remove(item)" class="text-red-400">Desactivar</li>
+                        </template>
                     </ul>
                 </Drop-Down-Button>
             </template>
@@ -174,6 +178,14 @@
         <template #close>
             <Icon @click="store.resetData" icon="fas fa-xmark" class="cursor-pointer text-white" />
         </template>
+
+        <div v-if="store.beneficiario.deleted_at != null" class="flex justify-end">
+            <div class="flex items-center gap-2">
+                <span class="text-sm text-gray-500">Activar</span>
+                <Switch v-model="store.beneficiario.deleted_at" class="h-auto w-14 bg-red-400 has-[:checked]:bg-green-500" :values="[null,true]" />
+                <span class="text-sm text-gray-500">Inactivo</span>
+            </div>
+        </div>
         <div>
             <DatosPersonales />
             <Domicilio />

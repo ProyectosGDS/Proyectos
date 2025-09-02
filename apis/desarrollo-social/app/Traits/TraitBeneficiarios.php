@@ -244,7 +244,8 @@ trait TraitBeneficiarios
             'interlocutor'      => $request->interlocutor ?? null,
             'celular'           => trim($request->celular),
             'correo'            => strtolower($request->correo),
-            'estado'            => $request->estado ?? null
+            'estado'            => $request->estado ?? null,
+            'deleted_at'        => $request->deleted_at
         ]);
 
         return $beneficiario;
