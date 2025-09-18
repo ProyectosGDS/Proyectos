@@ -260,7 +260,8 @@ class BeneficiariosController extends Controller
                     return response([
                         'message' => 'Se encontro información en la base de datos antigua',
                         'success' => true,
-                        'data' => BeneficiarioUnicoResource::make($beneficiarioUnico)
+                        'data' => BeneficiarioUnicoResource::make($beneficiarioUnico),
+                        'code' => 4,
                     ]);
                 }
 
@@ -270,13 +271,15 @@ class BeneficiariosController extends Controller
                     return response([
                         'message' => 'Se consulto en RENAP',
                         'success' => true,
-                        'data' => RenapConsultaResource::make($beneficiarioUnico['data'])
+                        'data' => RenapConsultaResource::make($beneficiarioUnico['data']),
+                        'code' => 5,
                     ]);
                 } else {
                     return response([
-                        'message' => 'No se encontro información',
+                        'message' => 'Cui invalido',
                         'success' => false,
-                        'data' => []
+                        'data' => [],
+                        'code' => 6
                     ]);
                 }
             }
@@ -285,15 +288,17 @@ class BeneficiariosController extends Controller
             return response([
                 'message' => 'El cui ya existe en la base de datos actual',
                 'success' => false,
-                'data' => []
-            ]);
+                'data' => [],
+                'code' => 2
+            ]); 
         
         } catch (\Throwable $th) {
             
             return response([
                 'message' =>  $th->getMessage(),
                 'success' => false,
-                'data' => []
+                'data' => [],
+                'code' => 1,
             ]);
         }
     }

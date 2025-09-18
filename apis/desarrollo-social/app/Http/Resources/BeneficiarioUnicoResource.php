@@ -27,8 +27,8 @@ class BeneficiarioUnicoResource extends JsonResource
             'correo' => $this->correo_alumno,
             'interlocutor' => $this->interlocutor,
             'datos_academicos' => [
-                'tipo' => $this->escuela_tipo,
-                'establecimiento' => $this->nombre_escuela,
+                'tipo' => ($this->escuela_tipo == 1) ? 'PR' : ($this->escuela_tipo == 2 ? 'PU' : null),
+                'establecimiento' => $this->nombre_escuela ?? null,
             ],
             'responsable' => [
                 'nombre' => $this->nombre_completo([ $this->primer_nombre_r, $this->segundo_nombre_r, $this->segundo_nombre_r, $this->tercer_nombre_r, $this->primer_apellido_r, $this->segundo_apellido_r ]),

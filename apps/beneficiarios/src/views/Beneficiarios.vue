@@ -1,5 +1,5 @@
 <script setup>
-    import { onBeforeMount } from 'vue'
+    import { onBeforeMount, watchEffect } from 'vue'
     import {useBeneficiariosStore} from '@/stores/beneficiarios'
     import { useCatalogosStore } from '@/stores/catalogos'
     import { useAuthStore } from '@/stores/auth'
@@ -25,12 +25,14 @@
         if(!cui){
             store.messageCui = 'Ingrese cui'
             store.success = false
+            store.codeFetchBeneficiario = null
             return false 
         }
 
         if (cui.length !== 13 || !/^[0-9]{4}\s?[0-9]{5}\s?[0-9]{4}$/.test(cui)) {
             store.messageCui = 'Cui invalido'
             store.success = false
+            store.codeFetchBeneficiario = null
             return false
         }
 
@@ -54,6 +56,7 @@
         if (depto === 0 || muni === 0 || depto > munisPorDepto.length || muni > munisPorDepto[depto - 1].cantidad) {
             store.messageCui = 'Cui invalido'
             store.success = false
+            store.codeFetchBeneficiario = null
             return false
         }
 
@@ -68,6 +71,7 @@
 
         store.messageCui = 'Cui invalido'
         store.success = false
+        store.codeFetchBeneficiario = null
         return false
     }
 
@@ -95,6 +99,29 @@
 
     onBeforeMount(() => {
         catalogos.fetch()        
+    })
+
+    watchEffect(() => {
+        if(store.cui == '') {
+            store.beneficiario = {
+                sexo : 'M',
+                domicilio : {
+                    departamento_id : 7,
+                    grupo_zona : {},
+                },
+                datos_academicos : {},
+                datos_medicos : {},
+                responsable : {},
+                emergencia : {},
+                estado : 'V',
+            }
+
+            store.copy_beneficiario = {}
+            store.errors = []
+            store.messageCui = 'Ingrese cui'
+            store.codeFetchBeneficiario = null
+            store.success = false
+        }
     })
 
 </script>
@@ -159,18 +186,18 @@
             </div>
             <small :class="store.success ? 'text-green-400' : 'text-red-400'">{{ store.messageCui }}</small>
         </div>
-        <div>
+        <div v-if="[4,5].includes(store.codeFetchBeneficiario)">
             <DatosPersonales />
             <Domicilio />
             <DatosMedicos />
-            <DatosAcademicos />
+            <DatosAcademicos v-if="store.beneficiario.edad > 4" />
             <Responsable v-if="store.beneficiario.edad < 18" />
             <Emergencia />
         </div>
         <Validate-Errors :errors="store.errors" v-if="store.errors != 0" />
         <template #footer>
             <Button @click="store.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
-            <Button @click="store.store" text="Guardar" icon="fas fa-save" class="btn-primary" :loading="store.loading.store" />
+            <Button v-if="[4,5].includes(store.codeFetchBeneficiario)" @click="store.store" text="Guardar" icon="fas fa-save" class="btn-primary" :loading="store.loading.store" />
         </template>
     </Modal>
 

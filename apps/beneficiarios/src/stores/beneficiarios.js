@@ -46,6 +46,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
     const copy_beneficiario = ref({})
     
     const messageCui = ref('Ingrese cui')
+    const codeFetchBeneficiario = ref(null)
     const cui = ref('')
     const reload = ref(false)
     const success = ref(false)
@@ -147,6 +148,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
             loading.value.search = true
             const response = await axios.post('beneficiarios/consulta-back-up',{cui : cui})
                 messageCui.value = response.data.message
+                codeFetchBeneficiario.value = response.data.code
                 updatePropertyBeneficiario(response.data.data)
                 success.value = response.data.success
 
@@ -235,6 +237,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         copy_beneficiario.value = {}
         errors.value = []
         messageCui.value = ''
+        codeFetchBeneficiario.value = null
         cui.value = ''
         success.value = false
     }
@@ -248,6 +251,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         headersHistorial,
         beneficiario,
         messageCui,
+        codeFetchBeneficiario,
         cui,
         reload,
         success,
