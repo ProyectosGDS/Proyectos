@@ -25,6 +25,8 @@ class programas extends Model
         'PROGRAMA MUNICIPAL DE AJEDREZ',
         'ESCUELA MUNICIPAL DE DANZA CLASICA',
         'ESCUELA MUNICIPAL DE MUSICA',
+        'CENTRO DE FORMACION TECNOLOGICA',
+        'ESCUELA TALLER',
     ];
 
     // RELACIONES

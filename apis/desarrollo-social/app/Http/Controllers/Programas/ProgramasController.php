@@ -248,6 +248,7 @@ class ProgramasController extends Controller
                 ->join('BENEFICIARIOS B','BC.BENEFICIARIO_ID','=','B.ID')
                 ->join('DOMICILIOS DO','DO.BENEFICIARIO_ID','=','B.ID')
                 ->join('DETALLES_CURSOS DC','BC.DETALLE_CURSO_ID','=','DC.ID')
+                ->join('SEDES S','DC.SEDE_ID','=','S.ID')
                 ->join('CURSOS C','DC.CURSO_ID','=','C.ID')
                 ->join('PROGRAMAS P','DC.PROGRAMA_ID','=','P.ID')
                 ->join('DEPENDENCIAS D','P.DEPENDENCIA_ID','=','D.ID')
@@ -266,6 +267,8 @@ class ProgramasController extends Controller
                     'D.NOMBRE AS DEPENDENCIA',
                     'DC.ID AS ID_MODULO_CURSO', 
                     'C.NOMBRE AS MODULO_CURSO',
+                    'DC.SECCION',
+                    'S.NOMBRE AS SEDE',
                     'BC.CREATED_AT AS FECHA_INSCRIPCION',
                     'BC.ESTADO',
                     DB::raw("CAST(C.IMPULSATEC AS VARCHAR2(1)) AS IMPULSATEC"),
@@ -304,6 +307,8 @@ class ProgramasController extends Controller
                     'D.NOMBRE AS DEPENDENCIA',
                     'DA.ID AS ID_MODULO_CURSO',
                     'A.NOMBRE AS MODULO_CURSO',
+                    DB::raw("NULL AS SECCION"),
+                    DB::raw("NULL AS SEDE"),
                     'BA.CREATED_AT AS FECHA_INSCRIPCION',
                     'BA.ESTADO',
                     DB::raw("CAST('N' AS VARCHAR2(1)) AS IMPULSATEC"),
@@ -322,6 +327,7 @@ class ProgramasController extends Controller
                 ->join('BENEFICIARIOS B','BM.BENEFICIARIO_ID','=','B.ID')
                 ->join('DOMICILIOS DO','DO.BENEFICIARIO_ID','=','B.ID')
                 ->join('MODULOS M','BM.MODULO_ID','=','M.ID')
+                ->join('SEDES S','M.SEDE_ID','=','S.ID')
                 ->join('PROGRAMAS P','M.PROGRAMA_ID','=','P.ID')
                 ->join('DEPENDENCIAS D','P.DEPENDENCIA_ID','=','D.ID')
                 ->select(
@@ -339,6 +345,8 @@ class ProgramasController extends Controller
                     'D.NOMBRE AS DEPENDENCIA',
                     'M.ID AS ID_MODULO_CURSO',
                     'M.NOMBRE AS MODULO_CURSO',
+                    'M.SECCION',
+                    'S.NOMBRE AS SEDE',
                     'BM.CREATED_AT AS FECHA_INSCRIPCION',
                     'BM.ESTADO',
                     DB::raw("CAST('N' AS VARCHAR2(1)) AS IMPULSATEC"),
