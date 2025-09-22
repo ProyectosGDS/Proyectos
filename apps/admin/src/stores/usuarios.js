@@ -8,31 +8,33 @@ export const useUsuariosStore = defineStore('usuarios', () => {
     const global = useGlobalStore()
 
     const headers = [
-        { title : 'id', key : 'id', type : 'numeric' },
-        { title : 'cui', key : 'cui' },
-        { title : 'nombre', key : 'nombre', class: 'uppercase text-xs' },
-        { title : 'dependencia', key : 'dependencia.nombre', },
-        { title : 'perfil', key : 'perfil.nombre' },
-        { title : 'fecha creación', key : 'created_at', type : 'date' },
-        { title : 'status', key : 'deleted_at', width : '10px', align : 'center' },
-        { title : '', key : 'actions', width : '10px', align : 'center' },
+        { title: 'id', key: 'id', type: 'numeric' },
+        { title: 'cui', key: 'cui' },
+        { title: 'nombre', key: 'nombre', class: 'uppercase text-xs' },
+        { title: 'dependencia', key: 'dependencia.nombre', },
+        { title: 'perfil', key: 'perfil.nombre' },
+        { title: 'fecha creación', key: 'created_at', type: 'date' },
+        { title: 'status', key: 'deleted_at', width: '10px', align: 'center' },
+        { title: '', key: 'actions', width: '10px', align: 'center' },
     ]
 
     const usuarios = ref([])
     const usuario = ref({})
     const copyUsuario = ref({})
     const loading = ref({
-        fetch : false,
-        store : false,
-        update : false,
-        destroy : false
+        fetch: false,
+        store: false,
+        update: false,
+        destroy: false,
+        import: false,
     })
     const errors = ref([])
     const modal = ref({
-        new : false,
-        edit : false,
-        delete : false,
-        resetPassword : false,
+        new: false,
+        edit: false,
+        delete: false,
+        resetPassword: false,
+        import: false,
     })
 
     const fetch = async () => {
@@ -42,7 +44,7 @@ export const useUsuariosStore = defineStore('usuarios', () => {
             usuarios.value = response.data
         } catch (error) {
             global.manejarError(error)
-            if(error.status === 422) {
+            if (error.status === 422) {
                 errors.value = error.response.data.errors
             }
         } finally {
@@ -54,11 +56,11 @@ export const useUsuariosStore = defineStore('usuarios', () => {
         try {
             const response = await axios.post('usuarios', usuario.value)
             fetch()
-            global.setAlert(response.data,'success')
+            global.setAlert(response.data, 'success')
             resetData()
         } catch (error) {
             global.manejarError(error)
-            if(error.status === 422) {
+            if (error.status === 422) {
                 errors.value = error.response.data.errors
             }
         } finally {
@@ -69,14 +71,14 @@ export const useUsuariosStore = defineStore('usuarios', () => {
         loading.value.update = true
         try {
             if (global.hasChanged(usuario.value, copyUsuario.value)) {
-                const response = await axios.put('usuarios/'+usuario.value.id, usuario.value)
+                const response = await axios.put('usuarios/' + usuario.value.id, usuario.value)
                 fetch()
-                global.setAlert(response.data,'success')
+                global.setAlert(response.data, 'success')
             }
             resetData()
         } catch (error) {
             global.manejarError(error)
-            if(error.status === 422) {
+            if (error.status === 422) {
                 errors.value = error.response.data.errors
             }
         } finally {
@@ -86,13 +88,13 @@ export const useUsuariosStore = defineStore('usuarios', () => {
     const destroy = async () => {
         loading.value.destroy = true
         try {
-            const response = await axios.delete('usuarios/'+usuario.value.id)
+            const response = await axios.delete('usuarios/' + usuario.value.id)
             fetch()
-            global.setAlert(response.data,'success')
+            global.setAlert(response.data, 'success')
             resetData()
         } catch (error) {
             global.manejarError(error)
-            if(error.status === 422) {
+            if (error.status === 422) {
                 errors.value = error.response.data.errors
             }
         } finally {
@@ -103,13 +105,13 @@ export const useUsuariosStore = defineStore('usuarios', () => {
     const resetPassword = async () => {
         loading.value.destroy = true
         try {
-            const response = await axios.put('usuarios/reiniciar-password/'+usuario.value.id)
+            const response = await axios.put('usuarios/reiniciar-password/' + usuario.value.id)
             fetch()
-            global.setAlert(response.data,'success')
+            global.setAlert(response.data, 'success')
             resetData()
         } catch (error) {
             global.manejarError(error)
-            if(error.status === 422) {
+            if (error.status === 422) {
                 errors.value = error.response.data.errors
             }
         } finally {
@@ -133,12 +135,49 @@ export const useUsuariosStore = defineStore('usuarios', () => {
         modal.value.resetPassword = true
     }
 
+    const uploadExcel = async (file) => {
+        loading.value.import = true
+        try {
+            let formData = new FormData()
+            formData.append("file", file)
+
+            const response = await axios.post('usuarios/importar-excel', formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+                responseType: 'blob'
+            })
+                const blob = new Blob([response.data])
+                const url = window.URL.createObjectURL(blob)
+
+                const link = document.createElement('a')
+                link.href = url
+                link.setAttribute('download', 'error-de-carga.log')
+                document.body.appendChild(link)
+                link.click()
+                link.remove()
+
+                global.setAlert('⚠️ Hubo errores, descargando log...', 'warning')
+
+            resetData()
+        } catch (error) {
+            global.manejarError(error)
+            if (error.response && error.response.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.import = false
+        }
+    }
+
+
     const resetData = () => {
         usuario.value = {}
         modal.value = {
-            new : false,
-            edit : false,
-            delete : false
+            new: false,
+            edit: false,
+            delete: false,
+            import: false,
         }
         errors.value = []
     }
@@ -150,7 +189,7 @@ export const useUsuariosStore = defineStore('usuarios', () => {
         loading,
         errors,
         modal,
-        
+
         fetch,
         store,
         update,
@@ -159,6 +198,7 @@ export const useUsuariosStore = defineStore('usuarios', () => {
         edit,
         remove,
         resetPass,
+        uploadExcel,
         resetData,
     }
 })

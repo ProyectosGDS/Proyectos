@@ -117,6 +117,12 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+
+        'error_insert_users' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/error-users-insert.log'),
+            'level' => 'error',
+        ],
     ],
 
 ];

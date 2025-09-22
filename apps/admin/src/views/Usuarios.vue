@@ -1,5 +1,5 @@
 <script setup>
-    import { onBeforeMount } from 'vue'
+    import { onBeforeMount, ref } from 'vue'
     import {useUsuariosStore} from '@/stores/usuarios'
     import { useCatalogosStore } from '@/stores/catalogos'
     import { useAuthStore } from '@/stores/auth'
@@ -10,6 +10,20 @@
 
     const date = new Date()
     const now = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()
+
+    const file = ref(null);
+
+    const handleFileChange = (event) => {
+        file.value = event.target.files[0];
+    }
+
+    const uploadFile = () => {
+        if (!file.value) {
+            alert("Selecciona un archivo Excel primero");
+            return;
+        }
+        store.uploadExcel(file.value);
+    }
     
     onBeforeMount(() => {
         store.fetch()
@@ -24,6 +38,9 @@
         <div v-if="auth.checkPermission('crear usuario')" class="flex justify-center">
             <Tool-Tip message="Nuevo usuario" class="-mt-7 text-color-4">
                 <Button @click="store.modal.new = true" icon="fas fa-plus" class="btn-primary" />
+            </Tool-Tip>
+            <Tool-Tip message="Carga masiva" class="-mt-7 text-color-4">
+                <Button @click="store.modal.import = true" icon="fas fa-upload" class="btn-secondary" />
             </Tool-Tip>
         </div>
         <Data-Table v-if="auth.checkPermission('ver usuarios')" :headers="store.headers" :data="store.usuarios" :loading="store.loading.fetch" :excel="auth.checkPermission('exportar usuarios')">
@@ -122,6 +139,20 @@
         <template #footer>
             <Button @click="store.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
             <Button @click="store.resetPassword" text="Sí, reiniciar" icon="fas fa-trash" class="btn-danger" :loading="store.loading.destroy" />
+        </template>
+    </Modal>
+
+    <Modal :open="store.modal.import" title="Creación masiva de usuarios" icon="fas fa-user-plus">
+        <template #close>
+            <Icon @click="store.resetData" icon="fas fa-xmark" class="cursor-pointer text-white" />
+        </template>
+        <div>
+            <input type="file" accept=".xlsx,.xls" @change="handleFileChange" />
+        </div>
+        <Validate-Errors :errors="store.errors" v-if="store.errors != 0" />
+        <template #footer>
+            <Button @click="store.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
+            <Button @click="uploadFile" text="Importar usuarios" icon="fas fa-upload" class="btn-primary" :loading="store.loading.import" />
         </template>
     </Modal>
 </template>

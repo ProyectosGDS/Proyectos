@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Imports\UsuariosImport;
 use App\Models\adm_gds\usuarios;
 use App\Rules\ValidateCui;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UsuariosController extends Controller
 {
@@ -143,6 +145,32 @@ class UsuariosController extends Controller
                 ]
             ],422);
 
+        } catch (\Throwable $th) {
+            return response($th->getMessage());
+        }
+    }
+
+    public function importUsersExcel(Request $request) {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls'
+        ]);
+
+        try {
+
+            $import = new UsuariosImport;
+
+            Excel::import($import, $request->file('file'));
+
+            if (count($import->errors) > 0) {
+                // Guardamos un archivo de log dinámico
+                $filePath = storage_path('logs/error-users-insert.log');
+
+                // Forzamos descarga
+                return response()->download($filePath, 'error-users-insert.log')->deleteFileAfterSend(true);
+            }
+
+            return response('Importación completada.');
+            
         } catch (\Throwable $th) {
             return response($th->getMessage());
         }
