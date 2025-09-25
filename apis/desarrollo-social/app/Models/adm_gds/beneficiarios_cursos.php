@@ -13,8 +13,9 @@ class beneficiarios_cursos extends Model
     protected $fillable = [
         'beneficiario_id',
         'detalle_curso_id',
-        'created_at',
+        'anio_inscripcion',
         'estado',
+        'created_at',
     ];
 
 

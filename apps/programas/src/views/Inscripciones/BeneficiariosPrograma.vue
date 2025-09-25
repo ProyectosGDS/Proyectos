@@ -12,9 +12,10 @@
 
     const years = computed(() => {
         const yearsList = []
-        for (let i = 0; i <= 3; i++) {
+        for (let i = 0; i <= 1; i++) {
             yearsList.unshift(currentYear - i)
         }
+        yearsList.push(currentYear + 1)
         return yearsList
     })
 

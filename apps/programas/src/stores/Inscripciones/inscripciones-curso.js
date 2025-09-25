@@ -67,7 +67,8 @@ export const useInscripcionesCursoStore = defineStore('inscripciones-curso', () 
         loading.value.store = true
         try {
             const response = await axios.post('inscripciones-curso/store-beneficiarios', {
-                beneficiarios: beneficiarios.value
+                beneficiarios: beneficiarios.value,
+                year : year.value,
             })
             global.setAlert(response.data, 'success')
             fetch(beneficiario_curso.curso.id)

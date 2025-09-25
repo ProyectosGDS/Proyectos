@@ -269,12 +269,12 @@ class ProgramasController extends Controller
                     'C.NOMBRE AS MODULO_CURSO',
                     'DC.SECCION',
                     'S.NOMBRE AS SEDE',
-                    'BC.CREATED_AT AS FECHA_INSCRIPCION',
+                    'BC.ANIO_INSCRIPCION AS ANIO_INSCRIPCION',
                     'BC.ESTADO',
                     DB::raw("CAST(C.IMPULSATEC AS VARCHAR2(1)) AS IMPULSATEC"),
                     DB::raw("CAST('CURSO' AS VARCHAR2(50)) AS TIPO")
                 )
-                ->whereYear('BC.CREATED_AT',$year)
+                ->where('BC.ANIO_INSCRIPCION',$year)
                 ->when(!empty($programa_id),function($query) use ($programa_id){
                     return $query->where('P.ID',$programa_id);
                 })
@@ -309,7 +309,7 @@ class ProgramasController extends Controller
                     'A.NOMBRE AS MODULO_CURSO',
                     DB::raw("NULL AS SECCION"),
                     DB::raw("NULL AS SEDE"),
-                    'BA.CREATED_AT AS FECHA_INSCRIPCION',
+                    DB::raw("EXTRACT(YEAR FROM BA.CREATED_AT) AS ANIO_INSCRIPCION"),
                     'BA.ESTADO',
                     DB::raw("CAST('N' AS VARCHAR2(1)) AS IMPULSATEC"),
                     DB::raw("CAST(TA.NOMBRE AS VARCHAR2(50)) AS TIPO")
@@ -347,12 +347,12 @@ class ProgramasController extends Controller
                     'M.NOMBRE AS MODULO_CURSO',
                     'M.SECCION',
                     'S.NOMBRE AS SEDE',
-                    'BM.CREATED_AT AS FECHA_INSCRIPCION',
+                    'BM.ANIO_INSCRIPCION AS ANIO_INSCRIPCION',
                     'BM.ESTADO',
                     DB::raw("CAST('N' AS VARCHAR2(1)) AS IMPULSATEC"),
                     DB::raw("CAST('MODULO' AS VARCHAR2(50)) AS TIPO")
                 )
-                ->whereYear('BM.CREATED_AT',$year)
+                ->where('BM.ANIO_INSCRIPCION',$year)
                 ->when(!empty($programa_id),function($query) use ($programa_id){
                     return $query->where('P.ID',$programa_id);
                 })
@@ -373,7 +373,7 @@ class ProgramasController extends Controller
                 ->join('CURSOS C','DC.CURSO_ID','=','C.ID')
                 ->join('PROGRAMAS P','DC.PROGRAMA_ID','=','P.ID')
                 ->select('B.CUI')
-                ->whereYear('BC.CREATED_AT',$year)
+                ->where('BC.ANIO_INSCRIPCION',$year)
                 ->when(!empty($programa_id),function($query) use ($programa_id){
                     return $query->where('P.ID',$programa_id);
                 })
@@ -405,7 +405,7 @@ class ProgramasController extends Controller
                 ->join('MODULOS M','BM.MODULO_ID','=','M.ID')
                 ->join('PROGRAMAS P','M.PROGRAMA_ID','=','P.ID')
                 ->select('B.CUI')
-                ->whereYear('BM.CREATED_AT',$year)
+                ->where('BM.ANIO_INSCRIPCION',$year)
                 ->when(!empty($programa_id),function($query) use ($programa_id){
                     return $query->where('P.ID',$programa_id);
                 })

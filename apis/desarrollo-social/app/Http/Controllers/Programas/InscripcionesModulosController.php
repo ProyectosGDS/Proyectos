@@ -67,7 +67,8 @@ class InscripcionesModulosController extends Controller
 
     public function store_beneficiarios(Request $request) {
         $request->validate([
-            'beneficiarios' => 'required|array'
+            'beneficiarios' => 'required|array',
+            'year' => 'required|numeric|digits:4',
         ]);
 
         try {
@@ -80,8 +81,9 @@ class InscripcionesModulosController extends Controller
                     $inscripcion_modulo = beneficiarios_modulos::create([
                         'beneficiario_id' => $beneficiario['beneficiario_id'],
                         'modulo_id' => $beneficiario['modulo_id'],
+                        'anio_inscripcion' => $request->year,
+                        'estado' => 'A',
                         'created_at' => now(),
-                        'estado' => 'A'
                     ]);
 
                     bitacora::create([
@@ -113,7 +115,7 @@ class InscripcionesModulosController extends Controller
                     'modulo.programa'
                 ])->where('modulo_id',$modulo_id)
                 ->latest('id')
-                ->whereYear('created_at',$year)
+                ->where('anio_inscripcion',$year)
                 ->get();
 
             return response($beneficiarios_inscritos);

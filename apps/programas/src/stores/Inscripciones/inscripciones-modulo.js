@@ -65,7 +65,8 @@ export const useInscripcionesModuloStore = defineStore('inscripciones-modulo', (
         loading.value.store = true
         try {
             const response = await axios.post('inscripciones-modulo/store-beneficiarios', {
-                beneficiarios: beneficiarios.value
+                beneficiarios: beneficiarios.value,
+                year : year.value
             })
             global.setAlert(response.data, 'success')
             fetch()

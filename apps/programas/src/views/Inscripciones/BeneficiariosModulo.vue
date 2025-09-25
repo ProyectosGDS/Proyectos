@@ -116,9 +116,10 @@
 
     const years = computed(() => {
       const yearsList = []
-      for (let i = 0; i <= 3; i++) {
+      for (let i = 0; i <= 1; i++) {
         yearsList.unshift(currentYear - i)
       }
+      yearsList.push(currentYear + 1)
       return yearsList
     })
 
@@ -168,7 +169,7 @@
         <div class="grid xl:grid-cols-2 xl:divide-x-2">
             <div class="space-y-4 xl:pr-8">
                 <div class="flex gap-2">
-                    <Input v-model="inscripcion.year" option="select" title="*seleccione año" :error="store.errors.hasOwnProperty('year')">
+                    <Input v-model="inscripcion.year" option="select" title="*seleccione año inscripción" :error="store.errors.hasOwnProperty('year')">
                         <option v-for="year in years" :value="year">{{ year }}</option>
                     </Input>
                     <Input v-if="auth.user.dependencia_id == 5" @change="programas.getProgramasFromEscuelas(store.escuela)" v-model="store.escuela" option="select" title="*Seleccione una escuela" :error="store.errorsDetails.hasOwnProperty('escuela')">
@@ -251,8 +252,8 @@
                                         <span>
                                             <span class="flex items-center gap-1">
                                                 <Icon icon="fas fa-calendar-days" />
-                                                FECHA INSCRIPCIÓN: 
-                                                <span class="font-medium">{{ global.parseValue(inscripcion.created_at,'date') ?? '' }}</span>
+                                                AÑO INSCRIPCIÓN: 
+                                                <span class="font-medium">{{ inscripcion.anio_inscripcion }}</span>
                                             </span>
                                         </span>
                                         <span>
@@ -305,7 +306,14 @@
                 </div>
                 <div v-if="inscripcion.beneficiarios.length" class="flex justify-center gap-4">
                     <template v-if="inscripcion.cupo > 0">
-                        <Button v-if="auth.checkPermission('crear inscripcion modulo')" @click="inscripcion.store" text="Inscribir beneficiarios nuevos al modulo" icon="fas fa-plus" class="btn-primary" :loading="inscripcion.loading.store"/>
+                        <Button 
+                            v-if="auth.checkPermission('crear inscripcion modulo')" 
+                            @click="inscripcion.store" 
+                            text="Inscribir beneficiarios nuevos al modulo" 
+                            icon="fas fa-plus" 
+                            class="btn-primary" 
+                            :loading="inscripcion.loading.store"
+                        />
                     </template>
                 </div>
             </div>
