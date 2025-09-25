@@ -22,7 +22,7 @@ class ActividadesController extends Controller
 
     public function store (Request $request) {
         $request->validate([
-            'nombre' => 'required|string|max:80',
+            'nombre' => 'required|string|max:90',
             'descripcion' => 'required|string|max:255',
         ]);
 
