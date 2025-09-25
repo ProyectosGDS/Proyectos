@@ -2,7 +2,7 @@ import './assets/main.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-
+import './services/axios'
 
 import App from './App.vue'
 import router from './router'
@@ -28,15 +28,10 @@ import DropDownButton from './components/DropDownButton.vue'
 import LoadingBar from './components/LoadingBar.vue'
 import Switch from './components/Switch.vue'
 
-import axios from 'axios'
 
 library.add(fas)
 library.add(fab)
 library.add(far)
-
-axios.defaults.baseURL = import.meta.env.VITE_MY_API_URL_BASE
-axios.defaults.withCredentials = true
-axios.defaults.headers.common['app'] = import.meta.env.VITE_MY_APPNAME
 
 const app = createApp(App)
 app.use(createPinia())

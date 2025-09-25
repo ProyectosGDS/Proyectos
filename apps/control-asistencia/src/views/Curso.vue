@@ -21,8 +21,8 @@
     })
 
     onBeforeMount(() => {
-        const dependencia_id = JSON.parse(atob(localStorage.getItem(btoa('dependencia_id'))))
-        if(dependencia_id && dependencia_id == 5) {
+        
+        if(auth.dependencia_id && auth.dependencia_id == 5) {
             catalogos.getEscuelas()
         }else{
             catalogos.getProgramas()
@@ -87,7 +87,7 @@
                     </template>
                 </Tabla>
                 <div v-if="catalogos.beneficiarios.length" class="flex items-center justify-center gap-3">
-                    <Button v-if="catalogos.programa != null && catalogos.curso.hasOwnProperty('id') && store.date" @click="store.download" text="Descargar listado" icon="fas fa-download" class="btn-secondary" :loading="store.loading.download" />
+                    <Button v-if="catalogos.programa != null && catalogos.curso.hasOwnProperty('id') && store.date" @click="store.download()" text="Descargar listado" icon="fas fa-download" class="btn-secondary" :loading="store.loading.download" />
                     <Button @click="store.store" text="Guardar asistencias" icon="fas fa-list-check" class="btn-primary" :loading="store.loading.store" />
                 </div>
             </div>

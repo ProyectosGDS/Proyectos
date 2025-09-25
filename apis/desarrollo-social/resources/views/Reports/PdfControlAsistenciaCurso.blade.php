@@ -71,8 +71,12 @@
                 <td>{{ strtoupper($curso->instructor->nombre) }}</td>
             </tr>
             <tr>
-                <td class="title">HORARIO:</td>
-                <td>{{ $curso->horario->nombre_completo }}</td>
+                <td class="title">HORARIOS:</td>
+                <td>
+                    @foreach ($curso->horarios as $horario)
+                        {{ $horario->nombre_completo.', ' }}
+                    @endforeach
+                </td>
                 <td class="title">SEDE:</td>
                 <td>{{ $curso->sede->nombre_completo }}</td>
             </tr>

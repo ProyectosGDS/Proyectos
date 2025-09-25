@@ -66,9 +66,7 @@
         const year = new Date()
         asignaciones.year = year.getFullYear()
 
-        const dependencia_id = JSON.parse(atob(localStorage.getItem(btoa('dependencia_id'))))
-
-        if(dependencia_id && dependencia_id == 5){
+        if(auth.dependencia_id && auth.dependencia_id == 5){
             catalogos.getEscuelas()
         }else{
             programas.fetch()

@@ -13,6 +13,11 @@ import UserPhoto from './UserPhoto.vue'
 
     onClickOutside(target, (event) => open.value = false)
 
+    const handleLogout = () => {
+        auth.logout()
+        window.location.href = import.meta.env.VITE_MY_URL + 'login'
+    }
+
     defineOptions({
         inheritAttrs: false
     })
@@ -28,7 +33,7 @@ import UserPhoto from './UserPhoto.vue'
             
             <div class="font-bold text-blue-muni text-xs text-center hidden md:block uppercase">
                 <p>{{ `${auth.user.nombre }` }}</p>
-                <p>{{ auth.user?.perfil ?? '' }}</p>
+                <p>{{ auth.user?.nombre_perfil ?? '' }}</p>
                 <p>{{ auth.user?.dependencia?.nombre ?? '' }}</p>
             </div>
         </div>
@@ -43,7 +48,7 @@ import UserPhoto from './UserPhoto.vue'
                             Perfil
                         </a>
                     </li>
-                    <!-- <li class="font-medium">
+                    <li class="font-medium">
                         <a href="#" @click="openModalHelp = true" class="flex items-center transform transition-colors duration-200 border-r-4 border-transparent hover:border-blue-700">
                             <div class="mr-3">
                                 <i class="fas fa-gears"></i>
@@ -51,8 +56,8 @@ import UserPhoto from './UserPhoto.vue'
                             Ayuda ?
                         </a>
                     </li>
-                    <hr> -->
-                    <li @click="auth.logout()" class="font-medium cursor-pointer">
+                    <hr>
+                    <li @click="handleLogout" class="font-medium cursor-pointer">
                         <div class="flex gap-2 items-center transform transition-colors duration-200 border-r-4 border-transparent hover:border-red-600" >
                             <Icon icon="fas fa-arrow-right-from-bracket" class="text-red-500" />
                             Cerrar sesión
@@ -65,7 +70,7 @@ import UserPhoto from './UserPhoto.vue'
     </div>
     <Modal :open="openModalHelp" title="Manual de usuario del módulo" class="w-1/3" icon="fas fa-file-pdf" >
         
-        <iframe src="/public/docs/help.pdf" class="w-full h-[42rem]"></iframe>
+        <iframe src="docs/Manual.pdf" class="w-full h-[42rem]"></iframe>
 
         <template #footer>
             <Button text="Cerrar" class="btn-danger shadow-red-800" icon="fas fa-xmark"  @click="openModalHelp = false" />

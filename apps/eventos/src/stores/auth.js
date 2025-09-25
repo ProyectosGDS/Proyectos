@@ -1,76 +1,120 @@
+import { ref, computed, watch } from 'vue'
 import { defineStore } from 'pinia'
-import axios from 'axios'
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useGlobalStore } from './global'
+import axios from '@/services/axios'
+import { useGlobalStore } from './global' // usamos tu servicio de axios ya configurado
 
 export const useAuthStore = defineStore('auth', () => {
 
-	const router = useRouter()
-	const global = useGlobalStore()
-	const user = ref({})
-	const loading = ref(false)
-	const errors = ref([])
+    const global = useGlobalStore()
 
-	const login = () => {
-		
-		loading.value = true
-		axios.post('login',{
-			cui : user.value.cui,
-			password : btoa(user.value.password)
-		})
-		.then(response => {
-			user.value = JSON.parse(atob(response.data))
-			localStorage.setItem(btoa('permisos'),btoa(JSON.stringify(user.value.permisos)))
-			localStorage.setItem(btoa('menu'),btoa(JSON.stringify(user.value.menu)))
-			localStorage.setItem(btoa('dependencia_id'),btoa(JSON.stringify(user.value.dependencia_id)))
-			localStorage.setItem(btoa('id'),btoa(JSON.stringify(user.value.id)))
-			router.push({ name: 'Home' })
-		})
-		.catch(error => {
-			if(error.response.data.errors) {
-				errors.value = error.response.data.errors
-			}else {
-				errors.value = error.response.data.message
-			}
-		})
-		.finally(() => loading.value = false)
-	}
-	
-	const validateAuth = () => {
-		if(global.checkIfCookieExists(btoa('access_token'))) {
-			axios.post('me')
-			.then(response =>{
-				user.value = JSON.parse(atob(response.data))
-				localStorage.setItem( btoa('permisos'), btoa(JSON.stringify(user.value.permisos)))
-				localStorage.setItem(btoa('menu'),btoa(JSON.stringify(user.value.menu)))
-				localStorage.setItem(btoa('id_dependencia'),btoa(JSON.stringify(user.value.id_dependencia)))
-				localStorage.setItem(btoa('id_usuario'),btoa(JSON.stringify(user.value.id_usuario)))
-			}) 		
-			.catch(error => {
-				resetData()
-				logout()
-			})
-		}
-	}
+    const user = ref(JSON.parse(localStorage.getItem('user')) || null)
+    const accessToken = ref(localStorage.getItem('access_token') || null)
+    const userPermissions = ref(JSON.parse(localStorage.getItem('user_permissions')) || [])
+    const userMenu = ref(JSON.parse(localStorage.getItem('user_menu')) || [])
+    const dependencia_id = ref(JSON.parse(localStorage.getItem("dependencia_id")) || null)
+    const loading = ref(false)
+    const credentials = ref({})
+    const errors = ref([])
 
-	const resetData = () => {
-		user.value = {}
-		errors.value = []
-	}
+    const isLoggedIn = computed(() => !!accessToken.value)
 
-	const logout = async () => {
-		sessionStorage.clear()
-		localStorage.clear()
-		try {
-			const response = await axios.post('logout')
-			resetData()
-			window.location.href = import.meta.env.VITE_MY_URL + 'login'
+    // Mantener sincronizado con localStorage
+    watch(accessToken, (val) => {
+        if (val) {
+            localStorage.setItem('access_token', val)
+        } else {
+            localStorage.removeItem('access_token')
+        }
+    })
 
-		} catch (error) {
-			console.error(error)
-		}
-	}
+    watch(user, (val) => {
+        if (val) {
+            localStorage.setItem('user', JSON.stringify(val))
+        } else {
+            localStorage.removeItem('user')
+        }
+    })
+
+    watch(userPermissions, (val) => {
+        localStorage.setItem('user_permissions', JSON.stringify(val))
+    })
+
+    watch(userMenu, (val) => {
+        localStorage.setItem('user_menu', JSON.stringify(val))
+    })
+
+    watch(dependencia_id, (val) => {
+        localStorage.setItem('dependencia_id',JSON.stringify(val))
+    })
+
+    const getCsrfCookie = async () => {
+        try {
+            await axios.get('auth/csrf-cookie')
+            return true
+        } catch (error) {
+            console.error('Failed to get CSRF cookie:', error)
+            global.manejarError(error)
+            return false
+        }
+    }
+
+    const login = async () => {
+        loading.value = true
+        try {
+            const csrfSuccess = await getCsrfCookie()
+            if (!csrfSuccess) return false
+
+            const response = await axios.post('login', credentials.value)
+
+            accessToken.value = response.data.access_token
+            user.value = response.data.user
+            dependencia_id.value = response.data.user.dependencia_id
+            userPermissions.value = response.data.user.permisos || []
+            userMenu.value = response.data.user.menu || []
+            credentials.value = {}
+
+            return true
+        } catch (error) {
+            errors.value = []
+            if(error.response.status == 422) {
+                errors.value = error.response.data.errors
+            }
+
+            logout()
+            return false
+        } finally {
+            loading.value = false
+        }
+    }
+
+    const verifyAuth = async () => {
+        loading.value = true
+        try {
+            const response = await axios.post('me')
+            user.value = response.data.user
+            dependencia_id.value = response.data.user.dependencia_id
+            userPermissions.value = response.data.user.permisos || []
+            userMenu.value = response.data.user.menu || []
+            return true
+        } catch (error) {
+            errors.value = []
+            if(error.response.status == 422) {
+                errors.value = error.response.data.errors
+            }
+            return false
+        } finally {
+            loading.value = false
+        }
+    }
+
+    const logout = () => {
+        user.value = null
+        accessToken.value = null
+        userPermissions.value = []
+        userMenu.value = []
+    }
+
+    
 
 	const checkPermission = (el) => {
 		for (var key in user.value.permisos) {
@@ -89,14 +133,21 @@ export const useAuthStore = defineStore('auth', () => {
 		return false;
 	}
 
-	return {
-		user,
-		errors,
-		loading,
+    return {
+        user,
+        dependencia_id,
+        accessToken,
+        userPermissions,
+        userMenu,
+        isLoggedIn,
+        credentials,
+        loading,
+        errors,
 
-		login,
-		logout,
-		validateAuth,
-		checkPermission,
-	}
+        getCsrfCookie,
+        login,
+        verifyAuth,
+        logout,
+        checkPermission,
+    }
 })

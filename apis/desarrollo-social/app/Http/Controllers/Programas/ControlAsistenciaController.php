@@ -155,7 +155,7 @@ class ControlAsistenciaController extends Controller
                     ->get();
                 
                 $fecha = $request->fecha;
-                $curso = $beneficiarios_inscritos->first()->curso->load(['curso','modulo','programa.dependencia','sede','horario','instructor','temporalidad']) ?? null;
+                $curso = $beneficiarios_inscritos->first()->curso->load(['curso','modulo','programa.dependencia','sede','horarios','instructor','temporalidad']) ?? null;
                 $pdf = Pdf::loadView('Reports.PdfControlAsistenciaCurso',compact('beneficiarios_inscritos','fecha','curso'));
                 
             } else if($request->tipo == 'modulo') {

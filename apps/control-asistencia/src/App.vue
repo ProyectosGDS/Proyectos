@@ -8,7 +8,7 @@
 	const auth = useAuthStore()
 
 	onMounted(() => {
-		auth.validateAuth()
+		auth.verifyAuth()
 	})
 </script>
 

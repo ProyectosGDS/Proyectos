@@ -105,57 +105,41 @@ export const useCursoStore = defineStore('curso', () => {
         }
     }
 
+
     const download = async () => {
+        loading.value.download = true
+        try {
+            const response = await axios.get("control-asistencia/listado-asistencia", {
+                params : {
+                    detalle_curso_id : catalogos.curso.id,
+                    year : year.value,
+                    fecha : date.value,
+                    tipo : 'curso'
+                }, // los query params que quieras mandar
+                responseType: "blob", // MUY IMPORTANTE
+            })
 
-    loading.value.download = true
+            // Crear blob con la respuesta
+            const blob = new Blob([response.data], { type: "application/pdf" })
+            const url = window.URL.createObjectURL(blob)
 
-    try {
+            // Crear un enlace temporal para forzar la descarga
+            const link = document.createElement("a")
+            link.href = url
+            link.setAttribute("download", "listado-asistencia.pdf") // nombre del archivo
+            document.body.appendChild(link)
+            link.click()
 
-        // const response = await axios.get('control-asistencia/listado-asistencia',
-        //     {
-        //         params: {
-        //                 detalle_curso_id : catalogos.curso.id,
-        //                 year : year.value,
-        //                 fecha : date.value,
-        //         }
+            // Limpiar
+            link.remove()
+            window.URL.revokeObjectURL(url)
 
-        //     },
-        //     {
-        //         responseType: 'blob',
-        //         headers: {
-        //             'Content-Type': 'application/pdf',
-        //         }
-        //     })
-
-        // const url = window.URL.createObjectURL(new Blob([response.data]));
-        const url = import.meta.env.VITE_MY_API_URL_BASE 
-                    + 'control-asistencia/listado-asistencia?detalle_curso_id=' 
-                    + catalogos.curso.id 
-                    + '&year=' 
-                    + year.value 
-                    + '&fecha=' 
-                    + date.value
-                    + '&tipo=curso'
-
-        const link = document.createElement('a')
-        link.href = url
-        link.setAttribute('download', 'listado-asistencia.pdf')
-
-        document.body.appendChild(link)
-        link.click();
-
-        window.URL.revokeObjectURL(url)
-        document.body.removeChild(link)
-
-
-    } catch (error) {
-        global.manejarError(error);
-
-    } finally {
-
-        loading.value.download = false
+        } catch (error) {
+            console.error("Error al descargar el PDF:", error)
+        } finally {
+            loading.value.download = false
+        }
     }
-}
     
 
     return {
