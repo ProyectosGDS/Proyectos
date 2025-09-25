@@ -3,17 +3,20 @@
     import Logo from './Logo.vue'
     import TitlePage from './TitlePage.vue'
     import { useGlobalStore } from '@/stores/global'
+    import { useAuthStore } from '@/stores/auth'
+
+    const auth = useAuthStore()
 
     const global = useGlobalStore()
 
     const selectedOption = ref({})
 
     function searchSelectedOption () {
-        menus.value.forEach(menu => {
-            if(menu.active && !menu.subMenu.length){
+       auth.userMenu.forEach(menu => {
+            if(menu.active && !menu.childrens.length){
                 selectedOption.value = menu
-            } else if ( menu.active && menu.subMenu.length) {
-                menu.subMenu.forEach(sub => {
+            } else if ( menu.active && menu.childrens.length) {
+                menu.childrens.forEach(sub => {
                     if( sub.active ) {
                         selectedOption.value = sub
                     }
@@ -22,19 +25,18 @@
         })
     }
 
-    const menus = ref([])
 
     const toggleActive = (id) => {
-        menus.value.forEach(menu => {
+       auth.userMenu.forEach(menu => {
             if (menu.id == id) {
                 menu.active = !menu.active
-                if(!menu.subMenu.length){
+                if(!menu.childrens.length){
                     selectedOption.value = menu
                 }
             } else {
                 menu.active = false
-                if(menu.subMenu.length) {
-                    menu.subMenu.forEach(sub => {
+                if(menu.childrens.length) {
+                    menu.childrens.forEach(sub => {
                         if(sub.id == id){
                             sub.active = true
                             selectedOption.value = sub
@@ -46,17 +48,8 @@
                 }
             }
         })
-        localStorage.setItem(btoa('menu'),btoa(JSON.stringify(menus.value)))
+        localStorage.setItem('user_menu',JSON.stringify(auth.userMenu))
     }
-
-    onBeforeMount(async () => {
-
-        const menu = await JSON.parse(atob(localStorage.getItem(btoa('menu'))))        
-
-        if(menu){
-            menus.value = menu;
-        }
-    })
 
     watchEffect(() => {
         searchSelectedOption()
@@ -76,7 +69,7 @@
                     <li class="font-medium uppercase text-nowrap text-center text-color-1 group-hover/principal:text-color-4 transition-all duration-700 text-lg">
                         menú general
                     </li>
-                    <template v-for="menu in menus">
+                    <template v-for="menu in auth.userMenu">
                         <li class="mt-2">
                             <a :href="menu.link">
                                 <div @click="toggleActive(menu.id)" 
@@ -88,12 +81,12 @@
                                             {{ menu.titulo }}
                                         </span>
                                     </div>
-                                    <Icon v-if="menu.subMenu.length" icon="fas fa-angle-up" :class="menu.active ? '' : 'rotate-180'" />
+                                    <Icon v-if="menu.childrens.length" icon="fas fa-angle-up" :class="menu.active ? '' : 'rotate-180'" />
                                 </div>
                             </a>
                             <Transition>
                                 <ul v-if="menu.active" class="ml-3 hidden group-hover/principal:block">
-                                    <template v-for="sub in menu.subMenu">
+                                    <template v-for="sub in menu.childrens">
                                         <a :href="sub.link" @click="toggleActive(sub.id)">
                                             <li class="flex items-center hover:bg-blue-800 hover:text-white hover:font-bold cursor-pointer p-2 rounded-lg mt-2"
                                                 :class="{ 'bg-blue-800 text-white font-bold' :  sub.active }">

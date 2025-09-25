@@ -1,10 +1,12 @@
 <script setup>
-import { ref } from 'vue';
-import { onClickOutside } from '@vueuse/core'
-import { useAuthStore } from '../stores/auth'
-import UserPhoto from './UserPhoto.vue'
+    import { ref } from 'vue';
+    import { onClickOutside } from '@vueuse/core'
+    import { useAuthStore } from '../stores/auth'
+    import UserPhoto from './UserPhoto.vue'
+    import { useRouter } from 'vue-router'
 
     const auth = useAuthStore()
+    const router = useRouter()
 
     const openModalHelp = ref(false);
     const open = ref(false);
@@ -12,6 +14,11 @@ import UserPhoto from './UserPhoto.vue'
 
 
     onClickOutside(target, (event) => open.value = false)
+
+    const handleLogout = () => {
+        auth.logout()
+        router.push({ name : 'Login'})
+    }
 
     defineOptions({
         inheritAttrs: false
@@ -27,8 +34,8 @@ import UserPhoto from './UserPhoto.vue'
             <UserPhoto :user="auth.user" class="h-10 w-10 cursor-pointer" />
             
             <div class="font-bold text-blue-muni text-xs text-center hidden md:block uppercase">
-                <p>{{ `${auth.user.nombre }` }}</p>
-                <p>{{ auth.user?.perfil ?? '' }}</p>
+                <p>{{ `${auth.user?.nombre }` }}</p>
+                <p>{{ auth.user?.nombre_perfil ?? '' }}</p>
                 <p>{{ auth.user?.dependencia?.nombre ?? '' }}</p>
             </div>
         </div>
@@ -52,7 +59,7 @@ import UserPhoto from './UserPhoto.vue'
                         </a>
                     </li>
                     <hr>
-                    <li @click="auth.logout()" class="font-medium cursor-pointer">
+                    <li @click="handleLogout" class="font-medium cursor-pointer">
                         <div class="flex gap-2 items-center transform transition-colors duration-200 border-r-4 border-transparent hover:border-red-600" >
                             <Icon icon="fas fa-arrow-right-from-bracket" class="text-red-500" />
                             Cerrar sesión

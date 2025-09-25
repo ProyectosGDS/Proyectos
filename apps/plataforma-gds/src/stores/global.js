@@ -63,30 +63,36 @@ export const useGlobalStore = defineStore('global', () => {
     }
 
     function manejarError(error) {
-        if (error.response) {
-
-            const { status, data } = error.response
-    
-            if (status === 422) {
-                setAlert(data.message,'danger','ERROR DE VALIDACIÓN')
-                console.error('Error de validación:', data.errors)
-            } else if (status === 401) {
-                setAlert(data.message,'danger','NO AUTORIZADO')
-                console.error('No autorizado:', data.message)
-            } else if (status === 404) {
-                setAlert(data.message,'danger','RECURSO NO ENCONTRADO')
-                console.error('Recurso no encontrado:', data.message)
-            } else if (status >= 500) {
-                setAlert(data.message,'danger','ERROR DEL SERVIDOR')
-                console.error('Error del servidor:', data.message)
-            } else {
-                setAlert(data,'danger','ERROR')
-                console.error('Error :',data)
-            }
-        } else if (error.request) {
+        if (!error.response) {
             console.error('No se recibió respuesta del servidor:', error.request)
-        } else {
-            console.error('Error en la solicitud:', error.message)
+            setAlert('No se pudo conectar con el servidor','danger','ERROR')
+            return
+        }
+
+        const { status, data } = error.response
+
+        switch (status) {
+            case 422:
+                setAlert(data.message || 'Error de validación','warning','ERROR DE VALIDACIÓN')
+                console.error('Error de validación:', data.errors)
+                break
+            case 401:
+                setAlert(data.message || 'No autorizado','danger','NO AUTORIZADO')
+                console.error('No autorizado',data.errors ?? 'No hay errores')
+                break
+            case 404:
+                setAlert(data.message || 'Recurso no encontrado','danger','RECURSO NO ENCONTRADO')
+                console.error('Recurso no encontrado:', data.message)
+                break
+            default:
+                if (status >= 500) {
+                    setAlert(data.message || 'Error del servidor','danger','ERROR DEL SERVIDOR')
+                    console.error('Error del servidor:', data.message)
+                } else {
+                    setAlert(data.message || 'Error desconocido','danger','ERROR')
+                    console.error('Error desconocido:', data)
+                }
+                break
         }
     }
 

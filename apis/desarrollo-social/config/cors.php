@@ -19,7 +19,11 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => [
+        'http://192.168.20.116',
+        'http://192.168.20.116:5173',
+        'https://gds.muniguate.com',
+    ],
 
     'allowed_origins_patterns' => [],
 

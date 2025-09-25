@@ -1,102 +1,105 @@
+import { ref, computed, watch } from 'vue'
 import { defineStore } from 'pinia'
-import axios from 'axios'
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useGlobalStore } from './global'
+import axios from '@/services/axios'
+import { useGlobalStore } from './global' // usamos tu servicio de axios ya configurado
 
 export const useAuthStore = defineStore('auth', () => {
 
-	const router = useRouter()
-	const global = useGlobalStore()
+    const global = useGlobalStore()
 
-	const user = ref({})
-	const loading = ref(false)
-	const errors = ref([])
+    const user = ref(JSON.parse(localStorage.getItem('user')) || null)
+    const accessToken = ref(localStorage.getItem('access_token') || null)
+    const userPermissions = ref(JSON.parse(localStorage.getItem('user_permissions')) || [])
+    const userMenu = ref(JSON.parse(localStorage.getItem('user_menu')) || [])
+    const loading = ref(false)
+    const credentials = ref({})
+    const errors = ref([])
 
-	const login = () => {
-		
-		loading.value = true
-		axios.post('login',{
-			cui : user.value.cui,
-			password : btoa(user.value.password)
-		})
-		.then(response => {
-			user.value = JSON.parse(atob(response.data))
-			localStorage.setItem(btoa('permisos'),btoa(JSON.stringify(user.value.permisos)))
-			localStorage.setItem(btoa('menu'),btoa(JSON.stringify(user.value.menu)))
-			localStorage.setItem(btoa('dependencia_id'),btoa(JSON.stringify(user.value.dependencia_id)))
-			localStorage.setItem(btoa('id'),btoa(JSON.stringify(user.value.id)))
-			router.push({ name: 'Home' })
-		})
-		.catch(error => {
-			global.manejarError(error)
-            if(error.status === 422) {
+    const isLoggedIn = computed(() => !!accessToken.value)
+
+    // Mantener sincronizado con localStorage
+    watch(accessToken, (val) => {
+        if (val) {
+            localStorage.setItem('access_token', val)
+        } else {
+            localStorage.removeItem('access_token')
+        }
+    })
+
+    watch(user, (val) => {
+        if (val) {
+            localStorage.setItem('user', JSON.stringify(val))
+        } else {
+            localStorage.removeItem('user')
+        }
+    })
+
+    watch(userPermissions, (val) => {
+        localStorage.setItem('user_permissions', JSON.stringify(val))
+    })
+
+    watch(userMenu, (val) => {
+        localStorage.setItem('user_menu', JSON.stringify(val))
+    })
+
+    const getCsrfCookie = async () => {
+        try {
+            await axios.get('auth/csrf-cookie')
+            return true
+        } catch (error) {
+            console.error('Failed to get CSRF cookie:', error)
+            global.manejarError(error)
+            return false
+        }
+    }
+
+    const login = async () => {
+        loading.value = true
+        try {
+            const csrfSuccess = await getCsrfCookie()
+            if (!csrfSuccess) return false
+
+            const response = await axios.post('login', credentials.value)
+
+            accessToken.value = response.data.access_token
+            user.value = response.data.user
+            userPermissions.value = response.data.user.permisos || []
+            userMenu.value = response.data.user.menu || []
+            credentials.value = {}
+
+            return true
+        } catch (error) {
+            errors.value = []
+            if(error.response.status == 422) {
                 errors.value = error.response.data.errors
             }
-		})
-		.finally(() => loading.value = false)
-	}
-	
-	const validateAuth = () => {
-		if(global.checkIfCookieExists(btoa('access_token'))) {
-			axios.post('me')
-			.then(response =>{
-				user.value = JSON.parse(atob(response.data))
-				localStorage.setItem( btoa('permisos'), btoa(JSON.stringify(user.value.permisos)))
-				localStorage.setItem(btoa('menu'),btoa(JSON.stringify(user.value.menu)))
-				localStorage.setItem(btoa('id_dependencia'),btoa(JSON.stringify(user.value.id_dependencia)))
-				localStorage.setItem(btoa('id_usuario'),btoa(JSON.stringify(user.value.id_usuario)))
-			}) 		
-			.catch(error => {
-				resetData()
-				router.push({name:'Login'})
-			})
-		}
-	}
 
-	const resetData = () => {
-		user.value = {}
-		errors.value = []
-	}
+            logout()
+            return false
+        } finally {
+            loading.value = false
+        }
+    }
 
-	const logout = async () => {
-		sessionStorage.clear()
-		localStorage.clear()
-		try {
-			await axios.post('logout')
-			resetData()
-			window.location.href = import.meta.env.VITE_MY_URL + 'login'
+    const logout = () => {
+        user.value = null
+        accessToken.value = null
+        userPermissions.value = []
+        userMenu.value = []
+    }
 
-		} catch (error) {
-			console.error(error)
-		}
-	}
+    return {
+        user,
+        accessToken,
+        userPermissions,
+        userMenu,
+        isLoggedIn,
+        credentials,
+        loading,
+        errors,
 
-	const checkPermission = (el) => {
-		for (var key in user.value.permisos) {
-			if (user.value.permisos.hasOwnProperty(key)) {
-				var value = user.value.permisos[key];
-
-				if (value === el) {
-					return true;
-				}
-
-				if (typeof value === 'object' && checkPermission(el)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	return {
-		user,
-		errors,
-		loading,
-
-		login,
-		logout,
-		validateAuth,
-		checkPermission,
-	}
+        getCsrfCookie,
+        login,
+        logout,
+    }
 })

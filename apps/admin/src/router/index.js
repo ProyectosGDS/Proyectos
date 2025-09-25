@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import NotFound from '@/views/404.vue'
 import UnaAthorized from '@/views/401.vue'
 import Layout from '@/layouts/Default.vue'
-import { useGlobalStore } from '@/stores/global'
+import { useAuthStore } from '@/stores/auth'
 
 
 const router = createRouter({
@@ -79,18 +79,19 @@ const router = createRouter({
 	]
 })
 
-router.beforeEach((to, from) => {
-	
-	const global = useGlobalStore()
-	
-	if (to.meta.auth) {
-		if (!global.checkIfCookieExists(btoa('access_token')) && to.name != 'Login') {		
-			window.location.href = import.meta.env.VITE_MY_URL + 'login';			
-		}
-	}
-	
-	return true
+router.beforeEach((to) => {
 
+    const authStore = useAuthStore()
+
+    if (to.meta.auth && !authStore.isLoggedIn && to.name != 'Login') {
+        window.location.href = import.meta.env.VITE_MY_URL + 'login';
+    }
+
+    if (to.name === 'Login' && authStore.isLoggedIn) {
+        return true
+    }
+
+    return true
 })
 
 export default router

@@ -9,142 +9,81 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
+    
     public function authenticate(Request $request) {
+        // Validación de datos de entrada
         $request->validate([
             'cui' => ['required','numeric','digits:13',new ValidateCui,'exists:usuarios,cui'],
             'password' => 'required|string|min:8'
         ]);
 
-        try {
+        $user = usuarios::where('cui', $request->cui)->first();
 
+        // Verificar la existencia del usuario y la contraseña
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            throw ValidationException::withMessages([
+                'cui' => ['Las credenciales proporcionadas son incorrectas.'],
+            ])->status(401); // 401 para credenciales incorrectas
+        }
+
+        try {
+            // Asegurarse de que el 'aud' sea válido
             $aud = $request->header('Origin');
             $receivers = config('jwt.receivers');
 
-            if(in_array($aud,$receivers)){
-
-                $user = usuarios::with('dependencia')->where('cui',$request->cui)->whereNull('deleted_at')->first();
-
-                if($user) {
-                    $user->makeVisible('password');
-                    if(Hash::check(base64_decode($request->password),$user->password)){
-    
-                        $user->makeHidden('password');
-    
-                        Auth::login($user);
-                        
-                        $payload = [
-                            'sub' => $user->id,
-                        ];
-    
-                        $accessToken = $user->createToken($payload, $aud);
-    
-                        if($accessToken) {
-    
-                            $cookie = cookie(base64_encode('access_token'), $accessToken, config('jwt.expired_token'), '/', null, null, false);
-    
-                            $user['permisos'] = $this->permisosApp($user,$request->header('App'));
-                            $user['menu'] = $this->menu($user);
-    
-                            $perfil = $user->perfil->nombre;
-                            unset($user->perfil);
-                            $user['perfil'] = $perfil;
-                            $user->makeHidden('perfil_id');
-    
-                            return response(base64_encode($user))->withCookie($cookie);
-                        }
-    
-                        return response('Unauthorized',422);
-                    }
-                }
-
+            if (!in_array($aud, $receivers)) {
+                return response()->json(['message' => 'Origen de la solicitud no permitido.'], 403);
             }
+            
+            // Generar el payload del JWT
+            $payload = [
+                'sub' => $user->id,
+                // Puedes añadir más información aquí si es necesario
+            ];
 
-            return response([
-                'message' => 'Credenciales invalidas',
-                'errors' => [
-                    'credenciales' => ['Credenciales invalidas']
-                ] 
-            ], 422);
+            $accessToken = $user->createToken($payload, $aud);
+            
+            // // Cargar datos del usuario y sus relaciones
+            $user->load('dependencia');
+            // $user->append('permisos', 'menu');
+
+            // Retornar el token y los datos del usuario en una respuesta JSON
+            return response()->json([
+                'user' => $user->toArray(),
+                'access_token' => $accessToken,
+            ]);
 
         } catch (\Throwable $th) {
-            return response($th->getMessage());
+            // Manejo de errores genéricos en caso de que algo falle internamente
+            return response()->json([
+                'message' => 'Error interno del servidor. Intente de nuevo más tarde.',
+                'error' => $th->getMessage(),
+            ], 500);
         }
+    }
 
+    public function verifyAuth() {
         
-    }
+        $user = Auth::user();
 
-    public function verifyAuth(Request $request) {
-
-        $user = auth()->user();
-
-        $user['permisos'] = $this->permisosApp($user,$request->header('App'));
-        $user['menu'] = $this->menu($user);
-
-        $perfil = $user->perfil->nombre;
-        unset($user->perfil);
-        $user['perfil'] = $perfil;
-
-        $user->makeHidden('perfil_id');
-
-        return response(base64_encode($user->load('dependencia')));
-
-    }
-
-    public function permisosApp($user, $app) {
-
-        $user = $user;
+        if (!$user) {
+            return response()->json(['message' => 'No se encontró el usuario.'], 404);
+        }
         
-        if($user->perfil) {
-            $permisos = [];            
-            foreach ( $user->perfil->rol->permisos as $permiso ) {
-                if( $permiso->app === $app ) {
-                    $permisos[] = $permiso->nombre;
-                }
-            }
-        }
+        // Retorna los datos completos del usuario
+        $user->load('dependencia');
+        // $user->append('permisos', 'menu', 'perfil');
 
-        return $permisos;
+        return response()->json([
+            'user' => $user->toArray()
+        ]);
     }
 
-    public function menu($user) {
-
-
-        if($user->perfil->menu->paginas) {
-            
-            $paginas = $user->perfil->menu->paginas->load('padre');
-            $grupoPaginas = $paginas->groupBy('pagina_id');
-            
-            $menu = collect();
-            $subMenu = collect();
-
-            foreach ($grupoPaginas as $grupo) {
-                foreach ($grupo as $hijo) {
-                    if($hijo->padre) {
-                        $hijo->padre->subMenu = collect();
-                        $menu->push($hijo->padre);
-                    } else {
-                        $menu->push($hijo);
-                    }
-
-                    unset($hijo->padre,$hijo->pivot);
-                    $subMenu->push($hijo);
-                }
-            }
-
-            $menu = $menu->unique('id');
-
-            $menu->each(function ($padre) use ($subMenu) {
-                $padre->subMenu = $subMenu->where('pagina_id', $padre->id)->sortBy('orden')->values();
-            });
-
-        }
-
-        return $menu->sortBy('orden')->values()->all();
-
-    }
+    
 
     public function logout() {
         Auth::logout();

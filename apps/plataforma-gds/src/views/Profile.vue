@@ -15,7 +15,7 @@
                 <Input v-model="auth.user.dependencia.nombre" option="label" title="Dependencia" readonly disabled />
                 <Input v-model="auth.user.nombre" option="label" title="Usuario" readonly disabled />
                 <Input v-model="auth.user.cui" option="label" title="cui" readonly disabled />
-                <Input v-model="auth.user.perfil" option="label" title="perfil" readonly disabled />
+                <Input v-model="auth.user.nombre_perfil" option="label" title="perfil" readonly disabled />
             </div>
             
             <div class="grid gap-y-4 xl:pl-8">
