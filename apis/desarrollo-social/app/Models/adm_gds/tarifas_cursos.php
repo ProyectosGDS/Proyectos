@@ -9,6 +9,12 @@ class tarifas_cursos extends Model
     protected $connection = 'gds';
     protected $table = 'TARIFAS_CURSOS';
     public $timestamps = false;
+    protected $casts = [
+        'inscripcion' => 'decimal:2',
+        'tarifa_menos' => 'decimal:2',
+        'tarifa_mayor' => 'decimal:2',
+    ];
+
 
     protected $fillable = [
         'tipo',
@@ -17,6 +23,9 @@ class tarifas_cursos extends Model
         'tarifa_menor',
         'tarifa_mayor',
         'temporalidad',
+        'no_cuotas',
+        'mes_inicial',
+        'mes_final',
     ];
 
     public static $temporalidad = [

@@ -345,7 +345,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <section class="px-4 lg:px-7">
+    <section class="px-4 lg:px-7 overflow-auto">
         <!-- FILTER -->
         <div class="md:flex md:items-center md:justify-between">
             <div class="text-color-4 bg-transparent flex items-center px-2 py-1.5">

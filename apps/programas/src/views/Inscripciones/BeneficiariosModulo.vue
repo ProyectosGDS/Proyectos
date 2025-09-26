@@ -266,8 +266,8 @@
                                         <span>
                                             <span class="flex items-center gap-1">
                                                 <Icon icon="fas fa-mobile" />
-                                                CELULAR: 
-                                                <span class="font-medium">{{ inscripcion.beneficiario.celular }}</span>
+                                                INTERLOCUTOR: 
+                                                <span class="font-medium">{{ inscripcion.beneficiario.interlocutor ?? null }}</span>
                                             </span>
                                         </span>
                                         
@@ -311,7 +311,7 @@
                             @click="inscripcion.store" 
                             text="Inscribir beneficiarios nuevos al modulo" 
                             icon="fas fa-plus" 
-                            class="btn-primary" 
+                            class="btn-primary absolute bottom-4" 
                             :loading="inscripcion.loading.store"
                         />
                     </template>
@@ -326,7 +326,7 @@
         <div class="flex items-center justify-center gap-4">
             <Icon icon="fas fa-exclamation-triangle" class="text-orange-500 text-5xl" />
             <div>
-                <p class="text-center text-lg">¿Estás seguro de eliminar la matriculacion de:?</p>
+                <p class="text-center text-lg">¿Estás seguro de eliminar la inscripción de:?</p>
                 <h1 class="text-center font-semibold">{{ inscripcion.inscripcion?.beneficiario?.nombre_completo }}</h1>
             </div>
         </div>

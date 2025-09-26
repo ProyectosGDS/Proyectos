@@ -225,6 +225,7 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
         try {
             const response = await axios.get('detalles-curso/get-requisitos/' + item.id)
             curso.value = response.data
+            curso.value.curso = item.curso.nombre            
             selected_requirements.value = response.data.requisitos.map(requisito => requisito.id)
             modal.value.requisitos = true
         } catch (error) {

@@ -42,7 +42,7 @@ class ProgramasController extends Controller
 
     public function store (Request $request) {
         $request->validate([
-            'nombre' => 'required|string|max:80',
+            'nombre' => 'required_without:cursos.*.id|string|max:80',
             'descripcion' => 'nullable|string|max:255',
             'dependencia_id' => 'nullable|integer',
             'escuela' => 'required_if:dependencia_id,5|string|max:255',
@@ -91,7 +91,7 @@ class ProgramasController extends Controller
 
     public function update (Request $request, programas $programa) {
         $request->validate([
-            'nombre' => 'required|string|max:80',
+            'nombre' => 'required_without:cursos.*.id|string|max:80',
             'descripcion' => 'nullable|string|max:255',
             'dependencia_id' => 'required',
             'escuela' => 'nullable|string|max:255'
@@ -183,8 +183,29 @@ class ProgramasController extends Controller
 
     public function store_cursos(Request $request) {
         $request->validate([
-            'cursos' => 'required|array'
+            'cursos' => 'required|array',
+            'cursos.*.seccion' => 'nullable',
+            'cursos.*.capacidad' => 'required_without:cursos.*.id|integer|min:1',
+            'cursos.*.modalidad' => 'required_without:cursos.*.id|string|in:PRESENCIAL,VIRTUAL,HIBRIDA',
+            'cursos.*.curso_id' => 'required_without:cursos.*.id|integer|exists:cursos,id',
+            'cursos.*.instructor_id' => 'required_without:cursos.*.id|integer|exists:instructores,id',
+            'cursos.*.sede_id' => 'required_without:cursos.*.id|integer|exists:sedes,id',
+            'cursos.*.programa_id' => 'required_without:cursos.*.id|integer|exists:programas,id',
+            'cursos.*.temporalidad_id' => 'required_without:cursos.*.id|integer|exists:temporalidades,id',
+            'cursos.*.fecha_inicial' => 'required_without:cursos.*.id|date',
+            'cursos.*.fecha_final' => 'required_without:cursos.*.id|date|after:cursos.*.fecha_inicial',
+            'cursos.*.paga' => 'required_without:cursos.*.id|in:S,N',
+            'cursos.*.horarios' => 'required_without:cursos.*.id|array|min:1',
+            
+            'cursos.*.inscripcion' => 'nullable|required_if:cursos.*.paga,S|numeric|min:0',
+            'cursos.*.tarifa_menor' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|numeric|min:0',
+            'cursos.*.tarifa_mayor' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|numeric|min:0',
+            'cursos.*.temporalidad_tarifa' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|string',
+            'cursos.*.no_cuotas' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|integer|min:1',
+            'cursos.*.mes_inicial' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|date|date_format:Y-m',
+            'cursos.*.mes_final' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|date|date_format:Y-m|after_or_equal:cursos.*.mes_inicial',
         ]);
+        
         try {
 
             $count_cursos = 0;
@@ -219,6 +240,9 @@ class ProgramasController extends Controller
                                 'tarifa_menor' => $curso['tarifa_menor'],
                                 'tarifa_mayor' => $curso['tarifa_mayor'],
                                 'temporalidad' => $curso['temporalidad_tarifa'],
+                                'no_cuotas' => $curso['no_cuotas'],
+                                'mes_inicial' => $curso['mes_inicial'],
+                                'mes_final' => $curso['mes_final'],
                             ]);
                         }
                     }
@@ -469,7 +493,7 @@ class ProgramasController extends Controller
 
     public function store_actividades(Request $request) {
         $request->validate([
-            'actividades' => 'required|array'
+            'actividades' => 'required_without:cursos.*.id|array'
         ]);
         try {
 

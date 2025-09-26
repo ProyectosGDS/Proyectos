@@ -138,6 +138,9 @@
                             <option v-for="tempo in catalogos.tempo_tarifas">{{ tempo }}</option>
                         </Input>
                     </div>
+                    <Input option="label" title="Cantidad de cuotas" type="number" min="1" max="12" v-model="store.curso.no_cuotas" :error="store.errors.hasOwnProperty('no_cuotas')" />
+                    <Input option="label" title="Mes inicial" type="month" v-model="store.curso.mes_inicial" :error="store.errors.hasOwnProperty('mes_inicial')" />
+                    <Input option="label" title="Mes final" type="month" v-model="store.curso.mes_final" :error="store.errors.hasOwnProperty('mes_final')" />
                 </div>
                 <Validate-Errors :errors="store.errorsDetails" v-if="store.errorsDetails != 0" />
                 <div class="flex justify-center gap-4">
@@ -421,6 +424,9 @@
                         <option v-for="tempo in catalogos.tempo_tarifas">{{ tempo }}</option>
                     </Input>
                 </div>
+                <Input option="label" title="Cantidad de cuotas" type="number" min="1" max="12" v-model="asignaciones.curso.tarifas.no_cuotas" :error="asignaciones.errors.hasOwnProperty('tarifas.no_cuotas')" />
+                <Input option="label" title="Mes inicial" type="month" v-model="asignaciones.curso.tarifas.mes_inicial" :error="asignaciones.errors.hasOwnProperty('tarifas.mes_inicial')" />
+                <Input option="label" title="Mes final" type="month" v-model="asignaciones.curso.tarifas.mes_final" :error="asignaciones.errors.hasOwnProperty('tarifas.mes_final')" />
             </div>
         </div>
         <Validate-Errors :errors="asignaciones.errors" v-if="asignaciones.errors != 0" />
@@ -459,7 +465,7 @@
             <Icon @click="asignaciones.resetData" icon="fas fa-xmark" class="cursor-pointer text-white" />
         </template>
         <div>
-            <Input v-model="asignaciones.curso.curso" option="label" title="Curso seleccionado" readonly disabled/>
+            <Input v-model="asignaciones.curso.curso.nombre" option="label" title="Curso seleccionado" readonly disabled/>
             <br>
             <details open class="border rounded-md border-color-4 text-color-1 uppercase p-4">
                 <summary>Requisitos disponibles</summary>

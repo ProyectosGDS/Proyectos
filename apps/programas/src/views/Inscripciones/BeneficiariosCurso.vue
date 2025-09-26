@@ -246,8 +246,8 @@
                                         <span>
                                             <span class="flex items-center gap-1">
                                                 <Icon icon="fas fa-mobile" />
-                                                CELULAR: 
-                                                <span class="font-medium">{{ inscripcion.beneficiario.celular }}</span>
+                                                INTERLOCUTOR: 
+                                                <span class="font-medium">{{ inscripcion.beneficiario.interlocutor ?? null }}</span>
                                             </span>
                                         </span> 
                                         <span>
@@ -264,13 +264,6 @@
                                                 <span class="font-medium">{{ inscripcion.beneficiario.edad + ' años' }}</span>
                                             </span>
                                         </span>
-                                        <!-- <span v-if="inscripcion.tarifa">
-                                            <span class="flex items-center gap-1">
-                                                <Icon icon="fas fa-dollar" />
-                                                {{ inscripcion.beneficiario.edad >= 18 ? 'TARIFA MAYOR: ' : 'TARIFA MENOR: ' }} 
-                                                <span class="font-medium">{{ global.parseValue(inscripcion.tarifa,'currency') }}</span>
-                                            </span>
-                                        </span> -->
                                     </div>
                                 </Card>
                                 <div class="grid">
@@ -284,7 +277,14 @@
                     </div>
                 </div>
                 <div v-if="inscripcion.beneficiarios.length && inscripcion.cupo > 0" class="flex justify-center gap-4">
-                    <Button v-if="auth.checkPermission('crear inscripcion curso')" @click="inscripcion.store" text="Inscribir beneficiarios nuevos al curso" icon="fas fa-plus" class="btn-primary" :loading="inscripcion.loading.store"/>
+                    <Button 
+                        v-if="auth.checkPermission('crear inscripcion curso')" 
+                        @click="inscripcion.store" 
+                        text="Inscribir beneficiarios nuevos al curso" 
+                        icon="fas fa-plus" 
+                        class="btn-primary absolute bottom-4" 
+                        :loading="inscripcion.loading.store"
+                    />
                 </div>
             </div>
         </div>
@@ -310,7 +310,7 @@
         <div class="flex items-center justify-center gap-4">
             <Icon icon="fas fa-exclamation-triangle" class="text-orange-500 text-5xl" />
             <div>
-                <p class="text-center text-lg">¿Estás seguro de eliminar la matriculacion de:?</p>
+                <p class="text-center text-lg">¿Estás seguro de eliminar la inscripción de:?</p>
                 <h1 class="text-center font-semibold">{{ inscripcion.inscripcion?.beneficiario?.nombre_completo }}</h1>
             </div>
         </div>

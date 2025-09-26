@@ -96,6 +96,9 @@ export const useCursosProgramaStore = defineStore('cursos-programa', () => {
                     tarifa_menor : curso.value.tarifa_menor,
                     tarifa_mayor : curso.value.tarifa_mayor,
                     temporalidad_tarifa : curso.value.temporalidad_tarifa,
+                    no_cuotas : curso.value.no_cuotas,
+                    mes_inicial : curso.value.mes_inicial,
+                    mes_final : curso.value.mes_final,
                 })
                 curso.value = {
                     curso: {},
