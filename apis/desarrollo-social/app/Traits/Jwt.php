@@ -2,7 +2,7 @@
 
 namespace App\Traits;
 
-use App\Jwt\JsonWebToken;
+use App\Services\Jwt\JsonWebToken;
 
 trait Jwt {
 

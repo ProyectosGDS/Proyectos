@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Jwt\JsonWebToken;
+use App\Services\Jwt\JsonWebToken;
 use App\Models\adm_gds\usuarios;
 use Closure;
 use Illuminate\Http\Request;
