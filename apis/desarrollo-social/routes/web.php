@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Services\SapRfc as SAP;
+use App\Services\Sap\SapRfc as SAP;
 
 /*
 |--------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Sap;
 
 use RuntimeException;
 use SAPNWRFC\Connection as SapConnection;
