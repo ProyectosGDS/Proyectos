@@ -1,5 +1,5 @@
 <script setup>
-    import { onBeforeMount } from 'vue'
+    import { onBeforeMount, watchEffect } from 'vue'
     import { useCursosModuloStore } from '@/stores/Asignaciones/cursos-modulo'
     import { useModulosStore } from '@/stores/Catalogos/modulos'
     import { useProgramasStore } from '@/stores/Catalogos/programas'
@@ -15,6 +15,17 @@
         store.detalles.modulo = item
     }
 
+    const mes_final = () => {
+        const [year, month] = modulos.modulo.tarifas.mes_inicial.split("-").map(Number);
+        const date = new Date(year, month - 1, 1);
+        const cuotas = parseInt(modulos.modulo.tarifas.no_cuotas)
+        date.setMonth(date.getMonth() + (cuotas - 1));
+        const newYear = date.getFullYear();
+        const newMonth = String(date.getMonth() + 1).padStart(2, "0");
+
+        modulos.modulo.tarifas.mes_final = `${newYear}-${newMonth}`;
+    }
+
     onBeforeMount(() => {
         modulos.fetch(store.programa_id)
         modulos.modulo.programa_id = store.programa_id
@@ -22,6 +33,14 @@
         catalogos.getSedes()
         catalogos.getTemporalidades()
         catalogos.getTemporalidadesTarifas()
+    })
+
+    watchEffect(() => {
+        if(modulos.modulo.tarifas.no_cuotas && modulos.modulo.tarifas.mes_inicial) {
+            mes_final()
+        } else {
+            modulos.modulo.tarifas.mes_final = null
+        }
     })
 </script>
 
@@ -99,7 +118,7 @@
                 </div>
                 <Input option="label" title="Cantidad de cuotas" type="number" min="1" max="12" v-model="modulos.modulo.tarifas.no_cuotas" :error="modulos.errors.hasOwnProperty('tarifas.no_cutoas')" />
                 <Input option="label" title="Mes inicial" type="month" v-model="modulos.modulo.tarifas.mes_inicial" :error="modulos.errors.hasOwnProperty('tarifas.mes_inicial')" />
-                <Input option="label" title="Mes final" type="month" v-model="modulos.modulo.tarifas.mes_final" :error="modulos.errors.hasOwnProperty('tarifas.mes_final')" />
+                <Input option="label" title="Mes final" type="month" v-model="modulos.modulo.tarifas.mes_final" :error="modulos.errors.hasOwnProperty('tarifas.mes_final')" disabled />
             </div>
             
             <Validate-Errors :errors="modulos.errors" v-if="modulos.errors != 0" />

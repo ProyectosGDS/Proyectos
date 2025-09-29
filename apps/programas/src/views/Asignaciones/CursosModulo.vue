@@ -1,5 +1,5 @@
 <script setup>
-    import { computed, onMounted } from 'vue'
+    import { computed, onMounted, watchEffect } from 'vue'
 
     import { useProgramasStore } from '@/stores/Catalogos/programas'
     import { useCursosModuloStore } from '@/stores/Asignaciones/cursos-modulo'
@@ -37,8 +37,8 @@
                 return String(value).toLowerCase().includes(store.search.toLowerCase()) 
             })
         })
-    } , { cache: true } )    
-    
+    } , { cache: true } ) 
+        
     onMounted(() => {
      
         if(auth.dependencia_id && auth.dependencia_id == 5){
@@ -50,7 +50,6 @@
         catalogos.getTemporalidades()
         catalogos.getCatalogosCurso()
     })
-
 </script>
 
 <template>

@@ -1,5 +1,5 @@
 <script setup>
-    import { computed, onBeforeMount } from 'vue'
+    import { computed, onBeforeMount, watchEffect } from 'vue'
 
     import { useProgramasStore } from '@/stores/Catalogos/programas'
     import { useCursosProgramaStore } from '@/stores/Asignaciones/cursos-programa'
@@ -34,6 +34,17 @@
         searchables.push(el.key.toLowerCase().trim())
     })
 
+    const mes_final = () => {
+        const [year, month] = store.curso.mes_inicial.split("-").map(Number);
+        const date = new Date(year, month - 1, 1);
+        const cuotas = parseInt(store.curso.no_cuotas)
+        date.setMonth(date.getMonth() + (cuotas - 1));
+        const newYear = date.getFullYear();
+        const newMonth = String(date.getMonth() + 1).padStart(2, "0");
+
+        store.curso.mes_final = `${newYear}-${newMonth}`;
+    }
+
     const searching_cursos = computed(() => {
         
         return asignaciones.cursos.filter((item) => {
@@ -43,8 +54,6 @@
             })
         })
     } , { cache: true } )
-
-
     
     onBeforeMount(() => {
         
@@ -57,6 +66,14 @@
         catalogos.getCatalogosCurso()
         requisitos.fetch()
         catalogos.getTemporalidadesTarifas()
+    })
+
+    watchEffect(() => {
+        if(store.curso.no_cuotas && store.curso.mes_inicial) {
+            mes_final()
+        } else { 
+            store.curso.mes_final = null
+        }
     })
 
 </script>
@@ -140,7 +157,7 @@
                     </div>
                     <Input option="label" title="Cantidad de cuotas" type="number" min="1" max="12" v-model="store.curso.no_cuotas" :error="store.errors.hasOwnProperty('no_cuotas')" />
                     <Input option="label" title="Mes inicial" type="month" v-model="store.curso.mes_inicial" :error="store.errors.hasOwnProperty('mes_inicial')" />
-                    <Input option="label" title="Mes final" type="month" v-model="store.curso.mes_final" :error="store.errors.hasOwnProperty('mes_final')" />
+                    <Input option="label" title="Mes final" type="month" v-model="store.curso.mes_final" :error="store.errors.hasOwnProperty('mes_final')" disabled />
                 </div>
                 <Validate-Errors :errors="store.errorsDetails" v-if="store.errorsDetails != 0" />
                 <div class="flex justify-center gap-4">
@@ -426,7 +443,7 @@
                 </div>
                 <Input option="label" title="Cantidad de cuotas" type="number" min="1" max="12" v-model="asignaciones.curso.tarifas.no_cuotas" :error="asignaciones.errors.hasOwnProperty('tarifas.no_cuotas')" />
                 <Input option="label" title="Mes inicial" type="month" v-model="asignaciones.curso.tarifas.mes_inicial" :error="asignaciones.errors.hasOwnProperty('tarifas.mes_inicial')" />
-                <Input option="label" title="Mes final" type="month" v-model="asignaciones.curso.tarifas.mes_final" :error="asignaciones.errors.hasOwnProperty('tarifas.mes_final')" />
+                <Input option="label" title="Mes final" type="month" v-model="asignaciones.curso.tarifas.mes_final" :error="asignaciones.errors.hasOwnProperty('tarifas.mes_final')" disabled />
             </div>
         </div>
         <Validate-Errors :errors="asignaciones.errors" v-if="asignaciones.errors != 0" />
