@@ -33,6 +33,7 @@ class beneficiarios extends Model
         'interlocutor',
         'deleted_at',
         'estado',
+        'codigo_alumno',
     ];
 
     //RELACIONES

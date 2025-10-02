@@ -12,7 +12,9 @@
         <summary class="text-color-4 text-lg mb-3 cursor-pointer hover:bg-gray-100 rounded-lg font-medium">CONTACTO DE EMERGENCIA</summary>
         <div class="grid lg:grid-cols-2 gap-4">
             <Input v-model="store.beneficiario.emergencia.cui" option="label" title="cui" maxlength="13" :error="store.errors.hasOwnProperty('emergencia.cui')"/>
-            <Input v-model="store.beneficiario.emergencia.nombre" option="label" title="*nombre" maxlength="150" :error="store.errors.hasOwnProperty('emergencia.nombre')"/>
+            <Input v-model="store.beneficiario.emergencia.fecha_nacimiento" option="label" title="*fecha nacimiento" type="date" :error="store.errors.hasOwnProperty('emergencia.fecha_nacimiento')"/>
+            <Input v-model="store.beneficiario.emergencia.nombres" option="label" title="*nombres" maxlength="150" :error="store.errors.hasOwnProperty('emergencia.nombres')"/>
+            <Input v-model="store.beneficiario.emergencia.apellidos" option="label" title="*apellidos" maxlength="150" :error="store.errors.hasOwnProperty('emergencia.apellidos')"/>
             <Input v-model="store.beneficiario.emergencia.celular" option="label" title="*celular" maxlength="12" :error="store.errors.hasOwnProperty('emergencia.celular')"/>
             <Input v-model="store.beneficiario.emergencia.email" option="label" title="email" type="email" maxlength="60" :error="store.errors.hasOwnProperty('emergencia.email')"/>
             <Input v-model="store.beneficiario.emergencia.zona_id" option="select" title="seleccione zona" :error="store.errors.hasOwnProperty('emergencia.zona_id')">

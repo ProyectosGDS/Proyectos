@@ -20,6 +20,8 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         estado : 'V',
     })
     const copy_beneficiario = ref({})
+
+    const codeFetchBeneficiario = ref(null)
     
     const messageCui = ref('Ingrese cui')
     const cui = ref('')
@@ -144,6 +146,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
             messageCui.value = response.data.message
             success.value = response.data.success
             const beneficiario = response.data.data
+            codeFetchBeneficiario.value = response.data.code
 
             if(!beneficiario.id && messageCui.value != "CUI no válido.") {
                 nuevo_registro.value = true
@@ -151,10 +154,10 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
                 nuevo_registro.value = false
             }
 
-            beneficiario.domicilio = response.data.domicilio == null ? { departamento_id : 7, grupo_zona : {} } : response.data.domicilio
+            beneficiario.domicilio = response.data.data.domicilio == null ? { departamento_id : 7, grupo_zona : {} } : response.data.data.domicilio
             beneficiario.datos_medicos = {}
             beneficiario.datos_academicos = {}
-            beneficiario.responsable = {}
+            beneficiario.responsable = response.data.data.responsable ?? {}
             beneficiario.emergencia = {}
 
             updatePropertyBeneficiario(beneficiario)
@@ -163,7 +166,6 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
             nuevo_registro.value = true
             messageCui.value = 'Error al realizar la consulta'
             success.value = false
-            console.error(error)
         }finally {
             loading.value.show = false
         }
@@ -178,7 +180,8 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
             
             messageCui.value = response.data.message
             success.value = response.data.success
-            const beneficiario = response.data.data            
+            const beneficiario = response.data.data
+            codeFetchBeneficiario.value = response.data.code            
 
             if(!beneficiario.id && messageCui.value != "CUI no válido.") {
                 nuevo_registro.value = true
@@ -186,11 +189,11 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
                 nuevo_registro.value = false
             }
 
-            beneficiario.domicilio = response.data.domicilio == null ? { departamento_id : 7, grupo_zona : {} } : response.data.domicilio
-            beneficiario.datos_medicos = response.data.datos_medicos == null ? {} : response.data.datos_medicos
-            beneficiario.datos_academicos = response.data.datos_academicos == null ? {} : response.data.datos_academicos
-            beneficiario.responsable = response.data.responsable == null ? {} : response.data.responsable
-            beneficiario.emergencia = response.data.emergencia == null ? {} : response.data.emergencia
+            beneficiario.domicilio = response.data.data.domicilio == null ? { departamento_id : 7, grupo_zona : {} } : response.data.data.domicilio
+            beneficiario.datos_medicos = response.data.data.datos_medicos == null ? {} : response.data.data.datos_medicos
+            beneficiario.datos_academicos = response.data.data.datos_academicos == null ? {} : response.data.data.datos_academicos
+            beneficiario.responsable = response.data.data.responsable == null ? {} : response.data.data.responsable
+            beneficiario.emergencia = response.data.data.emergencia == null ? {} : response.data.data.emergencia
             updatePropertyBeneficiario(beneficiario)
     
         } catch (error) {
@@ -250,6 +253,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         reload,
         success,
         nuevo_registro,
+        codeFetchBeneficiario,
 
         loading,
         errors,

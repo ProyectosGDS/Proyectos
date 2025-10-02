@@ -182,39 +182,84 @@ class ProgramasController extends Controller
     }
 
     public function store_cursos(Request $request) {
-        $request->validate([
-            'cursos' => 'required|array',
-            'cursos.*.seccion' => 'nullable',
-            'cursos.*.capacidad' => 'required_without:cursos.*.id|integer|min:1',
-            'cursos.*.modalidad' => 'required_without:cursos.*.id|string|in:PRESENCIAL,VIRTUAL,HIBRIDA',
-            'cursos.*.curso_id' => 'required_without:cursos.*.id|integer|exists:cursos,id',
-            'cursos.*.instructor_id' => 'required_without:cursos.*.id|integer|exists:instructores,id',
-            'cursos.*.sede_id' => 'required_without:cursos.*.id|integer|exists:sedes,id',
-            'cursos.*.programa_id' => 'required_without:cursos.*.id|integer|exists:programas,id',
-            'cursos.*.temporalidad_id' => 'required_without:cursos.*.id|integer|exists:temporalidades,id',
-            'cursos.*.fecha_inicial' => 'required_without:cursos.*.id|date',
-            'cursos.*.fecha_final' => 'required_without:cursos.*.id|date|after:cursos.*.fecha_inicial',
-            'cursos.*.paga' => 'required_without:cursos.*.id|in:S,N',
-            'cursos.*.horarios' => 'required_without:cursos.*.id|array|min:1',
+        // $request->validate([
+        //     'cursos' => 'required|array',
+        //     'cursos.*.seccion' => 'nullable',
+        //     'cursos.*.capacidad' => 'required_without:cursos.*.id|integer|min:1',
+        //     'cursos.*.modalidad' => 'required_without:cursos.*.id|string|in:PRESENCIAL,VIRTUAL,HIBRIDA',
+        //     'cursos.*.curso_id' => 'required_without:cursos.*.id|integer|exists:cursos,id',
+        //     'cursos.*.instructor_id' => 'required_without:cursos.*.id|integer|exists:instructores,id',
+        //     'cursos.*.sede_id' => 'required_without:cursos.*.id|integer|exists:sedes,id',
+        //     'cursos.*.programa_id' => 'required_without:cursos.*.id|integer|exists:programas,id',
+        //     'cursos.*.temporalidad_id' => 'required_without:cursos.*.id|integer|exists:temporalidades,id',
+        //     'cursos.*.fecha_inicial' => 'required_without:cursos.*.id|date',
+        //     'cursos.*.fecha_final' => 'required_without:cursos.*.id|date|after:cursos.*.fecha_inicial',
+        //     'cursos.*.paga' => 'required_without:cursos.*.id|in:S,N',
+        //     'cursos.*.horarios' => 'required_without:cursos.*.id|array|min:1',
             
-            'cursos.*.inscripcion' => 'nullable|required_if:cursos.*.paga,S|numeric|min:0',
-            'cursos.*.tarifa_menor' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|numeric|min:0',
-            'cursos.*.tarifa_mayor' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|numeric|min:0',
-            'cursos.*.temporalidad_tarifa' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|string',
-            'cursos.*.no_cuotas' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|integer|min:1',
-            'cursos.*.mes_inicial' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|date|date_format:Y-m',
-            'cursos.*.mes_final' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|date|date_format:Y-m|after_or_equal:cursos.*.mes_inicial',
-        ]);
+        //     'cursos.*.inscripcion' => 'nullable|required_if:cursos.*.paga,S|numeric|min:0',
+        //     'cursos.*.tarifa_menor' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|numeric|min:0',
+        //     'cursos.*.tarifa_mayor' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|numeric|min:0',
+        //     'cursos.*.temporalidad_tarifa' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|string',
+        //     'cursos.*.no_cuotas' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|integer|min:1',
+        //     'cursos.*.mes_inicial' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|date|date_format:Y-m',
+        //     'cursos.*.mes_final' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|date|date_format:Y-m|after_or_equal:cursos.*.mes_inicial',
+        // ]);
         
         try {
 
             $count_cursos = 0;
 
-            foreach ($request->cursos as $curso) {
+            foreach ($request->cursos as $index => $curso) {
+
+                 $rules = [
+                    'seccion' => 'nullable',
+                ];
+
+                // si NO viene con id, significa que es nuevo → reglas completas
+                if (!isset($curso['id'])) {
+                    $rules = array_merge($rules, [
+                        'capacidad' => 'required|integer|min:1',
+                        'modalidad' => 'required|string|in:PRESENCIAL,VIRTUAL,HIBRIDA',
+                        'curso_id' => 'required|integer|exists:cursos,id',
+                        'instructor_id' => 'required|integer|exists:instructores,id',
+                        'sede_id' => 'required|integer|exists:sedes,id',
+                        'programa_id' => 'required|integer|exists:programas,id',
+                        'temporalidad_id' => 'required|integer|exists:temporalidades,id',
+                        'fecha_inicial' => 'required|date',
+                        'fecha_final' => 'required|date|after:fecha_inicial',
+                        'paga' => 'required|in:S,N',
+                        'horarios' => 'required|array|min:1',
+                    ]);
+
+                    // si paga = S, se agregan reglas adicionales
+                    if (isset($curso['paga']) && $curso['paga'] === 'S') {
+                        $rules = array_merge($rules, [
+                            'inscripcion' => 'nullable|numeric|min:0',
+                            'tarifa_menor' => 'required|numeric|min:0',
+                            'tarifa_mayor' => 'required|numeric|min:0',
+                            'temporalidad_tarifa' => 'required|string',
+                            'no_cuotas' => 'required|integer|min:1',
+                            'mes_inicial' => 'required|date|date_format:Y-m',
+                            'mes_final' => 'required|date|date_format:Y-m|after_or_equal:mes_inicial',
+                        ]);
+                    }
+                }
+
+                // validar cada curso por separado
+                $validator = \Illuminate\Support\Facades\Validator::make($curso, $rules);
+
+                if ($validator->fails()) {
+                    // importante: mostrar el error indicando cuál curso falló
+                    return response([
+                        "message" => "Error en el curso #".($index+1),
+                        "errors" => $validator->errors()
+                    ], 422);
+                }
 
                 if(!isset($curso['id'])) {
                     $detalle_curso = detalles_cursos::create([
-                        'seccion' => $curso['seccion'] ?? null,
+                        'seccion' => strtoupper($curso['seccion']) ?? null,
                         'capacidad' => $curso['capacidad'],
                         'modalidad' => $curso['modalidad'],
                         'curso_id' => $curso['curso_id'],

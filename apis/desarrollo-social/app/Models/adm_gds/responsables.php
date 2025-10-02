@@ -11,9 +11,15 @@ class responsables extends Model
     protected $table = 'RESPONSABLES';
     public $timestamps = false;
 
+    protected $casts = [
+        'fecha_nacimiento' => 'datetime:Y-m-d',
+    ];
+
     protected $fillable = [
         'cui',
-        'nombre',
+        'nombres',
+        'apellidos',
+        'fecha_nacimiento',
         'celular',
         'email',
         'sexo',

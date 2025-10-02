@@ -73,46 +73,110 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
     const addBeneficiario = () => {
 
         if (
-            programas.programa &&
-            Object.keys(curso.value).length &&
-            beneficiariosStore.beneficiario.hasOwnProperty('primer_nombre')
-        ) {
-
-            const new_beneficiario = inscripcion.beneficiarios.filter(item => item.beneficiario.cui === beneficiariosStore.beneficiario.cui )            
-
+            !programas.programa ||
+            !Object.keys(curso.value).length ||
+            !beneficiariosStore.beneficiario.hasOwnProperty('primer_nombre') ||
+            !beneficiariosStore.beneficiario.hasOwnProperty('primer_apellido')
+        ) { 
+            errorsDetails.value = { detalles: ['Hay datos que faltan o no se seleccionaron'] }
+            return
+        }
+ 
+        if(beneficiariosStore.beneficiario.edad < 18) {            
+            
+            if(
+                !beneficiariosStore.beneficiario?.responsable ||
+                !beneficiariosStore.beneficiario?.responsable?.cui ||
+                !beneficiariosStore.beneficiario?.responsable?.nombres ||
+                !beneficiariosStore.beneficiario?.responsable?.apellidos ||
+                !beneficiariosStore.beneficiario?.responsable?.fecha_nacimiento
+            ) {
+                errorsDetails.value = { detalles: ['No hay datos del responsable'] }
+                return
+            }
+            
+            const new_beneficiario = inscripcion.beneficiarios.filter(item => item.beneficiario.cui === beneficiariosStore.beneficiario.cui ) 
+    
             if(!Object.keys(new_beneficiario).length > 0) {
-                let tarifas = curso.value.paga == 'S' ? curso.value.tarifas : {}
                 inscripcion.beneficiarios.unshift({
+    
                     detalle_curso_id : curso.value.id,
                     beneficiario_id : beneficiariosStore.beneficiario.id,
                     beneficiario : beneficiariosStore.beneficiario,
-                    // tarifa : curso.value.paga == 'S' ? (beneficiariosStore.beneficiario.edad >= 18 ? tarifas.tarifa_mayor : tarifas.tarifa_menor) : null,
+                    paga : curso.value.paga,
+                    tarifas : curso.value.tarifas,
+                    edad : beneficiariosStore.beneficiario.edad,
+                    dependencia : auth.dependencia_id,
+                    cui : beneficiariosStore.beneficiario.cui,
+                    responsable : beneficiariosStore.beneficiario.responsable
                 })
     
                 beneficiariosStore.resetData()
                 errorsDetails.value = []
                 beneficiariosStore.nuevo_registro = false
                 return
+            } else {
+                errorsDetails.value = { detalles: ['Ya existe el beneficiario en el listado'] }
+                beneficiariosStore.resetData()
+                return
             }
             
-            errorsDetails.value = { detalles: ['Ya existe el beneficiario en el listado'] }
-            beneficiariosStore.resetData()
-            return
+        } else {
 
-        }
-
-        errorsDetails.value = { detalles: ['Hay datos que no se seleccionaron'] }
+            const new_beneficiario = inscripcion.beneficiarios.filter(item => item.beneficiario.cui === beneficiariosStore.beneficiario.cui )  
+              
+            if(!Object.keys(new_beneficiario).length > 0) {
+                inscripcion.beneficiarios.unshift({
+    
+                    detalle_curso_id : curso.value.id,
+                    beneficiario_id : beneficiariosStore.beneficiario.id,
+                    beneficiario : beneficiariosStore.beneficiario,
+                    paga : curso.value.paga,
+                    tarifas : curso.value.tarifas,
+                    edad : beneficiariosStore.beneficiario.edad,
+                    dependencia : auth.dependencia_id,
+                    cui : beneficiariosStore.beneficiario.cui
+                })
+    
+                beneficiariosStore.resetData()
+                errorsDetails.value = []
+                beneficiariosStore.nuevo_registro = false
+                return
+            } else {
+                errorsDetails.value = { detalles: ['Ya existe el beneficiario en el listado'] }
+                beneficiariosStore.resetData()
+                return
+            }
+            
+        }     
     }
 
     const saveAddBeneficiario = async () => {
         if (
-            programas.programa &&
-            Object.keys(curso.value).length &&
-            beneficiariosStore.beneficiario.hasOwnProperty('primer_nombre')
-        ) {
+            !programas.programa ||
+            !Object.keys(curso.value).length ||
+            !beneficiariosStore.beneficiario.hasOwnProperty('primer_nombre') ||
+            !beneficiariosStore.beneficiario.hasOwnProperty('primer_apellido')
+        ) { 
+            errorsDetails.value = { detalles: ['Hay datos que faltan o no se seleccionaron'] }
+            return
+        }
+                  
+        if(beneficiariosStore.beneficiario.edad < 18) {            
             
-            const new_beneficiario = inscripcion.beneficiarios.filter(item => item.beneficiario.cui === beneficiariosStore.beneficiario.cui )            
-            
+            if(
+                !beneficiariosStore.beneficiario?.responsable ||
+                !beneficiariosStore.beneficiario?.responsable?.cui ||
+                !beneficiariosStore.beneficiario?.responsable?.nombres ||
+                !beneficiariosStore.beneficiario?.responsable?.apellidos ||
+                !beneficiariosStore.beneficiario?.responsable?.fecha_nacimiento 
+            ) {
+                errorsDetails.value = { detalles: ['No hay datos del responsable'] }
+                return
+            }  
+
+            const new_beneficiario = inscripcion.beneficiarios.filter(item => item.beneficiario.cui === beneficiariosStore.beneficiario.cui )
+
             if(!Object.keys(new_beneficiario).length > 0) { 
                 
                 await beneficiariosStore.create()
@@ -120,14 +184,16 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
                 if(beneficiariosStore.errors == 0) {
 
                     beneficiariosStore.nuevo_registro = false
-
-                    let tarifas = curso.value.paga == 'S' ? curso.value.tarifas : {}
-
                     inscripcion.beneficiarios.unshift({
                         detalle_curso_id : curso.value.id,
                         beneficiario_id : beneficiariosStore.beneficiario.id,
                         beneficiario : beneficiariosStore.beneficiario,
-                        // tarifa : curso.value.paga == 'S' ? (beneficiariosStore.beneficiario.edad >= 18 ? tarifas.tarifa_mayor : tarifas.tarifa_menor) : null,
+                        paga : curso.value.paga,
+                        tarifas : curso.value.tarifas,
+                        edad : beneficiariosStore.beneficiario.edad,
+                        dependencia : auth.dependencia_id,
+                        cui : beneficiariosStore.beneficiario.cui,
+                        responsable : beneficiariosStore.beneficiario.responsable
                     })
 
                     beneficiariosStore.resetData()
@@ -135,15 +201,46 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
                     return
                 }
 
+            } else {
+
+                errorsDetails.value = { detalles: ['Ya existe el beneficiario en el listado'] }
+                beneficiariosStore.resetData()
                 return
             }
             
-            errorsDetails.value = { detalles: ['Ya existe el beneficiario en el listado'] }
-            beneficiariosStore.resetData()
-            return
-        }
+        } else {
 
-        errorsDetails.value = { detalles: ['Hay datos que no se seleccionaron'] }
+            const new_beneficiario = inscripcion.beneficiarios.filter(item => item.beneficiario.cui === beneficiariosStore.beneficiario.cui ) 
+            if(!Object.keys(new_beneficiario).length > 0) { 
+                
+                await beneficiariosStore.create()
+
+                if(beneficiariosStore.errors == 0) {
+
+                    beneficiariosStore.nuevo_registro = false
+                    inscripcion.beneficiarios.unshift({
+                        detalle_curso_id : curso.value.id,
+                        beneficiario_id : beneficiariosStore.beneficiario.id,
+                        beneficiario : beneficiariosStore.beneficiario,
+                        paga : curso.value.paga,
+                        tarifas : curso.value.tarifas,
+                        edad : beneficiariosStore.beneficiario.edad,
+                        dependencia : auth.dependencia_id,
+                        cui : beneficiariosStore.beneficiario.cui
+                    })
+
+                    beneficiariosStore.resetData()
+                    errorsDetails.value = []
+                    return
+                }
+
+            } else {
+
+                errorsDetails.value = { detalles: ['Ya existe el beneficiario en el listado'] }
+                beneficiariosStore.resetData()
+                return
+            }
+        }
     }
 
     const resetData = () => {

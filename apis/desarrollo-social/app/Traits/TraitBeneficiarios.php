@@ -13,6 +13,7 @@ use App\Models\adm_gds\responsables;
 use App\Rules\ValidateCui;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -46,6 +47,8 @@ trait TraitBeneficiarios
             return;
         }
 
+        $sequence = DB::getSequence();
+
         $beneficiario = beneficiarios::create([
             'cui'               => $request->cui,
             'primer_nombre'     => ucfirst(strtolower(trim($request->primer_nombre))),
@@ -60,7 +63,8 @@ trait TraitBeneficiarios
             'interlocutor'      => $request->interlocutor ?? null,
             'celular'           => trim($request->celular),
             'correo'            => strtolower($request->correo),
-            'estado'            => $request->estado ?? null
+            'estado'            => $request->estado ?? null,
+            'codigo_alumno'     => intval(date('Y').$sequence->nextValue('COD_ALUMNO_SEQ')),
         ]);
 
         return $beneficiario;
@@ -119,8 +123,10 @@ trait TraitBeneficiarios
     {
 
         $validations = Validator::make($request->all(), [
-            'responsable.cui' => ['nullable', 'numeric', 'digits:13', new ValidateCui],
-            'responsable.nombre' => 'required|string|max:150',
+            'responsable.cui' => ['required', 'numeric', 'digits:13', new ValidateCui],
+            'responsable.nombres' => 'required|string|max:150',
+            'responsable.apellidos' => 'required|string|max:150',
+            'responsable.fecha_nacimiento' => 'required|date|date_format:Y-m-d|after:' . (date('Y') - 100) . '-12-31|before :' . date('Y-m-d'),
             'responsable.celular' => 'required|numeric|digits:8',
             'responsable.email' => 'nullable|email',
             'responsable.sexo' => 'required',
@@ -136,7 +142,9 @@ trait TraitBeneficiarios
         $responsable = responsables::create([
             'beneficiario_id' => $beneficiario_id,
             'cui' => $request->responsable['cui'] ?? null,
-            'nombre' => strtoupper(trim($request->responsable['nombre'])),
+            'nombres' => strtoupper(trim($request->responsable['nombres'])),
+            'apellidos' => strtoupper(trim($request->responsable['apellidos'])),
+            'fecha_nacimiento' => $request->responsable['fecha_nacimiento'],
             'celular' => $request->responsable['celular'],
             'email' => $request->has('responsable.email') ? strtolower($request->responsable['email']) : null,
             'sexo' => $request->responsable['sexo'],
@@ -154,7 +162,9 @@ trait TraitBeneficiarios
 
         $validations = Validator::make($request->all(), [
             'emergencia.cui' => ['nullable', 'numeric', 'digits:13', new ValidateCui],
-            'emergencia.nombre' => 'required|string|max:150',
+            'emergencia.nombres' => 'required|string|max:150',
+            'emergencia.apellidos' => 'required|string|max:150',
+            'emergencia.fecha_nacimiento' => 'required|date|date_format:Y-m-d|after:' . (date('Y') - 100) . '-12-31|before :' . date('Y-m-d'),
             'emergencia.celular' => 'required|numeric|digits:8',
             'emergencia.email' => 'nullable|email',
             'emergencia.direccion' => 'nullable|string|max:200',
@@ -170,7 +180,9 @@ trait TraitBeneficiarios
         $emergencia = responsables::create([
             'beneficiario_id' => $beneficiario_id,
             'cui' => $request->emergencia['cui'] ?? null,
-            'nombre' => strtoupper(trim($request->emergencia['nombre'])),
+            'nombres' => strtoupper(trim($request->emergencia['nombres'])),
+            'apellidos' => strtoupper(trim($request->emergencia['apellidos'])),
+            'fecha_nacimiento' => $request->emergencia['fecha_nacimiento'],
             'celular' => $request->emergencia['celular'],
             'email' => $request->has('emergencia.email') ? strtolower($request->emergencia['email']) : null,
             'sexo' => $request->emergencia['sexo'],
@@ -221,7 +233,7 @@ trait TraitBeneficiarios
             'fecha_nacimiento' => 'required|date|date_format:Y-m-d|after:' . (date('Y') - 100) . '-12-31',
             'celular' => 'required|numeric|digits:8',
             'sexo' => 'required',
-            'interlocutor' => 'nullable|numeric|digits:10',
+            'interlocutor' => 'nullable|numeric',
             'correo' => 'nullable|email'
         ]);
 
@@ -303,7 +315,9 @@ trait TraitBeneficiarios
 
         $validations = Validator::make($request->all(), [
             'responsable.cui' => ['nullable', 'numeric', 'digits:13', new ValidateCui],
-            'responsable.nombre' => 'required|string|max:150',
+            'responsable.nombres' => 'required|string|max:150',
+            'responsable.apellidos' => 'required|string|max:150',
+            'responsable.fecha_nacimiento' => 'required|date|date_format:Y-m-d|after:' . (date('Y') - 100) . '-12-31|before :' . date('Y-m-d'),
             'responsable.celular' => 'required|numeric|digits:8',
             'responsable.email' => 'nullable|email',
             'responsable.sexo' => 'required',
@@ -318,7 +332,9 @@ trait TraitBeneficiarios
 
         $responsable = $beneficiario->responsable()->update([
             'cui' => $request->responsable['cui'] ?? null,
-            'nombre' => strtoupper(trim($request->responsable['nombre'])),
+            'nombres' => strtoupper(trim($request->responsable['nombres'])),
+            'apellidos' => strtoupper(trim($request->responsable['apellidos'])),
+            'fecha_nacimiento' => $request->responsable['fecha_nacimiento'],
             'celular' => $request->responsable['celular'],
             'email' => $request->has('responsable.email') ? strtolower($request->responsable['email']) : null,
             'sexo' => $request->responsable['sexo'],
@@ -336,7 +352,9 @@ trait TraitBeneficiarios
 
         $validations = Validator::make($request->all(), [
             'emergencia.cui' => ['nullable', 'numeric', 'digits:13', new ValidateCui],
-            'emergencia.nombre' => 'required|string|max:150',
+            'emergencia.nombres' => 'required|string|max:150',
+            'emergencia.apellidos' => 'required|string|max:150',
+            'emergencia.fecha_nacimiento' => 'required|date|date_format:Y-m-d|after:' . (date('Y') - 100) . '-12-31|before :' . date('Y-m-d'),
             'emergencia.celular' => 'required|numeric|digits:8',
             'emergencia.email' => 'nullable|email',
             'emergencia.direccion' => 'nullable|string|max:200',
@@ -351,7 +369,9 @@ trait TraitBeneficiarios
 
         $emergencia = $beneficiario->emergencia()->update([
             'cui' => $request->emergencia['cui'] ?? null,
-            'nombre' => strtoupper(trim($request->emergencia['nombre'])),
+            'nombres' => strtoupper(trim($request->emergencia['nombres'])),
+            'apellidos' => strtoupper(trim($request->emergencia['apellidos'])),
+            'fecha_nacimiento' => $request->emergencia['fecha_nacimiento'],
             'celular' => $request->emergencia['celular'],
             'email' => $request->has('emergencia.email') ? strtolower($request->emergencia['email']) : null,
             'sexo' => $request->emergencia['sexo'],
