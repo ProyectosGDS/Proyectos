@@ -160,7 +160,7 @@ export const useAsignacionesActividadesProgramaStore = defineStore('asignaciones
                 item.actividad_id == actividad.value.actividad_id && 
                 item.zona_id == actividad.value.zona_id && 
                 item.distrito_id == actividad.value.distrito_id && 
-                item.direccion.toUpperCase() == actividad.value.direccion.toUpperCase() && 
+                item.direccion == actividad.value.direccion && 
                 item.hora_inicio == actividad.value.hora_inicio && 
                 item.fecha_inicial == actividad.value.fecha_inicial+' 00:00:00' && 
                 item.fecha_final == actividad.value.fecha_final+' 00:00:00' && 

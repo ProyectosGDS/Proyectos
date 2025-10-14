@@ -11,7 +11,7 @@ export const useProgramasStore = defineStore('programas', () => {
     
     const headers = [
         { title : 'id', key : 'id', type : 'numeric' },
-        { title : 'escuela', key : 'escuela' },
+        { title : 'escuela', key : 'escuela.nombre' },
         { title : 'nombre', key : 'nombre', class: 'uppercase text-xs' },
         { title : 'descripcion', key : 'descripcion', class: 'uppercase text-xs' },
         { title : 'dependencia', key : 'dependencia.nombre' },
@@ -57,8 +57,8 @@ export const useProgramasStore = defineStore('programas', () => {
             if(!escuela){
                 return
             }
-            const response = await axios.get('programas/escuela/'+ escuela )
-            programas.value = response.data
+            const response = await axios.get('escuelas/'+ escuela )
+            programas.value = response.data.programas
         } catch (error) {
             programas.value = []
             global.manejarError(error)

@@ -62,8 +62,8 @@
     
     onBeforeMount(() => {
         
-        if(auth.dependencia_id && auth.dependencia_id == 5) {
-            catalogos.getEscuelas()
+        if(["5","8"].includes(auth.dependencia_id)) {
+            catalogos.getEscuelas(auth.dependencia_id)
         }else {
             programas.fetch()
         }
@@ -88,9 +88,9 @@
         <div class="grid xl:grid-cols-2">
             <div class="space-y-4 xl:pr-8">
                 <div class="flex items-center gap-2">
-                    <Input v-if="auth.user.dependencia_id == 5" @change="programas.getProgramasFromEscuelas(store.escuela)" v-model="store.escuela" option="select" title="*Seleccione una escuela" :error="store.errorsDetails.hasOwnProperty('escuela')">
+                    <Input v-if="['5','8'].includes(auth.user.dependencia_id)" @change="programas.getProgramasFromEscuelas(store.escuela)" v-model="store.escuela" option="select" title="*Seleccione una escuela" :error="store.errorsDetails.hasOwnProperty('escuela')">
                         <option selected></option>
-                        <option v-for="escuela in catalogos.escuelas" :value="escuela">{{ escuela }}</option>
+                        <option v-for="escuela in catalogos.escuelas" :value="escuela.id">{{ escuela.nombre }}</option>
                     </Input>
                     <Input @change="asignaciones.fetch(asignaciones.programa_id)"  v-model="asignaciones.programa_id" option="select" title="*seleccione programas" :error="store.errorsDetails.hasOwnProperty('programa_id')">
                         <option value=""></option>

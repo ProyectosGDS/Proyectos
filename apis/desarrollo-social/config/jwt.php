@@ -9,6 +9,8 @@ return [
         'http://localhost:5173',
         'http://192.168.20.116',
         'https://gds.muniguate.com',
+        'http://192.168.137.128:5174',
+        'http://192.168.20.59:5174'
     ]
 
 ];

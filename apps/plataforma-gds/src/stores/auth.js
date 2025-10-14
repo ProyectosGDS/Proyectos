@@ -87,6 +87,25 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
+    const verifyAuth = async () => {
+        loading.value = true
+        try {
+            const response = await axios.post('me')
+            user.value = response.data.user
+            userPermissions.value = response.data.user.permisos || []
+            userMenu.value = response.data.user.menu || []
+            return true
+        } catch (error) {
+            errors.value = []
+            if(error.response.status == 422) {
+                errors.value = error.response.data.errors
+            }
+            return false
+        } finally {
+            loading.value = false
+        }
+    }
+
     const logout = () => {
         user.value = null
         accessToken.value = null
@@ -106,6 +125,7 @@ export const useAuthStore = defineStore('auth', () => {
 
         getCsrfCookie,
         login,
+        verifyAuth,
         logout,
     }
 })

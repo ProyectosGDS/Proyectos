@@ -15,6 +15,7 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
     
     const beneficiario_curso = ref({})
     const curso = ref({})
+    const escuela = ref({})
     const detalles = ref([])
     const search = ref('')
     const label_curso = ref('')
@@ -22,7 +23,6 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
     const modal = ref({
         cursos: false,
     })
-
 
     const errors = ref([])
     const errorsDetails = ref([])
@@ -108,7 +108,10 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
                     edad : beneficiariosStore.beneficiario.edad,
                     dependencia : auth.dependencia_id,
                     cui : beneficiariosStore.beneficiario.cui,
-                    responsable : beneficiariosStore.beneficiario.responsable
+                    responsable : beneficiariosStore.beneficiario.responsable,
+                    nombre_curso : curso.value.curso.nombre,
+                    objeto_contrato : JSON.parse(escuela.value).objeto_contrato,
+                    sede_oc : curso.value.sede.objeto_contrato ?? null,
                 })
     
                 beneficiariosStore.resetData()
@@ -135,7 +138,10 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
                     tarifas : curso.value.tarifas,
                     edad : beneficiariosStore.beneficiario.edad,
                     dependencia : auth.dependencia_id,
-                    cui : beneficiariosStore.beneficiario.cui
+                    cui : beneficiariosStore.beneficiario.cui,
+                    nombre_curso : curso.value.curso.nombre,
+                    objeto_contrato : JSON.parse(escuela.value).objeto_contrato,
+                    sede_oc : curso.value.sede.objeto_contrato ?? null,
                 })
     
                 beneficiariosStore.resetData()
@@ -193,7 +199,10 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
                         edad : beneficiariosStore.beneficiario.edad,
                         dependencia : auth.dependencia_id,
                         cui : beneficiariosStore.beneficiario.cui,
-                        responsable : beneficiariosStore.beneficiario.responsable
+                        responsable : beneficiariosStore.beneficiario.responsable,
+                        nombre_curso : curso.value.curso.nombre,
+                        objeto_contrato : JSON.parse(escuela.value).objeto_contrato,
+                        sede_oc : curso.value.sede.objeto_contrato ?? null,
                     })
 
                     beneficiariosStore.resetData()
@@ -226,7 +235,10 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
                         tarifas : curso.value.tarifas,
                         edad : beneficiariosStore.beneficiario.edad,
                         dependencia : auth.dependencia_id,
-                        cui : beneficiariosStore.beneficiario.cui
+                        cui : beneficiariosStore.beneficiario.cui,
+                        nombre_curso : curso.value.curso.nombre,
+                        objeto_contrato : JSON.parse(escuela.value).objeto_contrato,
+                        sede_oc : curso.value.sede.objeto_contrato ?? null,
                     })
 
                     beneficiariosStore.resetData()
@@ -256,6 +268,7 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
         beneficiario_curso,
         search,
         curso,
+        escuela,
         label_curso,
         detalles,
         modal,

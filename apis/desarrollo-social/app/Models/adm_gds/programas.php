@@ -15,18 +15,11 @@ class programas extends Model
         'descripcion',
         'dependencia_id',
         'estado',
-        'escuela'
+        'escuela_id'
     ];
 
-    public static $escuelas = [
-        'ESCUELA MUNICIPAL DE ARTES VISUALES',
-        'PROGRAMA MUNICIPAL DE DANZA CREATIVA',
-        'ESCUELA MUNICIPAL DE ESCULTURA',
-        'PROGRAMA MUNICIPAL DE AJEDREZ',
-        'ESCUELA MUNICIPAL DE DANZA CLASICA',
-        'ESCUELA MUNICIPAL DE MUSICA',
-        'CENTRO DE CAPACITACION TECNOLOGICA',
-        'ESCUELA TALLER',
+    protected $appends = [
+        'objeto_contrato'
     ];
 
     // RELACIONES
@@ -47,4 +40,13 @@ class programas extends Model
     public function dependencia() {
         return $this->belongsTo(dependencias::class,'dependencia_id');
     }
+
+    public function escuela() {
+        return $this->belongsTo(escuelas::class,'escuela_id');
+    }
+
+    public function getObjetoContratoAttribute() {
+        return $this->escuela->objeto_contrato ?? null;
+    }    
 }
+

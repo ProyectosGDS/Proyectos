@@ -137,8 +137,8 @@
   
     onBeforeMount(() => {
 
-        if(auth.dependencia_id && auth.dependencia_id == 5) {
-            catalogos.getEscuelas()
+        if(['5','8'].includes(auth.dependencia_id)) {
+            catalogos.getEscuelas(auth.dependencia_id)
         }else {
             programas.fetch()
         }
@@ -158,9 +158,9 @@
                     <Input v-model="inscripcion.year" option="select" title="*seleccione año inscripción" :error="store.errors.hasOwnProperty('year')">
                         <option v-for="year in years" :value="year">{{ year }}</option>
                     </Input>
-                    <Input v-if="auth.user.dependencia_id == 5" @change="programas.getProgramasFromEscuelas(store.escuela)" v-model="store.escuela" option="select" title="*Seleccione una escuela" :error="store.errorsDetails.hasOwnProperty('escuela')">
+                    <Input v-if="['5','8'].includes(auth.user.dependencia_id)" @change="programas.getProgramasFromEscuelas(JSON.parse(store.escuela).id)" v-model="store.escuela" option="select" title="*Seleccione una escuela" :error="store.errorsDetails.hasOwnProperty('escuela')">
                         <option selected></option>
-                        <option v-for="escuela in catalogos.escuelas" :value="escuela">{{ escuela }}</option>
+                        <option v-for="escuela in catalogos.escuelas" :value="JSON.stringify(escuela)">{{ escuela.nombre }}</option>
                     </Input>
                 </div>
                 <Input @change="store.removeCurso" v-model="inscripcion.programa_id" option="select" title="*seleccione programas" :error="store.errors.hasOwnProperty('programa_id')">

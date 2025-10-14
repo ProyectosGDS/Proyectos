@@ -16,7 +16,7 @@ export const useBeneficiariosModuloStore = defineStore('beneficiarios-modulo', (
     const curso = ref({})
     const detalles = ref([])
     const search = ref('')
-
+    const escuela = ref({})
     const errors = ref([])
     const errorsDetails = ref([])
 
@@ -56,7 +56,6 @@ export const useBeneficiariosModuloStore = defineStore('beneficiarios-modulo', (
     }
 
     const addBeneficiario = () => {
-        console.log(beneficiariosStore.beneficiario)
         
         if (
             !inscripcion.programa_id ||
@@ -94,7 +93,10 @@ export const useBeneficiariosModuloStore = defineStore('beneficiarios-modulo', (
                         edad : beneficiariosStore.beneficiario.edad,
                         dependencia : auth.dependencia_id,
                         cui : beneficiariosStore.beneficiario.cui,
-                        responsable : beneficiariosStore.beneficiario.responsable
+                        responsable : beneficiariosStore.beneficiario.responsable,
+                        nombre_modulo : modulo.nombre,
+                        objeto_contrato : JSON.parse(escuela.value).objeto_contrato,
+                        sede_oc : modulo.sede.objeto_contrato ?? null,
                     })
         
                     beneficiariosStore.resetData()
@@ -122,7 +124,10 @@ export const useBeneficiariosModuloStore = defineStore('beneficiarios-modulo', (
                         tarifas : modulo.tarifas,
                         edad : beneficiariosStore.beneficiario.edad,
                         dependencia : auth.dependencia_id,
-                        cui : beneficiariosStore.beneficiario.cui
+                        cui : beneficiariosStore.beneficiario.cui,
+                        nombre_modulo : modulo.nombre,
+                        objeto_contrato : JSON.parse(escuela.value).objeto_contrato,
+                        sede_oc : modulo.sede.objeto_contrato ?? null,
                     })
         
                     beneficiariosStore.resetData()
@@ -182,7 +187,10 @@ export const useBeneficiariosModuloStore = defineStore('beneficiarios-modulo', (
                             edad : beneficiariosStore.beneficiario.edad,
                             dependencia : auth.dependencia_id,
                             cui : beneficiariosStore.beneficiario.cui,
-                            responsable : beneficiariosStore.beneficiario.responsable
+                            responsable : beneficiariosStore.beneficiario.responsable,
+                            nombre_modulo : modulo.nombre,
+                            objeto_contrato : JSON.parse(escuela.value).objeto_contrato,
+                            sede_oc : modulo.sede.objeto_contrato ?? null,
                         })
     
                         beneficiariosStore.resetData()
@@ -216,7 +224,10 @@ export const useBeneficiariosModuloStore = defineStore('beneficiarios-modulo', (
                             tarifas : modulo.tarifas,
                             edad : beneficiariosStore.beneficiario.edad,
                             dependencia : auth.dependencia_id,
-                            cui : beneficiariosStore.beneficiario.cui
+                            cui : beneficiariosStore.beneficiario.cui,
+                            nombre_modulo : modulo.nombre,
+                            objeto_contrato : JSON.parse(escuela.value).objeto_contrato,
+                            sede_oc : modulo.sede.objeto_contrato ?? null,
                         })
     
                         beneficiariosStore.resetData()
@@ -243,6 +254,7 @@ export const useBeneficiariosModuloStore = defineStore('beneficiarios-modulo', (
     }
 
     return {
+        escuela,
         search,
         detalles,
         errors,

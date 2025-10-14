@@ -51,10 +51,10 @@ trait TraitBeneficiarios
 
         $beneficiario = beneficiarios::create([
             'cui'               => $request->cui,
-            'primer_nombre'     => ucfirst(strtolower(trim($request->primer_nombre))),
-            'segundo_nombre'    => ucfirst(strtolower(trim($request->segundo_nombre))) ?? null,
-            'primer_apellido'   => ucfirst(strtolower(trim($request->primer_apellido))),
-            'segundo_apellido'  => ucfirst(strtolower(trim($request->segundo_apellido))) ?? null,
+            'primer_nombre'     => mb_strtoupper(trim($request->primer_nombre)),
+            'segundo_nombre'    => mb_strtoupper(trim($request->segundo_nombre)) ?? null,
+            'primer_apellido'   => mb_strtoupper(trim($request->primer_apellido)),
+            'segundo_apellido'  => mb_strtoupper(trim($request->segundo_apellido)) ?? null,
             'fecha_nacimiento'  => $request->fecha_nacimiento,
             'sexo'              => $request->sexo,
             'pasaporte'         => $request->pasaporte ?? null,
@@ -62,7 +62,7 @@ trait TraitBeneficiarios
             'estado_civil_id'   => $request->estado_civil_id ?? null,
             'interlocutor'      => $request->interlocutor ?? null,
             'celular'           => trim($request->celular),
-            'correo'            => strtolower($request->correo),
+            'correo'            => mb_strtoupper($request->correo),
             'estado'            => $request->estado ?? null,
             'codigo_alumno'     => intval(date('Y').$sequence->nextValue('COD_ALUMNO_SEQ')),
         ]);
@@ -146,7 +146,7 @@ trait TraitBeneficiarios
             'apellidos' => strtoupper(trim($request->responsable['apellidos'])),
             'fecha_nacimiento' => $request->responsable['fecha_nacimiento'],
             'celular' => $request->responsable['celular'],
-            'email' => $request->has('responsable.email') ? strtolower($request->responsable['email']) : null,
+            'email' => $request->has('responsable.email') ? mb_strtoupper($request->responsable['email']) : null,
             'sexo' => $request->responsable['sexo'],
             'zona_id' => $request->responsable['zona_id'] ?? null,
             'direccion' => $request->responsable['direccion'] ?? null,
@@ -180,11 +180,11 @@ trait TraitBeneficiarios
         $emergencia = responsables::create([
             'beneficiario_id' => $beneficiario_id,
             'cui' => $request->emergencia['cui'] ?? null,
-            'nombres' => strtoupper(trim($request->emergencia['nombres'])),
-            'apellidos' => strtoupper(trim($request->emergencia['apellidos'])),
+            'nombres' => mb_strtoupper(trim($request->emergencia['nombres'])),
+            'apellidos' => mb_strtoupper(trim($request->emergencia['apellidos'])),
             'fecha_nacimiento' => $request->emergencia['fecha_nacimiento'],
             'celular' => $request->emergencia['celular'],
-            'email' => $request->has('emergencia.email') ? strtolower($request->emergencia['email']) : null,
+            'email' => $request->has('emergencia.email') ? mb_strtoupper($request->emergencia['email']) : null,
             'sexo' => $request->emergencia['sexo'],
             'zona_id' => $request->emergencia['zona_id'] ?? null,
             'direccion' => $request->emergencia['direccion'] ?? null,
@@ -244,10 +244,10 @@ trait TraitBeneficiarios
 
         $beneficiario = $beneficiario->update([
             'cui'               => $request->cui,
-            'primer_nombre'     => ucfirst(strtolower(trim($request->primer_nombre))),
-            'segundo_nombre'    => ucfirst(strtolower(trim($request->segundo_nombre))) ?? null,
-            'primer_apellido'   => ucfirst(strtolower(trim($request->primer_apellido))),
-            'segundo_apellido'  => ucfirst(strtolower(trim($request->segundo_apellido))) ?? null,
+            'primer_nombre'     => mb_strtoupper(trim($request->primer_nombre)),
+            'segundo_nombre'    => mb_strtoupper(trim($request->segundo_nombre)) ?? null,
+            'primer_apellido'   => mb_strtoupper(trim($request->primer_apellido)),
+            'segundo_apellido'  => mb_strtoupper(trim($request->segundo_apellido)) ?? null,
             'fecha_nacimiento'  => $request->fecha_nacimiento,
             'sexo'              => $request->sexo,
             'pasaporte'         => $request->pasaporte ?? null,
@@ -255,7 +255,7 @@ trait TraitBeneficiarios
             'estado_civil_id'   => $request->estado_civil_id ?? null,
             'interlocutor'      => $request->interlocutor ?? null,
             'celular'           => trim($request->celular),
-            'correo'            => strtolower($request->correo),
+            'correo'            => mb_strtoupper($request->correo),
             'estado'            => $request->estado ?? null,
             'deleted_at'        => $request->deleted_at
         ]);
@@ -332,11 +332,11 @@ trait TraitBeneficiarios
 
         $responsable = $beneficiario->responsable()->update([
             'cui' => $request->responsable['cui'] ?? null,
-            'nombres' => strtoupper(trim($request->responsable['nombres'])),
-            'apellidos' => strtoupper(trim($request->responsable['apellidos'])),
+            'nombres' => mb_strtoupper(trim($request->responsable['nombres'])),
+            'apellidos' => mb_strtoupper(trim($request->responsable['apellidos'])),
             'fecha_nacimiento' => $request->responsable['fecha_nacimiento'],
             'celular' => $request->responsable['celular'],
-            'email' => $request->has('responsable.email') ? strtolower($request->responsable['email']) : null,
+            'email' => $request->has('responsable.email') ? mb_strtoupper($request->responsable['email']) : null,
             'sexo' => $request->responsable['sexo'],
             'zona_id' => $request->responsable['zona_id'] ?? null,
             'direccion' => $request->responsable['direccion'] ?? null,
@@ -369,11 +369,11 @@ trait TraitBeneficiarios
 
         $emergencia = $beneficiario->emergencia()->update([
             'cui' => $request->emergencia['cui'] ?? null,
-            'nombres' => strtoupper(trim($request->emergencia['nombres'])),
-            'apellidos' => strtoupper(trim($request->emergencia['apellidos'])),
+            'nombres' => mb_strtoupper(trim($request->emergencia['nombres'])),
+            'apellidos' => mb_strtoupper(trim($request->emergencia['apellidos'])),
             'fecha_nacimiento' => $request->emergencia['fecha_nacimiento'],
             'celular' => $request->emergencia['celular'],
-            'email' => $request->has('emergencia.email') ? strtolower($request->emergencia['email']) : null,
+            'email' => $request->has('emergencia.email') ? mb_strtoupper($request->emergencia['email']) : null,
             'sexo' => $request->emergencia['sexo'],
             'zona_id' => $request->emergencia['zona_id'] ?? null,
             'direccion' => $request->emergencia['direccion'] ?? null,
@@ -400,8 +400,8 @@ trait TraitBeneficiarios
         $datosAcademicos = $beneficiario->datos_academicos()->update([
             'escolaridad_id' => $request->datos_academicos['escolaridad_id'],
             'tipo' => $request->datos_academicos['tipo'],
-            'establecimiento' => $request->has('datos_academicos.establecimiento') ? strtoupper($request->datos_academicos['establecimiento']) : null,
-            'titulo_carrera' => $request->has('datos_academicos.titulo_carrera') ? strtoupper($request->datos_academicos['titulo_carrera']) : null,
+            'establecimiento' => $request->has('datos_academicos.establecimiento') ? mb_strtoupper($request->datos_academicos['establecimiento']) : null,
+            'titulo_carrera' => $request->has('datos_academicos.titulo_carrera') ? mb_strtoupper($request->datos_academicos['titulo_carrera']) : null,
         ]);
 
         return $datosAcademicos;

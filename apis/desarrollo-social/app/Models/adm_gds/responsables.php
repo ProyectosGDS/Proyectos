@@ -15,6 +15,13 @@ class responsables extends Model
         'fecha_nacimiento' => 'datetime:Y-m-d',
     ];
 
+    protected $appends = [
+        'primer_nombre',
+        'segundo_nombre',
+        'primer_apellido',
+        'segundo_apellido'
+    ];
+
     protected $fillable = [
         'cui',
         'nombres',
@@ -43,5 +50,25 @@ class responsables extends Model
 
     public function zona() {
         return $this->belongsTo(zonas::class);
+    }
+
+    public function getPrimerNombreAttribute() {
+        $nombres = explode(" ",$this->nombres);
+        return $nombres[0] ?? '';
+    }
+
+    public function getSegundoNombreAttribute() {
+        $nombres = explode(" ",$this->nombres);
+        return $nombres[1] ?? '';
+    }
+
+    public function getPrimerApellidoAttribute() {
+        $apellidos = explode(" ",$this->apellidos);
+        return $apellidos[0] ?? '';
+    }
+
+    public function getSegundoApellidoAttribute() {
+        $apellidos = explode(" ",$this->apellidos);
+        return $apellidos[1] ?? '';
     }
 }

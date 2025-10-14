@@ -23,6 +23,9 @@ return [
         'http://192.168.20.116',
         'http://192.168.20.116:5173',
         'https://gds.muniguate.com',
+        'http://192.168.20.34:5174',
+        'http://192.168.137.128:5174',
+        'http://192.168.20.59:5174',
     ],
 
     'allowed_origins_patterns' => [],

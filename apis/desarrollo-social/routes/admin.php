@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\DependenciasController;
+use App\Http\Controllers\Admin\EscuelasController;
 use App\Http\Controllers\Admin\MenusController;
 use App\Http\Controllers\Admin\PaginasController;
 use App\Http\Controllers\Admin\PerfilesController;
@@ -16,6 +17,7 @@ Route::apiResource('roles',RolesController::class);
 Route::apiResource('usuarios',UsuariosController::class);
 
 Route::apiResource('dependencias',DependenciasController::class)->except(['show','destroy']);
+Route::apiResource('escuelas',EscuelasController::class)->except(['destroy']);
 Route::apiResource('perfiles',PerfilesController::class)->except(['show','destroy']);
 Route::apiResource('paginas',PaginasController::class);
 Route::apiResource('menus',MenusController::class);

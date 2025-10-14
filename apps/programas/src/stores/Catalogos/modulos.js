@@ -49,6 +49,8 @@ export const useModulosStore = defineStore('modulos', () => {
         requisitos : false,
     })
 
+    const escuela = ref({})
+
     const getRequirements = async () => {
         loading.value.requisitos = true
         try {
@@ -193,6 +195,7 @@ export const useModulosStore = defineStore('modulos', () => {
         programa_id,
         modulos,
         modulo,
+        escuela,
         requisitos,
         selected_requirements,
         loading,

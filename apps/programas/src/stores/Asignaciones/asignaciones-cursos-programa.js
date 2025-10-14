@@ -11,7 +11,7 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
 
     const headers = [
         { title : 'id', key : 'id', type : 'numeric' },
-        { title : 'escuela', key : 'programa.escuela' },
+        { title : 'escuela', key : 'programa.escuela.nombre' },
         { title : 'programa', key : 'programa.nombre' },
         { title : 'curso', key : 'curso.nombre' },
         { title : 'seccion', key : 'seccion', width : '10px', align : 'center' },

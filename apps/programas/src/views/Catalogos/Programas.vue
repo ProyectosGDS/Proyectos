@@ -9,13 +9,13 @@
     const catalogos = useCatalogosStore()
 
     const validateEscuela = () => {
-        return auth.user.dependencia_id == 5 || auth.user.perfil.toLowerCase() == 'sysadmin'
+        return ['5','8'].includes(auth.user.dependencia_id) || auth.user.nombre_perfil.toLowerCase() == 'sysadmin'
     }
 
     onBeforeMount(() => {
         store.fetch()
         catalogos.getDependencias()
-        catalogos.getEscuelas()
+        catalogos.getEscuelas(auth.user.dependencia_id)
     })
 
 </script>
@@ -49,11 +49,11 @@
             <Icon @click="store.resetData" icon="fas fa-xmark" class="cursor-pointer text-white" />
         </template>
         <div class="grid gap-4">
-            <Input v-if="validateEscuela()" v-model="store.programa.escuela" option="select" title="*Seleccione escuela" :error="store.errors.hasOwnProperty('escuela')">
-                <option v-for="escuela in catalogos.escuelas" :value="escuela">{{ escuela }}</option>
+            <Input v-if="validateEscuela()" v-model="store.programa.escuela_id" option="select" title="*Seleccione escuela" :error="store.errors.hasOwnProperty('escuela')">
+                <option v-for="escuela in catalogos.escuelas" :value="escuela.id">{{ escuela.nombre }}</option>
             </Input>
             <Input v-model="store.programa.nombre" option="label" title="*Nombre" maxlength="80" :error="store.errors.hasOwnProperty('nombre')" />
-            <Input v-if="auth.user.perfil.toLowerCase() == 'sysadmin'" v-model="store.programa.dependencia_id" option="select" title="*Seleccione dependencia" :error="store.errors.hasOwnProperty('dependencia_id')">
+            <Input v-if="auth.user.nombre_perfil.toLowerCase() == 'sysadmin'" v-model="store.programa.dependencia_id" option="select" title="*Seleccione dependencia" :error="store.errors.hasOwnProperty('dependencia_id')">
                 <option value=""></option>
                 <option v-for="dependencia in catalogos.dependencias" :value="dependencia.id">{{ dependencia.nombre }}</option>
             </Input>
@@ -78,11 +78,11 @@
                     <span class="text-sm text-gray-500">Inactivo</span>
                 </div>
             </div>
-            <Input v-if="validateEscuela()" v-model="store.programa.escuela" option="select" title="*Seleccione escuela" :error="store.errors.hasOwnProperty('escuela')">
-                <option v-for="escuela in catalogos.escuelas" :value="escuela">{{ escuela }}</option>
+            <Input v-if="validateEscuela()" v-model="store.programa.escuela_id" option="select" title="*Seleccione escuela" :error="store.errors.hasOwnProperty('escuela_id')">
+                <option v-for="escuela in catalogos.escuelas" :value="escuela.id">{{ escuela.nombre }}</option>
             </Input>
             <Input v-model="store.programa.nombre" option="label" title="*Nombre" maxlength="80" :error="store.errors.hasOwnProperty('nombre')" />
-            <Input v-if="auth.user.perfil.toLowerCase() == 'sysadmin'" v-model="store.programa.dependencia_id" option="select" title="*Seleccione dependencia" :error="store.errors.hasOwnProperty('dependencia_id')">
+            <Input v-if="auth.user.nombre_perfil.toLowerCase() == 'sysadmin'" v-model="store.programa.dependencia_id" option="select" title="*Seleccione dependencia" :error="store.errors.hasOwnProperty('dependencia_id')">
                 <option value=""></option>
                 <option v-for="dependencia in catalogos.dependencias" :value="dependencia.id">{{ dependencia.nombre }}</option>
             </Input>

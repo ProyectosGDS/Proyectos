@@ -21,7 +21,7 @@ class ProgramasController extends Controller
             $perfil = strtolower(auth()->user()->perfil->nombre) == 'sysadmin' ? true : false;
 
             if ($perfil) {
-                $programas = programas::with(['dependencia','modulos'])
+                $programas = programas::with(['dependencia','modulos','escuela'])
                     ->latest('id')
                     ->get();
                 return response($programas);
@@ -30,7 +30,7 @@ class ProgramasController extends Controller
             $programas = programas::whereHas('dependencia',function($query){
                     $query->where('dependencia_id',auth()->user()->dependencia_id);
                 })
-                ->with(['dependencia','modulos'])
+                ->with(['dependencia','modulos','escuela'])
                 ->latest('id')
                 ->get();
             return response($programas);  
@@ -45,7 +45,7 @@ class ProgramasController extends Controller
             'nombre' => 'required_without:cursos.*.id|string|max:80',
             'descripcion' => 'nullable|string|max:255',
             'dependencia_id' => 'nullable|integer',
-            'escuela' => 'required_if:dependencia_id,5|string|max:255',
+            'escuela_id' => 'required_if:dependencia_id,5,8|string|max:255',
         ]);
 
         try {
@@ -62,7 +62,7 @@ class ProgramasController extends Controller
                 'descripcion' => $request->descripcion ?? null,
                 'dependencia_id' => $dependencia_id ?? auth()->user()->dependencia_id,
                 'estado' => 'A',
-                'escuela' => $request->escuela ?? null,
+                'escuela_id' => $request->escuela_id ?? null,
             ]);
 
             return response('Programa creado correctamente');
@@ -94,7 +94,7 @@ class ProgramasController extends Controller
             'nombre' => 'required_without:cursos.*.id|string|max:80',
             'descripcion' => 'nullable|string|max:255',
             'dependencia_id' => 'required',
-            'escuela' => 'nullable|string|max:255'
+            'escuela_id' => 'nullable|string|max:255'
         ]);
 
         try {
@@ -103,7 +103,7 @@ class ProgramasController extends Controller
             $programa->descripcion = $request->descripcion ?? null;
             $programa->dependencia_id = $request->dependencia_id;
             $programa->estado = $request->estado;
-            $programa->escuela = $request->escuela ?? null;
+            $programa->escuela_id = $request->escuela_id ?? null;
 
             $programa->save();
 
@@ -181,31 +181,7 @@ class ProgramasController extends Controller
         }
     }
 
-    public function store_cursos(Request $request) {
-        // $request->validate([
-        //     'cursos' => 'required|array',
-        //     'cursos.*.seccion' => 'nullable',
-        //     'cursos.*.capacidad' => 'required_without:cursos.*.id|integer|min:1',
-        //     'cursos.*.modalidad' => 'required_without:cursos.*.id|string|in:PRESENCIAL,VIRTUAL,HIBRIDA',
-        //     'cursos.*.curso_id' => 'required_without:cursos.*.id|integer|exists:cursos,id',
-        //     'cursos.*.instructor_id' => 'required_without:cursos.*.id|integer|exists:instructores,id',
-        //     'cursos.*.sede_id' => 'required_without:cursos.*.id|integer|exists:sedes,id',
-        //     'cursos.*.programa_id' => 'required_without:cursos.*.id|integer|exists:programas,id',
-        //     'cursos.*.temporalidad_id' => 'required_without:cursos.*.id|integer|exists:temporalidades,id',
-        //     'cursos.*.fecha_inicial' => 'required_without:cursos.*.id|date',
-        //     'cursos.*.fecha_final' => 'required_without:cursos.*.id|date|after:cursos.*.fecha_inicial',
-        //     'cursos.*.paga' => 'required_without:cursos.*.id|in:S,N',
-        //     'cursos.*.horarios' => 'required_without:cursos.*.id|array|min:1',
-            
-        //     'cursos.*.inscripcion' => 'nullable|required_if:cursos.*.paga,S|numeric|min:0',
-        //     'cursos.*.tarifa_menor' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|numeric|min:0',
-        //     'cursos.*.tarifa_mayor' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|numeric|min:0',
-        //     'cursos.*.temporalidad_tarifa' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|string',
-        //     'cursos.*.no_cuotas' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|integer|min:1',
-        //     'cursos.*.mes_inicial' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|date|date_format:Y-m',
-        //     'cursos.*.mes_final' => 'required_without:cursos.*.id|required_if:cursos.*.paga,S|date|date_format:Y-m|after_or_equal:cursos.*.mes_inicial',
-        // ]);
-        
+    public function store_cursos(Request $request) {        
         try {
 
             $count_cursos = 0;
@@ -320,6 +296,7 @@ class ProgramasController extends Controller
                 ->join('SEDES S','DC.SEDE_ID','=','S.ID')
                 ->join('CURSOS C','DC.CURSO_ID','=','C.ID')
                 ->join('PROGRAMAS P','DC.PROGRAMA_ID','=','P.ID')
+                ->join('ESCUELAS E','P.ESCUELA_ID','=','E.ID')
                 ->join('DEPENDENCIAS D','P.DEPENDENCIA_ID','=','D.ID')
                 ->select(
                     'BC.ID AS INSCRIPCION_ID',
@@ -331,7 +308,7 @@ class ProgramasController extends Controller
                     DB::raw("TRUNC(MONTHS_BETWEEN(SYSDATE, B.FECHA_NACIMIENTO) / 12) AS EDAD"),
                     'DO.ZONA_ID AS ZONA',
                     'B.ESTADO AS STATUS',
-                    'P.ESCUELA',
+                    'E.NOMBRE AS ESCUELA',
                     'P.NOMBRE AS PROGRAMA',
                     'D.NOMBRE AS DEPENDENCIA',
                     'DC.ID AS ID_MODULO_CURSO', 
@@ -359,6 +336,7 @@ class ProgramasController extends Controller
                 ->join('DETALLES_ACTIVIDADES DA','BA.DETALLE_ACTIVIDAD_ID','=','DA.ID')
                 ->join('ACTIVIDADES A','DA.ACTIVIDAD_ID','=','A.ID')
                 ->join('PROGRAMAS P','DA.PROGRAMA_ID','=','P.ID')
+                ->join('ESCUELAS E','P.ESCUELA_ID','=','E.ID')
                 ->join('DEPENDENCIAS D','P.DEPENDENCIA_ID','=','D.ID')
                 ->join('TIPOS_ACTIVIDADES TA','DA.TIPO_ACTIVIDAD_ID','=','TA.ID')
                 ->select(
@@ -371,7 +349,7 @@ class ProgramasController extends Controller
                     DB::raw("TRUNC(MONTHS_BETWEEN(SYSDATE, B.FECHA_NACIMIENTO) / 12) AS EDAD"),
                     'DO.ZONA_ID AS ZONA',
                     'B.ESTADO AS STATUS',
-                    'P.ESCUELA',
+                    'E.NOMBRE AS ESCUELA',
                     'P.NOMBRE AS PROGRAMA',
                     'D.NOMBRE AS DEPENDENCIA',
                     'DA.ID AS ID_MODULO_CURSO',
@@ -398,6 +376,7 @@ class ProgramasController extends Controller
                 ->join('MODULOS M','BM.MODULO_ID','=','M.ID')
                 ->join('SEDES S','M.SEDE_ID','=','S.ID')
                 ->join('PROGRAMAS P','M.PROGRAMA_ID','=','P.ID')
+                ->join('ESCUELAS E','P.ESCUELA_ID','=','E.ID')
                 ->join('DEPENDENCIAS D','P.DEPENDENCIA_ID','=','D.ID')
                 ->select(
                     'BM.ID AS INSCRIPCION_ID',
@@ -409,7 +388,7 @@ class ProgramasController extends Controller
                     DB::raw("TRUNC(MONTHS_BETWEEN(SYSDATE, B.FECHA_NACIMIENTO) / 12) AS EDAD"),
                     'DO.ZONA_ID AS ZONA',
                     'B.ESTADO AS STATUS',
-                    'P.ESCUELA',
+                    'E.NOMBRE AS ESCUELA',
                     'P.NOMBRE AS PROGRAMA',
                     'D.NOMBRE AS DEPENDENCIA',
                     'M.ID AS ID_MODULO_CURSO',

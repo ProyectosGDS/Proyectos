@@ -215,10 +215,14 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         }
     }
 
-    const getEscuelas = async () => {
+    const getEscuelas = async (dependencia_id) => {
         loading.value.escuelas = true
         try {                
-            const response = await axios.get('programas/get-escuelas')
+            const response = await axios.get('escuelas',{
+                params : {
+                    dependencia_id : dependencia_id
+                }
+            })
             escuelas.value = response.data
         } catch (error) {
             global.manejarError(error)

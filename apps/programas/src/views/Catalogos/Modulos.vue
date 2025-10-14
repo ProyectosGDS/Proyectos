@@ -2,7 +2,7 @@
     import { useModulosStore } from '@/stores/Catalogos/modulos'
     import { useProgramasStore } from '@/stores/Catalogos/programas'
     import { useAuthStore } from '@/stores/auth'
-    import { onBeforeMount } from 'vue'
+    import { onBeforeMount, watchEffect } from 'vue'
     import { useCatalogosStore } from '@/stores/Catalogos/catalogos'
     import Select from '@/components/Select.vue'
 
@@ -10,11 +10,22 @@
     const store = useModulosStore()
     const auth = useAuthStore()
     const catalogos = useCatalogosStore()
+
+    const mes_final = (mes_inicial,no_cuotas) => {
+        const [year, month] = mes_inicial.split("-").map(Number);
+        const date = new Date(year, month - 1, 1);
+        const cuotas = parseInt(no_cuotas)
+        date.setMonth(date.getMonth() + (cuotas - 1));
+        const newYear = date.getFullYear();
+        const newMonth = String(date.getMonth() + 1).padStart(2, "0");
+
+        return `${newYear}-${newMonth}`;
+    }
     
     onBeforeMount(() => {
 
-        if(auth.dependencia_id && auth.dependencia_id == 5){
-            catalogos.getEscuelas()
+        if(['5','8'].includes(auth.dependencia_id)){
+            catalogos.getEscuelas(auth.dependencia_id)
         } else {
             programas.fetch()
         }
@@ -23,6 +34,14 @@
         catalogos.getSedes()
         catalogos.getTemporalidades()
         catalogos.getTemporalidadesTarifas()
+    })
+
+    watchEffect(() => {
+        if(store.modulo.tarifas.no_cuotas && store.modulo.tarifas.mes_inicial) {
+            store.modulo.tarifas.mes_final = mes_final(store.modulo.tarifas.mes_inicial,store.modulo.tarifas.no_cuotas)
+        } else { 
+            store.modulo.tarifas.mes_final = null
+        }
     })
 
 </script>
@@ -35,9 +54,9 @@
             </Tool-Tip>
         </div>
         <div class="flex items-center gap-4 p-4">
-            <Input v-if="auth.user.dependencia_id == 5" @change="programas.getProgramasFromEscuelas(store.escuela)" v-model="store.escuela" option="select" title="*Seleccione una escuela" :error="store.errors.hasOwnProperty('escuela')">
+            <Input v-if="auth.user.dependencia_id == 5" @change="programas.getProgramasFromEscuelas(JSON.parse(store.escuela).id)" v-model="store.escuela" option="select" title="*Seleccione una escuela" :error="store.errors.hasOwnProperty('escuela')">
                 <option selected></option>
-                <option v-for="escuela in catalogos.escuelas" :value="escuela">{{ escuela }}</option>
+                <option v-for="escuela in catalogos.escuelas" :value="JSON.stringify(escuela)">{{ escuela.nombre }}</option>
             </Input>
             <Input v-model="store.programa_id" option="select" class="flex-1" title="*Seleccione programa para cargar módulos" :error="store.errors.hasOwnProperty('programa_id')">
                 <option value=""></option>
@@ -70,9 +89,9 @@
             <Icon @click="store.resetData" icon="fas fa-xmark" class="cursor-pointer text-white" />
         </template>
         <div class="grid gap-4">
-            <Input v-if="auth.user.dependencia_id == 5" @change="programas.getProgramasFromEscuelas(store.escuela)" v-model="store.escuela" option="select" title="*Seleccione una escuela" :error="store.errors.hasOwnProperty('escuela')">
+            <Input v-if="['5','8'].includes(auth.user.dependencia_id)" @change="programas.getProgramasFromEscuelas(JSON.parse(store.escuela).id)" v-model="store.escuela" option="select" title="*Seleccione una escuela" :error="store.errors.hasOwnProperty('escuela')">
                 <option selected></option>
-                <option v-for="escuela in catalogos.escuelas" :value="escuela">{{ escuela }}</option>
+                <option v-for="escuela in catalogos.escuelas" :value="JSON.stringify(escuela)">{{ escuela.nombre }}</option>
             </Input>
             <Input v-model="store.modulo.programa_id" option="select" title="*Seleccione programa" :error="store.errors.hasOwnProperty('programa_id')">
                 <option value=""></option>
