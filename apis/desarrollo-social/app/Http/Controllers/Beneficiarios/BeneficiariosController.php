@@ -537,6 +537,52 @@ class BeneficiariosController extends Controller
         }
     }
 
+    public function createBeneficiarioActividad(Request $request) {
+
+        DB::connection('gds')->beginTransaction();
+        
+        try {
+            
+            $beneficiario = $this->storeBeneficiario($request);
+
+            if($beneficiario) {
+
+                $this->storeDomicilio($request,$beneficiario->id);
+                
+                bitacora::create([
+                    'accion' => bitacora::$acciones[1],
+                    'tabla' => 'BENEFICIARIOS',
+                    'descripcion' => 'SE CREO BENEFICIARIO',
+                    'created_at' => now(),
+                    'usuario_id' => auth()->user()->id,
+                    'beneficiario_id' => $beneficiario->id,
+                ]);
+            }
+
+
+
+            if(!empty($this->bagValidations)){
+                DB::connection('gds')->rollBack();
+                return response([
+                    'message' => 'Hay campos que no cumplen con las validaciones',
+                    'errors' => $this->bagValidations
+                ],422);
+            }
+
+            DB::connection('gds')->commit();
+            
+            return response($beneficiario->load([
+                'domicilio',
+            ]));
+
+        } catch (\Throwable $th) {
+
+            DB::connection('gds')->rollBack();
+            return response($th->getMessage());
+
+        }
+    }
+
     public function historial(Request $request) {
         $request->validate([
             'cui' => ['required','numeric','digits:13',new ValidateCui ],
@@ -578,8 +624,7 @@ class BeneficiariosController extends Controller
                         AND adminsiaf.tb_curso_g.tipo_escuela = adminsiaf.tb_asigna_curso_g.tipo_escuela
                     INNER JOIN adminsiaf.tb_tipo_escuela_g 
                         ON adminsiaf.tb_escuela_g.tipo_escuela = adminsiaf.tb_tipo_escuela_g.tipo_escuela
-                WHERE adminsiaf.tb_asignacion_g.estatus = 'A'
-                AND adminsiaf.tb_alumno_g.cui = ?
+                WHERE adminsiaf.tb_alumno_g.cui = ?
                 ORDER BY adminsiaf.tb_asignacion_g.anio DESC
             ";
 

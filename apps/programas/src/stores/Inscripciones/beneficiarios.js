@@ -100,6 +100,22 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         }
     }
 
+    const createBeneficiarioActividad = async () => {
+        loading.value.store = true
+        try {
+            const response = await axios.post('beneficiarios/create-beneficiario-actividad', beneficiario.value)
+            beneficiario.value = response.data
+            errors.value = []
+        } catch (error) {
+            global.manejarError(error)
+            if(error.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.store = false
+        }
+    }
+
     const update = async () => {
         loading.value.update = true
         try {
@@ -262,6 +278,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         show,
         store,
         create,
+        createBeneficiarioActividad,
         update,
         destroy,
         edit,

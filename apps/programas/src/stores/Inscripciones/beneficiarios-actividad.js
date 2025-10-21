@@ -111,7 +111,7 @@ export const useBeneficiariosActividadStore = defineStore('beneficiarios-activid
             
             if(!Object.keys(new_beneficiario).length > 0) { 
                 
-                await beneficiariosStore.create()
+                await beneficiariosStore.createBeneficiarioActividad()
 
                 if(beneficiariosStore.errors == 0) {
 
