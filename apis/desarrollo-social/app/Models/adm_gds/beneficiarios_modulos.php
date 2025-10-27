@@ -16,6 +16,7 @@ class beneficiarios_modulos extends Model
         'created_at',
         'estado',
         'anio_inscripcion',
+        'becado',
     ];
 
 

@@ -153,22 +153,34 @@ class InscripcionesModulosController extends Controller
 
                                 }
 
-                                for ($i=0; $i <= intval($row['tarifas']['no_cuotas']) - 1 ; $i++) { 
+                                // for ($i=0; $i <= intval($row['tarifas']['no_cuotas']) - 1 ; $i++) { 
                                 
+                                    // $params = [
+                                    //     'INTERLOCUTOR' => $ic, 
+                                    //     'OP_PRINCIPAL' => '4010',
+                                    //     'OP_PARCIAL' => '0175',
+                                    //     'OBJETO_CONTRATO' => 'EJ04',
+                                    //     // 'OBJETO_CONTRATO' => $row['sede_oc'] ?? $row['objeto_contrato'],
+                                    //     'VALOR' => $row['edad'] > 18 ? strval(floatval($row['tarifas']['tarifa_mayor'])) : strval(floatval($row['tarifas']['tarifa_mayor'])),
+                                    //     'PERIODO' => date('my',strtotime($this->sumMonth($row['tarifas']['mes_inicial'],$i))),
+                                    //     'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($row['tarifas']['mes_inicial'],$i)),
+                                    //     'DESCRIPCION' => 'PAGO CUOTA '. mb_strtoupper($row['nombre_modulo']),
+                                    //     'LLAVE_RECONCILIACION' => 'OCT2025'
+                                    // ];
                                     $params = [
                                         'INTERLOCUTOR' => $ic, 
                                         'OP_PRINCIPAL' => '4010',
                                         'OP_PARCIAL' => '0175',
                                         'OBJETO_CONTRATO' => 'EJ04',
                                         // 'OBJETO_CONTRATO' => $row['sede_oc'] ?? $row['objeto_contrato'],
-                                        'VALOR' => $row['edad'] > 18 ? strval(floatval($row['tarifas']['tarifa_mayor'])) : strval(floatval($row['tarifas']['tarifa_mayor'])),
-                                        'PERIODO' => date('my',strtotime($this->sumMonth($row['tarifas']['mes_inicial'],$i))),
-                                        'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($row['tarifas']['mes_inicial'],$i)),
+                                        'VALOR' => $row['edad'] > 18 ? strval(floatval($row['tarifas']['tarifa_mayor'])) : strval(floatval($row['tarifas']['tarifa_menor'])),
+                                        'PERIODO' => date('my',strtotime($this->sumMonth($row['tarifas']['mes_inicial'],0))),
+                                        'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($row['tarifas']['mes_inicial'],0)),
                                         'DESCRIPCION' => 'PAGO CUOTA '. mb_strtoupper($row['nombre_modulo']),
                                         'LLAVE_RECONCILIACION' => 'OCT2025'
                                     ];
                                     SAP::rfc_name('Z_ZFUN_PSCD_00003_005')->params($params);
-                                } 
+                                // } 
                             }
                         }   
                     } 
@@ -231,5 +243,22 @@ class InscripcionesModulosController extends Controller
         $timestamp = strtotime($fechaYm . "-01");
         $ultimoDia = date("t", $timestamp);
         return date("Ym", $timestamp) . $ultimoDia;
+    }
+
+    public function asignar_beca(beneficiarios_modulos $inscripcion) {
+        try {
+            $inscripcion->becado = 1;
+            $inscripcion->save();
+
+            return response([
+                'message' => 'Beca asignada correctamente',
+            ]);
+
+        } catch (\Throwable $th) {
+            return response([
+                'error' => 'Error en asignar beca',
+                'message' => $th->getMessage()
+            ]);
+        }
     }
 }

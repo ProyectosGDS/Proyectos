@@ -89,8 +89,8 @@ class DetallesCursosController extends Controller
             'fecha_inicial' => 'nullable|required_with:fecha_final|date|date_format:Y-m-d',
             'fecha_final' => 'nullable|required_with:fecha_inicial|date|date_format:Y-m-d|after:fecha_inicial',
             'paga' => 'required|in:S,N',
-            'tarifas.tarifa_menor' => 'required_if:paga,S|decimal:2',
-            'tarifas.tarifa_mayor' => 'required_if:paga,S|decimal:2',
+            'tarifas.tarifa_menor' => 'required_if:paga,S|numeric',
+            'tarifas.tarifa_mayor' => 'required_if:paga,S|numeric',
             'tarifas.temporalidad' => 'required_if:paga,S',
         ]);
 
@@ -139,7 +139,7 @@ class DetallesCursosController extends Controller
                 'programa',
                 'modulo',
                 'curso',
-                'instructor',
+                'instructores',
                 'sede.zona',
                 'sede.distrito',
                 'horarios',
@@ -159,7 +159,6 @@ class DetallesCursosController extends Controller
             'modalidad' => 'present:capacidad',
             'temporalidad_id' => 'required',
             'curso_id' => 'required',
-            'instructor_id' => 'required',
             'horarios' => 'required|array',
             'programa_id' => 'required',
             'fecha_inicial' => 'nullable|required_with:fecha_final|date|date_format:Y-m-d',
@@ -178,7 +177,6 @@ class DetallesCursosController extends Controller
                 $curso->capacidad = $request->capacidad;
                 $curso->modalidad = $request->modalidad;
                 $curso->curso_id = $request->curso_id;
-                $curso->instructor_id = $request->instructor_id;
                 $curso->sede_id = $request->sede_id;
                 $curso->programa_id = $request->programa_id;
                 $curso->temporalidad_id = $request->temporalidad_id;
@@ -252,6 +250,15 @@ class DetallesCursosController extends Controller
         try {
             $curso->horarios()->sync(collect($request->horarios)->pluck('id'));
             return response('Horarios asignados exitosamente.');      
+        } catch (\Throwable $th) {
+            return response($th->getMessage());
+        }
+    }
+    
+    public function syncInstructores(Request $request, detalles_cursos $curso) {
+        try {
+            $curso->instructores()->sync(collect($request->instructores)->pluck('id'));
+            return response('Instructores asignados exitosamente.');      
         } catch (\Throwable $th) {
             return response($th->getMessage());
         }

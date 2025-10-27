@@ -15,6 +15,10 @@ class instructores extends Model
         'estado'
     ];
 
+    protected $hidden = [
+        'pivot',
+    ];
+
     // RELACIONES
     public function cursos () {
         return $this->hasMany(detalles_cursos::class,'instructor_id');

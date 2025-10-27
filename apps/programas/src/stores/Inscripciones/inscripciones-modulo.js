@@ -114,6 +114,28 @@ export const useInscripcionesModuloStore = defineStore('inscripciones-modulo', (
         }
     }
 
+    const showBeca = (item) => {
+        inscripcion.value = item
+        modal.value.beca = true
+    }
+
+    const assignBeca = async () => {
+        loading.value.update = true
+        try {
+            const response = await axios.put('inscripciones-modulo/asignar-beca/' + inscripcion.value.id)
+            global.setAlert(response.data.message, 'success')
+            fetch()
+            resetData()
+        } catch (error) {
+            global.manejarError(error)
+            if (error.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.update = false
+        }
+    }
+
     const exportExcel = async () => {
 
         loading.value.excel = true
@@ -177,6 +199,8 @@ export const useInscripcionesModuloStore = defineStore('inscripciones-modulo', (
         store,
         update,
         destroy,
+        showBeca,
+        assignBeca,
         resetData,
         exportExcel,
     }

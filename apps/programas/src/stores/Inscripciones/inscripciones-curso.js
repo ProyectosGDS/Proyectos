@@ -36,6 +36,7 @@ export const useInscripcionesCursoStore = defineStore('inscripciones-curso', () 
         update :false,
         destroy : false,
         excel : false,
+        beca : false,
     })
     const errors = ref([])
     const modal = ref({
@@ -43,6 +44,7 @@ export const useInscripcionesCursoStore = defineStore('inscripciones-curso', () 
         edit : false,
         delete :false,
         disabled : false,
+        beca : false,
     })
 
     const fetch = async (curso_id) => {
@@ -116,6 +118,28 @@ export const useInscripcionesCursoStore = defineStore('inscripciones-curso', () 
         }
     }
 
+    const showBeca = async (item) => {
+        inscripcion.value = item
+        modal.value.beca = true
+    }
+
+    const assingBeca = async () => {
+        loading.value.beca = true
+        try {
+            const response = await axios.put('inscripciones-curso/asignar-beca/' + inscripcion.value.id, inscripcion.value)
+            global.setAlert(response.data.message, 'success')
+            fetch(beneficiario_curso.curso.id)
+            resetData()
+        } catch (error) {
+            global.manejarError(error)
+            if (error.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.beca = false
+        }
+    }
+
     const exportExcel = async () => {
 
         loading.value.excel = true
@@ -179,6 +203,8 @@ export const useInscripcionesCursoStore = defineStore('inscripciones-curso', () 
         store,
         update,
         destroy,
+        showBeca,
+        assingBeca,
         resetData,
         exportExcel,
     }

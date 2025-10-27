@@ -23,7 +23,7 @@
     const programas = useProgramasStore()
     const modulos = useModulosStore()
     const catalogos = useCatalogosStore()
-    const inscripcion = useInscripcionesModuloStore()
+    const inscripciones = useInscripcionesModuloStore()
 
     function verifyCui () {
         const cui = beneficiarios.cui;
@@ -125,13 +125,13 @@
 
     const searchables = []
 
-    inscripcion.headers.map(el => {
+    inscripciones.headers.map(el => {
         searchables.push(el.key.toLowerCase().trim())
     })
 
     const beneficiarios_curso = computed(() => {
         
-        return inscripcion.beneficiarios.filter((item) => {
+        return inscripciones.beneficiarios.filter((item) => {
             return searchables.some((column) => {
                 const value = global.getNestedValue(item, column)
                 return String(value).toLowerCase().includes(store.search.toLowerCase())
@@ -152,7 +152,7 @@
 
     onBeforeMount(() => {
         const year = new Date()
-        inscripcion.year = year.getFullYear()
+        inscripciones.year = year.getFullYear()
 
         if(['5','8'].includes(auth.dependencia_id)) {
             catalogos.getEscuelas(auth.dependencia_id)   
@@ -169,7 +169,7 @@
         <div class="grid xl:grid-cols-2 xl:divide-x-2">
             <div class="space-y-4 xl:pr-8">
                 <div class="flex gap-2">
-                    <Input v-model="inscripcion.year" option="select" title="*seleccione año inscripción" :error="store.errors.hasOwnProperty('year')">
+                    <Input v-model="inscripciones.year" option="select" title="*seleccione año inscripción" :error="store.errors.hasOwnProperty('year')">
                         <option v-for="year in years" :value="year">{{ year }}</option>
                     </Input>
                     <Input v-if="['5','8'].includes(auth.user.dependencia_id)" @change="programas.getProgramasFromEscuelas(JSON.parse(store.escuela).id)" v-model="store.escuela" option="select" title="*Seleccione una escuela" :error="store.errorsDetails.hasOwnProperty('escuela')">
@@ -177,20 +177,20 @@
                         <option v-for="escuela in catalogos.escuelas" :value="JSON.stringify(escuela)">{{ escuela.nombre }}</option>
                     </Input>
                 </div>
-                <Input @change="store.selectedPrograma()" v-model="inscripcion.programa_id" option="select" title="*seleccione programas" :error="store.errors.hasOwnProperty('programa_id')">
+                <Input @change="store.selectedPrograma()" v-model="inscripciones.programa_id" option="select" title="*seleccione programas" :error="store.errors.hasOwnProperty('programa_id')">
                     <option value=""></option>
                     <template v-for="programa in programas.programas">
                         <option v-if="programa.estado == 'A'" :value="programa.id">{{ programa.nombre }}</option>
                     </template>
                 </Input>
                 <div class="flex gap-2 items-center">
-                    <Input @change="store.selectedModulo()" v-model="inscripcion.modulo" option="select" title="*seleccione módulo / grado" :error="store.errors.hasOwnProperty('modulo_id')">
+                    <Input @change="store.selectedModulo()" v-model="inscripciones.modulo" option="select" title="*seleccione módulo / grado" :error="store.errors.hasOwnProperty('modulo_id')">
                         <option value=""></option>
                         <template v-for="modulo in modulos.modulos">
                             <option v-if="modulo.estado == 'A' && modulo.cursos.length > 0" :value="JSON.stringify(modulo)">{{ nombre_modulo(modulo) }}</option>
                         </template>
                     </Input>
-                    <Icon v-if="typeof(inscripcion.modulo) === 'string'" @click="inscripcion.fetch()" icon="fas fa-arrows-rotate" class="icon-button btn-secondary" title="Actualizar consulta" :class="{'animate-spin' : inscripcion.loading.fetch }"  />
+                    <Icon v-if="typeof(inscripciones.modulo) === 'string'" @click="inscripciones.fetch()" icon="fas fa-arrows-rotate" class="icon-button btn-secondary" title="Actualizar consulta" :class="{'animate-spin' : inscripciones.loading.fetch }"  />
                 </div>
                 <div class="col-span-2">
                     <div class="relative">
@@ -224,17 +224,17 @@
                 </div>
             </div>
             <div class="xl:pl-8">
-                <h1 v-if="inscripcion.modulo" class="text-center text-2xl font-medium text-gray-500">
-                     Cupo : {{ inscripcion.cupo }}
+                <h1 v-if="inscripciones.modulo" class="text-center text-2xl font-medium text-gray-500">
+                     Cupo : {{ inscripciones.cupo }}
                 </h1>
                 <div class="flex items-center gap-4">
                     <Input v-model="store.search" icon="fas fa-search" type="search" placeholder="Buscar beneficiario .. " class="h-11" />
                     <Tool-Tip message="Excel" class="-mt-7 text-color-4">
-                        <Icon v-if="auth.checkPermission('exportar excel inscripciones modulo')" @click="inscripcion.exportExcel" :icon="inscripcion.loading.excel ? 'fas fa-spinner' : 'fas fa-file-excel'" class="icon-button p-2 btn-success" :class="inscripcion.loading.excel ? 'animate-spin bg-gray-300 text-gray-500' : ''" :disabled="inscripcion.loading.excel" />
+                        <Icon v-if="auth.checkPermission('exportar excel inscripciones modulo')" @click="inscripciones.exportExcel" :icon="inscripciones.loading.excel ? 'fas fa-spinner' : 'fas fa-file-excel'" class="icon-button p-2 btn-success" :class="inscripciones.loading.excel ? 'animate-spin bg-gray-300 text-gray-500' : ''" :disabled="inscripciones.loading.excel" />
                     </Tool-Tip>
                 </div>
                 <br>
-                <div class="grid" v-if="inscripcion.loading.fetch" >
+                <div class="grid" v-if="inscripciones.loading.fetch" >
                     <Loading-Bar class="bg-color-4 h-1"/>
                     <h1 class="text-center text-gray-400 text-xs animate-pulse">Cargando data ...</h1>
                 </div>
@@ -287,17 +287,20 @@
                                                 <span class="font-medium">{{ inscripcion.beneficiario.edad }}</span>
                                             </span>
                                         </span>
-                                        <!-- <span v-if="inscripcion.tarifa">
+                                        <span>
                                             <span class="flex items-center gap-1">
-                                                <Icon icon="fas fa-" />
-                                                TARIFA: 
-                                                <span class="font-medium">{{ global.parseValue(inscripcion.tarifa,'currency') }}</span>
+                                                <Icon icon="fas fa-medal" />
+                                                BECADO: 
+                                                <span class="font-medium">{{ inscripcion.becado ? 'SI':'NO' }}</span>
                                             </span>
-                                        </span> -->
+                                        </span>
                                     </div>
                                 </Card>
                                 <div class="grid items-center">
                                     <Icon @click="store.removeInscripcion(inscripcion,index)" icon="fas fa-trash" class="icon-button btn-danger" />
+                                    <template v-if="inscripcion.id" >
+                                        <Icon v-if="auth.checkPermission('asignar beca modulo')" @click="inscripciones.showBeca(inscripcion)" icon="fas fa-medal" class="icon-button btn-secondary" title="Asignar beca" />
+                                    </template>
                                     <template v-if="auth.checkPermission('desactivar inscripcion modulo')">
                                         <Icon v-if="inscripcion.id" @click="store.changeEstadoInscripcion(inscripcion)" :icon="inscripcion.estado == 'A' ? 'fas fa-xmark' : 'fas fa-check'" class="icon-button" :class="inscripcion.estado == 'A' ? 'btn-danger' : 'btn-success'" :title="inscripcion.estado == 'A' ? 'Deshabilitar' : 'Habilitar'" />
                                     </template>
@@ -306,15 +309,15 @@
                         </template>
                     </div>
                 </div>
-                <div v-if="inscripcion.beneficiarios.length" class="flex justify-center gap-4">
-                    <template v-if="inscripcion.cupo > 0">
+                <div v-if="inscripciones.beneficiarios.length" class="flex justify-center gap-4">
+                    <template v-if="inscripciones.cupo > 0">
                         <Button 
                             v-if="auth.checkPermission('crear inscripcion modulo')" 
-                            @click="inscripcion.store" 
+                            @click="inscripciones.store" 
                             text="Inscribir beneficiarios nuevos al modulo" 
                             icon="fas fa-plus" 
                             class="btn-primary absolute bottom-4" 
-                            :loading="inscripcion.loading.store"
+                            :loading="inscripciones.loading.store"
                         />
                     </template>
                 </div>
@@ -324,31 +327,45 @@
 
     <!-- MODALES -->
 
-    <Modal :open="inscripcion.modal.delete">
+    <Modal :open="inscripciones.modal.delete">
         <div class="flex items-center justify-center gap-4">
             <Icon icon="fas fa-exclamation-triangle" class="text-orange-500 text-5xl" />
             <div>
                 <p class="text-center text-lg">¿Estás seguro de eliminar la inscripción de:?</p>
-                <h1 class="text-center font-semibold">{{ inscripcion.inscripcion?.beneficiario?.nombre_completo }}</h1>
+                <h1 class="text-center font-semibold">{{ inscripciones.inscripcion?.beneficiario?.nombre_completo }}</h1>
             </div>
         </div>
         <template #footer>
-            <Button @click="inscripcion.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
-            <Button @click="inscripcion.destroy" text="Sí, elminar" icon="fas fa-trash" class="btn-danger" :loading="inscripcion.loading.destroy" />
+            <Button @click="inscripciones.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
+            <Button @click="inscripciones.destroy" text="Sí, elminar" icon="fas fa-trash" class="btn-danger" :loading="inscripciones.loading.destroy" />
         </template>
     </Modal>
 
-    <Modal :open="inscripcion.modal.disabled">
+    <Modal :open="inscripciones.modal.beca" title="Asignar beca" icon="fas fa-medal">
+        <div class="flex items-center justify-center gap-4">
+            <Icon icon="fas fa-medal" class="text-orange-500 text-5xl" />
+            <div>
+                <p class="text-center text-lg">¿Estás seguro de asignar la beca a:?</p>
+                <h1 class="text-center font-semibold">{{ inscripciones.inscripcion?.beneficiario?.nombre_completo }}</h1>
+            </div>
+        </div>
+        <template #footer>
+            <Button @click="inscripciones.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
+            <Button @click="inscripciones.assignBeca" text="Sí, asignar" icon="fas fa-check" class="btn-primary" :loading="inscripciones.loading.destroy" />
+        </template>
+    </Modal>
+
+    <Modal :open="inscripciones.modal.disabled">
         <div class="flex items-center justify-center gap-4">
             <Icon icon="fas fa-exclamation-triangle" class="text-orange-500 text-5xl" />
             <div>
                 <p class="text-center text-lg">¿Estás seguro de deshabilitar/habilitar la inscripción de:?</p>
-                <h1 class="text-center font-semibold">{{ inscripcion.inscripcion?.beneficiario?.nombre_completo }}</h1>
+                <h1 class="text-center font-semibold">{{ inscripciones.inscripcion?.beneficiario?.nombre_completo }}</h1>
             </div>
         </div>
         <template #footer>
-            <Button @click="inscripcion.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
-            <Button @click="inscripcion.update" :text="inscripcion.inscripcion?.estado == 'A' ? 'Sí, habilitar' : 'Sí, deshabilitar'" :icon="inscripcion.inscripcion?.estado == 'A' ? 'fas fa-check' : 'fas fa-xmark'" class="btn-danger" :loading="inscripcion.loading.update" />
+            <Button @click="inscripciones.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
+            <Button @click="inscripciones.update" :text="inscripcion.inscripcion?.estado == 'A' ? 'Sí, habilitar' : 'Sí, deshabilitar'" :icon="inscripciones.inscripcion?.estado == 'A' ? 'fas fa-check' : 'fas fa-xmark'" class="btn-danger" :loading="inscripcion.loading.update" />
         </template>
     </Modal>
 

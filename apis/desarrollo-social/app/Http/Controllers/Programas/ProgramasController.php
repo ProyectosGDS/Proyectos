@@ -124,14 +124,6 @@ class ProgramasController extends Controller
         }
     }
 
-    public function get_escuelas() {
-        try {
-            return response(programas::$escuelas);
-        } catch (\Throwable $th) {
-            return response($th->getMessage());
-        }
-    }
-
     public function get_modulos (programas $programa) {
         try {
 
@@ -164,7 +156,7 @@ class ProgramasController extends Controller
                 },
                 'cursos.horarios',
                 'cursos.sede',
-                'cursos.instructor',
+                'cursos.instructores',
                 'cursos.temporalidad',
                 'cursos.curso',
                 'cursos.tarifas',
@@ -198,7 +190,6 @@ class ProgramasController extends Controller
                         'capacidad' => 'required|integer|min:1',
                         'modalidad' => 'required|string|in:PRESENCIAL,VIRTUAL,HIBRIDA',
                         'curso_id' => 'required|integer|exists:cursos,id',
-                        'instructor_id' => 'required|integer|exists:instructores,id',
                         'sede_id' => 'required|integer|exists:sedes,id',
                         'programa_id' => 'required|integer|exists:programas,id',
                         'temporalidad_id' => 'required|integer|exists:temporalidades,id',
@@ -239,7 +230,6 @@ class ProgramasController extends Controller
                         'capacidad' => $curso['capacidad'],
                         'modalidad' => $curso['modalidad'],
                         'curso_id' => $curso['curso_id'],
-                        'instructor_id' => $curso['instructor_id'],
                         'sede_id' => $curso['sede_id'],
                         'programa_id' => $curso['programa_id'],
                         'temporalidad_id' => $curso['temporalidad_id'],
@@ -251,6 +241,7 @@ class ProgramasController extends Controller
                     ]);
 
                     $detalle_curso->horarios()->sync($curso['horarios']);
+                    $detalle_curso->instructores()->sync($curso['instructores']);
 
                     if($curso['paga'] == 'S') {
                         if(isset($detalle_curso->id)) {
@@ -625,16 +616,24 @@ class ProgramasController extends Controller
         }
     }
 
-    public function programas_escuelas(string $escuela) {
+    public function programas_escuela(int $escuela_id) {
         try {
-            $programas = programas::with(['modulos'])
+
+            $programas_escuela = programas::with(['modulos'])
                 ->where('estado','A')
-                ->where('escuela',$escuela)
+                ->where('escuela_id',$escuela_id)
                 ->get();
 
-            return response($programas);
+            return response([
+                'message' => 'Se obtuvieron los programas exitosamente',
+                'programas_escuela' => $programas_escuela
+            ]);
+
         } catch (\Throwable $th) {
-            return response($th->getMessage());
+            return response([
+                'error' => 'Error al obtener los programas por escuela',
+                'message' => $th->getMessage(),
+            ]);
         }
     }
 

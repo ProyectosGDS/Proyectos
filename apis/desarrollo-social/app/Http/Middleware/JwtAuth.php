@@ -39,7 +39,10 @@ class JwtAuth
             Auth::setUser($user);
 
         } catch (\Throwable $e) {
-            return response('Unauthorized: ' . $e->getMessage(), 401);
+            return response([
+                'error' => 'Unauthorized',
+                'message' => $e->getMessage()
+            ], 401);
         }
 
         return $next($request);

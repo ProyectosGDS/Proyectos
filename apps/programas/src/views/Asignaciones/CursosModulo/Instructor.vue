@@ -7,7 +7,7 @@
     const instructores = useInstructoresStore()
 
     function selectInstructor(item) {
-        store.detalles.instructor = item
+        store.detalles.instructores = item
     }
 
     onBeforeMount(() => {
@@ -24,6 +24,6 @@
         :rowsPerPage="5" 
         :multiSelect="true" 
         @selectdAllItems="selectInstructor" 
-        :itemsSelected="store.detalles.instructor" 
+        :itemsSelected="store.detalles.instructores" 
     />
 </template>

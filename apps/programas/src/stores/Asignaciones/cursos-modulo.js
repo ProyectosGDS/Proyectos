@@ -37,7 +37,7 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
 
     const detalles = ref({
         curso: [],
-        instructor: [],
+        instructores: [],
         sede: [],
         horarios: [],
     })
@@ -198,12 +198,12 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
 
     const selectDetails = (objeto) => {
 
-        if (detalles.value[objeto].length != 1 && objeto != 'horarios') {
+        if (detalles.value[objeto].length != 1 && !['horarios','instructores'].includes(objeto)) {
             errors.value = { seleccion: ['Seleccione un solo registro'] }
             return
         }
 
-        if (objeto == 'horarios') {
+        if (['horarios','instructores'].includes(objeto)) {
             asignaciones.cursos[indice.value]['curso'][objeto] = detalles.value[objeto]
         } else {
             asignaciones.cursos[indice.value]['curso'][objeto] = detalles.value[objeto][0]
@@ -218,7 +218,7 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
 
         asignaciones.cursos.forEach((item, index) => {
             if(!item.detalle_curso_id && !item.modulo_id) {
-                if((Object.keys(item.curso.instructor).length == 0) || (item.curso.horarios.length == 0)) {
+                if((item.curso.instructores.length == 0) || (item.curso.horarios.length == 0)) {
                     IndexesError.value.push(index)
                     return
                 }
@@ -238,7 +238,7 @@ export const useCursosModuloStore = defineStore('cursos-modulo', () => {
         errorsDetails.value = []
         detalles.value = {
             curso: [],
-            instructor: [],
+            instructores: [],
             sede: [],
             horario: [],
         }

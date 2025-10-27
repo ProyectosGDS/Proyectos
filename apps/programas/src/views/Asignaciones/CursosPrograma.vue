@@ -15,6 +15,7 @@
     import Horario from './CursosPrograma/Horario.vue'
     import Sede from './CursosPrograma/Sede.vue'
     import Select from '@/components/Select.vue'
+    import { useInstructoresStore } from '@/stores/Catalogos/instructores'
     
 
     const store = useCursosProgramaStore()
@@ -25,6 +26,7 @@
     const auth = useAuthStore()
     const global = useGlobalStore()
     const horarios = useHorariosStore()
+    const instructores = useInstructoresStore()
 
 
 
@@ -105,16 +107,16 @@
                     <Icon @click="store.removeItem('curso')" v-if="store.curso.curso.nombre" icon="fas fa-xmark" class="icon-button btn-danger" />
                 </div>
                 <div class="flex items-center gap-2">
-                    <Input @click="store.openModal('instructor')" v-model="store.curso.instructor.nombre" option="label" title="*seleccione instructor" class="cursor-pointer" :error="store.errorsDetails.hasOwnProperty('instructor_id')" readonly />
-                    <Icon @click="store.removeItem('instructor')" v-if="store.curso.instructor.nombre" icon="fas fa-xmark" class="icon-button btn-danger" />
+                    <Input @click="store.openModal('instructores')" v-model="store.labels.instructores" option="label" title="*seleccione instructor" class="cursor-pointer" :error="store.errorsDetails.hasOwnProperty('instructor_id')" readonly />
+                    <Icon @click="store.removeItem('instructores')" v-if="store.labels.instructores" icon="fas fa-xmark" class="icon-button btn-danger" />
                 </div>
                 <div class="flex items-center gap-2">
                     <Input @click="store.openModal('sede')" v-model="store.curso.sede.nombre_completo" option="label" title="*seleccione sede" class="cursor-pointer" :error="store.errorsDetails.hasOwnProperty('sede_id')" readonly />
                     <Icon @click="store.removeItem('sede')" v-if="store.curso.sede.nombre_completo" icon="fas fa-xmark" class="icon-button btn-danger" />
                 </div>
                 <div class="flex items-center gap-2">
-                    <Input @click="store.openModal('horarios')" v-model="store.label_horario" option="label" title="*seleccione horarios" class="cursor-pointer" :error="store.errorsDetails.hasOwnProperty('horario_id')" readonly />
-                    <Icon @click="store.removeItem('horarios')" v-if="store.label_horario" icon="fas fa-xmark" class="icon-button btn-danger" />
+                    <Input @click="store.openModal('horarios')" v-model="store.labels.horarios" option="label" title="*seleccione horarios" class="cursor-pointer" :error="store.errorsDetails.hasOwnProperty('horario_id')" readonly />
+                    <Icon @click="store.removeItem('horarios')" v-if="store.labels.horarios" icon="fas fa-xmark" class="icon-button btn-danger" />
                 </div>
                 <Input v-model="store.curso.temporalidad" option="select" title="*seleccione temporalidad" :error="store.errorsDetails.hasOwnProperty('temporalidad_id')">
                     <option value=""></option>
@@ -211,13 +213,7 @@
                                                 <span class="font-medium">{{ asignacion.curso?.nombre }}</span>
                                             </span>
                                         </span>
-                                        <span>
-                                            <span class="flex gap-1 items-center">
-                                                <Icon icon="fas fa-person-chalkboard" />
-                                                INSTRUCTOR:
-                                                <span class="font-medium">{{ asignacion.instructor?.nombre }}</span>
-                                            </span>
-                                        </span>
+                                        
                                         <span>
                                             <span class="flex gap-1 items-center">
                                                 <Icon icon="fas fa-dollar-sign" />
@@ -248,6 +244,24 @@
                                         </span>
                                         <span>
                                             <span class="flex gap-1 items-center">
+                                                <Icon icon="fas fa-calendar-days" />
+                                                INICIA - TERMINA:
+                                            </span>
+                                            <span class="font-medium">{{ asignacion.fecha_inicial + ' A ' + asignacion.fecha_final }}</span>
+                                        </span>
+                                        <span>
+                                            <span class="flex gap-1 items-center">
+                                                <Icon icon="fas fa-person-chalkboard" />
+                                                INSTRUCTORES:
+                                            </span>
+                                            <ul class=" list-decimal pl-4">
+                                                <li v-for="instructor in asignacion.instructores">
+                                                    {{ instructor.nombre }}
+                                                </li>
+                                            </ul>
+                                        </span>
+                                        <span>
+                                            <span class="flex gap-1 items-center">
                                                 <Icon icon="fas fa-clock" />
                                                 HORARIOS:
                                             </span>
@@ -257,13 +271,8 @@
                                                 </li>
                                             </ul>
                                         </span>
-                                        <span>
-                                            <span class="flex gap-1 items-center">
-                                                <Icon icon="fas fa-calendar-days" />
-                                                INICIA - TERMINA:
-                                            </span>
-                                            <span class="font-medium">{{ asignacion.fecha_inicial + ' A ' + asignacion.fecha_final }}</span>
-                                        </span>
+                                        
+                                        
                                         <span class="col-span-2">
                                             <span class="flex gap-1 items-center">
                                                 <Icon icon="fas fa-school" />
@@ -282,6 +291,10 @@
                                         <Icon v-if="auth.checkPermission('asignar requisitos curso')" @click="asignaciones.assignRequirements(asignacion)" icon="fas fa-list-check" class="icon-button btn-secondary" title="Asignar requisitos" />
                                     </template>
                                     
+                                    <template v-if="asignacion.hasOwnProperty('id')">
+                                        <Icon v-if="auth.checkPermission('editar instructores curso')" @click="asignaciones.editInstructores(asignacion.id)" icon="fas fa-user-graduate" title="Editar instructores" class="icon-button btn-secondary" />
+                                    </template>
+
                                     <template v-if="asignacion.hasOwnProperty('id')">
                                         <Icon v-if="auth.checkPermission('editar horarios curso')" @click="asignaciones.editHorarios(asignacion.id)" icon="fas fa-clock" title="Editar horario" class="icon-button btn-secondary" />
                                     </template>
@@ -316,7 +329,7 @@
         </template>
     </Modal>
 
-    <Modal :open="store.modal.instructor" title="Instructores" icon="fas fa-chalkboard-user">
+    <Modal :open="store.modal.instructores" title="Instructores" icon="fas fa-chalkboard-user">
         <template #close>
             <Icon @click="store.resetData" icon="fas fa-xmark" class="horarior-pointer text-white" />
         </template>
@@ -326,7 +339,7 @@
         <Validate-Errors :errors="store.errors" v-if="store.errors != 0" />
         <template #footer>
             <Button @click="store.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
-            <Button @click="store.selectedItem('instructor')" text="Seleccionar" icon="fas fa-check" class="btn-primary"/>
+            <Button @click="store.selectedItem('instructores')" text="Seleccionar" icon="fas fa-check" class="btn-primary"/>
         </template>
     </Modal>
 
@@ -459,6 +472,30 @@
         </template>
     </Modal>
     
+    <Modal :open="asignaciones.modal.instructores" title="Editar Instructores del curso" icon="fas fa-clock">
+        <template #close>
+            <Icon @click="asignaciones.resetData" icon="fas fa-xmark" class="cursor-pointer text-white" />
+        </template>
+        <div>
+            <Data-Table 
+                :headers="instructores.headers" 
+                :data="instructores.instructores"
+                :loading="instructores.loading.fetch"
+                :excel="false" 
+                :rowsPerPage="5" 
+                :multiSelect="true" 
+                @selectdAllItems="asignaciones.selectInstructores"
+                :itemsSelected="asignaciones.instructores" 
+            />
+        </div>
+        
+        <Validate-Errors :errors="asignaciones.errors" v-if="asignaciones.errors != 0" />
+        <template #footer>
+            <Button @click="asignaciones.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
+            <Button @click="asignaciones.syncInstructores" text="Actualizar" icon="fas fa-arrows-rotate" class="btn-primary" :loading="asignaciones.loading.update" />
+        </template>
+    </Modal>
+
     <Modal :open="asignaciones.modal.horarios" title="Editar horarios del curso" icon="fas fa-clock">
         <template #close>
             <Icon @click="asignaciones.resetData" icon="fas fa-xmark" class="cursor-pointer text-white" />

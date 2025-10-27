@@ -14,12 +14,14 @@
     import Instructor from './CursosModulo/Instructor.vue'
     import Horario from './CursosModulo/Horario.vue'
     import Select from '@/components/Select.vue'
+    import { useInstructoresStore } from '@/stores/Catalogos/instructores'
         
     const asignaciones = useAsignacionesCursosModuloStore()
     const store = useCursosModuloStore()
     const programas = useProgramasStore()
     const catalogos = useCatalogosStore()
     const horarios = useHorariosStore()
+    const instructores = useInstructoresStore()
     const auth = useAuthStore()
     const global = useGlobalStore()
 
@@ -127,12 +129,14 @@
                                                 <span class="font-medium">{{ asignacion.curso.curso.nombre }}</span>
                                             </span>
                                         </span>
-                                        <span v-if="asignacion.curso.instructor.nombre">
+                                        <span>
                                             <span class="flex gap-2 items-center">
                                                 <Icon icon="fas fa-person-chalkboard"/>
-                                                INSTRUCTOR: 
-                                                <span class="font-medium">{{ asignacion.curso.instructor.nombre }}</span>
+                                                INSTRUCTORES: 
                                             </span>
+                                            <ul class=" list-decimal pl-4">
+                                                <li v-for="instructor in asignacion.curso.instructores">{{ instructor.nombre }}</li>
+                                            </ul>
                                         </span>
                                         <span>
                                             <span class="flex gap-2 items-center">
@@ -158,6 +162,9 @@
                                     <Icon v-if="!asignacion.detalle_curso_id && !asignacion.modulo_id" @click="store.removeCurso(index)" icon="fas fa-trash" class="icon-button btn-danger" title="Remover de la lista" />
                                     <template v-if="asignacion.detalle_curso_id && asignacion.modulo_id" >
                                         <Icon @click="asignaciones.showHorarios(asignacion.detalle_curso_id)" icon="fas fa-clock" class="icon-button btn-secondary" title="Asignar horario" />
+                                    </template>
+                                    <template v-if="asignacion.detalle_curso_id && asignacion.modulo_id" >
+                                        <Icon @click="asignaciones.showInstructores(asignacion.detalle_curso_id)" icon="fas fa-user-graduate" class="icon-button btn-secondary" title="Asignar instructores" />
                                     </template>
                                     <template v-if="asignacion.detalle_curso_id && asignacion.modulo_id">
                                         <Icon v-if="auth.checkPermission('editar cursos modulo')" @click="asignaciones.show(asignacion.detalle_curso_id)" icon="fas fa-pencil" class="icon-button btn-secondary" title="Editar curso" />
@@ -216,7 +223,7 @@
         <Validate-Errors :errors="store.errors" v-if="store.errors != 0" />
         <template #footer>
             <Button @click="store.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
-            <Button @click="store.selectDetails('instructor')" text="Seleccionar" icon="fas fa-check" class="btn-primary"/>
+            <Button @click="store.selectDetails('instructores')" text="Seleccionar" icon="fas fa-check" class="btn-primary"/>
         </template>
     </Modal>
 
@@ -299,6 +306,29 @@
         <template #footer>
             <Button @click="asignaciones.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
             <Button @click="asignaciones.syncHorarios()" text="Actualizar" icon="fas fa-arrows-rotate" class="btn-primary"/>
+        </template>
+    </Modal>
+
+    <Modal :open="asignaciones.modal.instructores" title="Editar instructores" icon="fas fa-user-graduate">
+        <template #close>
+            <Icon @click="asignaciones.resetData" icon="fas fa-xmark" class="cursor-pointer text-white" />
+        </template>
+        <div class="grid gap-4">
+            <Data-Table 
+                :headers="instructores.headers" 
+                :data="instructores.instructores"
+                :loading="instructores.loading.fetch"
+                :excel="false" 
+                :rowsPerPage="5" 
+                :multiSelect="true"
+                @selectdAllItems="asignaciones.selectInstructores" 
+                :itemsSelected="asignaciones.instructores" 
+            />
+        </div>
+        <Validate-Errors :errors="store.errors" v-if="store.errors != 0" />
+        <template #footer>
+            <Button @click="asignaciones.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
+            <Button @click="asignaciones.syncInstructores()" text="Actualizar" icon="fas fa-arrows-rotate" class="btn-primary"/>
         </template>
     </Modal>
 </template>

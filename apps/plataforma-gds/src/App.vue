@@ -7,7 +7,10 @@
 	const auth = useAuthStore()
 	const global = useGlobalStore()
 
-	onMounted(() => auth.verifyAuth())
+	onMounted(() => {
+		if(window.location.pathname === '/login') return
+		auth.verifyAuth()
+	})
 
 </script>
 

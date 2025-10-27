@@ -144,6 +144,14 @@ const router = createRouter({
 						auth : true,
 					}
 				},
+				{
+					path : 'cargos',
+					name : 'Cargos',
+					component : () => import('@/views/Cargos/Cargos.vue'),
+					meta : {
+						auth : true,
+					}
+				},
 			]
 		},
 		{

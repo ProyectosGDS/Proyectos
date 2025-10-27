@@ -51,8 +51,8 @@ class ModulosController extends Controller
             'fecha_inicial' => 'required|required_with:fecha_final|date|date_format:Y-m-d',
             'fecha_final' => 'required|required_with:fecha_inicial|date|date_format:Y-m-d|after:fecha_inicial',
             'publico' => 'required',
-            'tarifas.tarifa_menor' => 'required_if:paga,S|decimal:2',
-            'tarifas.tarifa_mayor' => 'required_if:paga,S|decimal:2',
+            'tarifas.tarifa_menor' => 'required_if:paga,S|numeric',
+            'tarifas.tarifa_mayor' => 'required_if:paga,S|numeric',
             'tarifas.temporalidad' => 'required_if:paga,S|string|max:50',
             'tarifas.no_cuotas' => 'required_if:paga,S|integer|min:1|max:12',
             'tarifas.mes_inicial' => 'required_if:paga,S|required_with:mes_final|date|date_format:Y-m',
@@ -180,7 +180,7 @@ class ModulosController extends Controller
                     'modulo',
                     'curso.programa',
                     'curso.curso',
-                    'curso.instructor',
+                    'curso.instructores',
                     'curso.sede',
                     'curso.horarios',
                     'curso.temporalidad',
@@ -198,7 +198,13 @@ class ModulosController extends Controller
     public function store_cursos(Request $request) {
 
         $request->validate([
-            'cursos' => 'required|array'
+            'cursos' => 'required|array',
+            'cursos.*.curso.programa_id' => 'required|integer|exists:programas,id',
+            'cursos.*.curso.curso.id' => 'required|integer|exists:cursos,id',
+            'cursos.*.curso.sede.id' => 'required|integer|exists:sedes,id',
+            'cursos.*.curso.temporalidad.id' => 'required|integer|exists:temporalidades,id',
+            'cursos.*.curso.horarios' => 'required|array',
+            'cursos.*.curso.instructores' => 'required|array',
         ]);
 
         DB::connection('gds')->beginTransaction();
@@ -213,7 +219,6 @@ class ModulosController extends Controller
                         [
                             'programa_id'       => $curso['curso']['programa_id'],
                             'curso_id'          => $curso['curso']['curso']['id'],
-                            'instructor_id'     => $curso['curso']['instructor']['id'],
                             'sede_id'           => $curso['curso']['sede']['id'],
                             'temporalidad_id'   => $curso['curso']['temporalidad']['id'],
                         ],
@@ -229,6 +234,7 @@ class ModulosController extends Controller
                         ]);
 
                         $nuevo_curso->horarios()->sync(collect($curso['curso']['horarios'])->pluck('id'));
+                        $nuevo_curso->instructores()->sync(collect($curso['curso']['instructores'])->pluck('id'));
 
                     } else {
                         DB::connection('gds')->rollBack();

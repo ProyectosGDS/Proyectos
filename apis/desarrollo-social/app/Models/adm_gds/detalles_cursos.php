@@ -19,7 +19,6 @@ class detalles_cursos extends Model
         'capacidad',
         'modalidad',
         'curso_id',
-        'instructor_id',
         'sede_id',
         'programa_id',
         'temporalidad_id',
@@ -41,6 +40,10 @@ class detalles_cursos extends Model
         return $this->belongsToMany(horarios::class,'cursos_horarios','detalle_curso_id','horario_id');
     }
 
+    public function instructores() {
+        return $this->belongsToMany(instructores::class,'cursos_instructores','detalle_curso_id','instructor_id');
+    }
+
     public function modulo() {
         return $this->belongsToMany(modulos::class,'cursos_modulos','detalle_curso_id','modulo_id');
     }
@@ -58,10 +61,6 @@ class detalles_cursos extends Model
 
     public function sede() {
         return $this->belongsTo(sedes::class,'sede_id');
-    }
-
-    public function instructor() {
-        return $this->belongsTo(instructores::class,'instructor_id');
     }
 
     public function temporalidad() {

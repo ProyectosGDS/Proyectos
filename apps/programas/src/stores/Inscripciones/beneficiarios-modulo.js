@@ -16,7 +16,7 @@ export const useBeneficiariosModuloStore = defineStore('beneficiarios-modulo', (
     const curso = ref({})
     const detalles = ref([])
     const search = ref('')
-    const escuela = ref({})
+    const escuela = ref(null)
     const errors = ref([])
     const errorsDetails = ref([])
 
@@ -95,8 +95,12 @@ export const useBeneficiariosModuloStore = defineStore('beneficiarios-modulo', (
                         cui : beneficiariosStore.beneficiario.cui,
                         responsable : beneficiariosStore.beneficiario.responsable,
                         nombre_modulo : modulo.nombre,
-                        objeto_contrato : JSON.parse(escuela.value).objeto_contrato,
+                        objeto_contrato : escuela.value ? JSON.parse(escuela.value).objeto_contrato : null,
                         sede_oc : modulo.sede.objeto_contrato ?? null,
+                        op_principal : escuela.value ? JSON.parse(escuela.value).op_principal : null,
+                        op_parcial : escuela.value ? JSON.parse(escuela.value).op_parcial : null,
+                        sede_op_principal : modulo.sede.op_principal ?? null,
+                        sede_op_parcial : modulo.sede.op_parcial ?? null,
                     })
         
                     beneficiariosStore.resetData()
@@ -126,8 +130,12 @@ export const useBeneficiariosModuloStore = defineStore('beneficiarios-modulo', (
                         dependencia : auth.dependencia_id,
                         cui : beneficiariosStore.beneficiario.cui,
                         nombre_modulo : modulo.nombre,
-                        objeto_contrato : JSON.parse(escuela.value).objeto_contrato,
+                        objeto_contrato : escuela.value ? JSON.parse(escuela.value).objeto_contrato : null,
                         sede_oc : modulo.sede.objeto_contrato ?? null,
+                        op_principal : escuela.value ? JSON.parse(escuela.value).op_principal : null,
+                        op_parcial : escuela.value ? JSON.parse(escuela.value).op_parcial : null,
+                        sede_op_principal : modulo.sede.op_principal ?? null,
+                        sede_op_parcial : modulo.sede.op_parcial ?? null,
                     })
         
                     beneficiariosStore.resetData()
@@ -189,8 +197,12 @@ export const useBeneficiariosModuloStore = defineStore('beneficiarios-modulo', (
                             cui : beneficiariosStore.beneficiario.cui,
                             responsable : beneficiariosStore.beneficiario.responsable,
                             nombre_modulo : modulo.nombre,
-                            objeto_contrato : JSON.parse(escuela.value).objeto_contrato,
+                            objeto_contrato : escuela.value ? JSON.parse(escuela.value).objeto_contrato : null,
                             sede_oc : modulo.sede.objeto_contrato ?? null,
+                            op_principal : escuela.value ? JSON.parse(escuela.value).op_principal : null,
+                            op_parcial : escuela.value ? JSON.parse(escuela.value).op_parcial : null,
+                            sede_op_principal : modulo.sede.op_principal ?? null,
+                            sede_op_parcial : modulo.sede.op_parcial ?? null,
                         })
     
                         beneficiariosStore.resetData()
@@ -226,8 +238,12 @@ export const useBeneficiariosModuloStore = defineStore('beneficiarios-modulo', (
                             dependencia : auth.dependencia_id,
                             cui : beneficiariosStore.beneficiario.cui,
                             nombre_modulo : modulo.nombre,
-                            objeto_contrato : JSON.parse(escuela.value).objeto_contrato,
+                            objeto_contrato : escuela.value ? JSON.parse(escuela.value).objeto_contrato : null,
                             sede_oc : modulo.sede.objeto_contrato ?? null,
+                            op_principal : escuela.value ? JSON.parse(escuela.value).op_principal : null,
+                            op_parcial : escuela.value ? JSON.parse(escuela.value).op_parcial : null,
+                            sede_op_principal : modulo.sede.op_principal ?? null,
+                            sede_op_parcial : modulo.sede.op_parcial ?? null,
                         })
     
                         beneficiariosStore.resetData()

@@ -70,7 +70,7 @@ class JsonWebToken
             }
         
             if (isset($decodedPayload['exp']) && $currentTimestamp > $decodedPayload['exp']) {
-                throw new \Exception('El token ha expirado.', 401);
+                throw new \Exception('La sesión ha expirado.', 401);
             }
         
             $publicKey = openssl_pkey_get_public(file_get_contents($this->pathPublicKey));
@@ -91,7 +91,7 @@ class JsonWebToken
             
             return true;
         } catch (\Exception $e) {
-            throw new Exception('Invalid JWT: ' . $e->getMessage());
+            throw new Exception($e->getMessage());
         }
 
        

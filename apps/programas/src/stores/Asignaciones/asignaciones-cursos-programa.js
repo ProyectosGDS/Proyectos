@@ -3,11 +3,13 @@ import { useGlobalStore } from '../global'
 import { ref } from 'vue'
 import axios from 'axios'
 import { useHorariosStore } from '../Catalogos/horarios'
+import { useInstructoresStore } from '../Catalogos/instructores'
 
 export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-cursos-programa', () => {
     
     const global = useGlobalStore()
     const storeHorarios = useHorariosStore()
+    const storeInstructores = useInstructoresStore()
 
     const headers = [
         { title : 'id', key : 'id', type : 'numeric' },
@@ -15,7 +17,7 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
         { title : 'programa', key : 'programa.nombre' },
         { title : 'curso', key : 'curso.nombre' },
         { title : 'seccion', key : 'seccion', width : '10px', align : 'center' },
-        { title : 'instructor', key : 'instructor.nombre', class: 'uppercase text-xs' },
+        { title : 'instructor', key : 'instructores.nombre', class: 'uppercase text-xs' },
         { title : 'sede', key : 'sede.nombre_completo' },
         { title : 'horario', key : 'horarios.nombre_completo' },
         { title : 'temporalidad', key : 'temporalidad.nombre', class: 'uppercase text-xs', width : '10px', align : 'center' },
@@ -46,6 +48,7 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
     })
 
     const horarios = ref([])
+    const instructores = ref([])
 
     const errors = ref([])
     const modal = ref({
@@ -53,6 +56,7 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
         delete : false,
         requisitos : false,
         horarios:  false,
+        instructores:  false,
     })
 
     const fetch = async (programa_id, all = true) => {
@@ -98,6 +102,23 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
             curso.value = response.data
             horarios.value = response.data.horarios ?? []
             modal.value.horarios = true
+        } catch (error) {
+            global.manejarError(error)
+            if(error.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.show = false
+        }
+    }
+    const editInstructores = async (id) => {
+        storeInstructores.fetch()
+        loading.value.show = true
+        try {
+            const response = await axios.get('detalles-curso/' + id)
+            curso.value = response.data
+            instructores.value = response.data.instructores ?? []
+            modal.value.instructores = true
         } catch (error) {
             global.manejarError(error)
             if(error.status === 422) {
@@ -200,6 +221,25 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
         }
     }
 
+    const syncInstructores= async () => {
+        loading.value.update = true
+        try {
+            const response = await axios.post('detalles-curso/sync-instructores/' + curso.value.id, {
+                instructores : instructores.value
+            })
+            fetch(programa_id.value)
+            global.setAlert(response.data,'success')
+            resetData()
+        } catch (error) {
+            global.manejarError(error)
+            if(error.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.update = false
+        }
+    }
+
     const assign = async () => {
         loading.value.update = true
         try {
@@ -275,6 +315,10 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
         horarios.value = item
     }
 
+    const selectInstructores = (item) => {
+        instructores.value = item
+    }
+
     const resetData = () => {
         curso.value = {}
         copy_curso.value = {}
@@ -336,6 +380,7 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
         errors,
         modal,
         horarios,
+        instructores,
         
         fetch,
         show,
@@ -350,7 +395,10 @@ export const useAsignacionesCursosProgramaStore = defineStore('asignaciones-curs
         exportExcel,
         resetData,
         selectHorarios,
+        selectInstructores,
         editHorarios,
+        editInstructores,
         syncHorarios,
+        syncInstructores,
     }
 })

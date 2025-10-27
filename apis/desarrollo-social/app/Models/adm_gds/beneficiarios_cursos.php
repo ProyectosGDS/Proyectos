@@ -16,6 +16,7 @@ class beneficiarios_cursos extends Model
         'anio_inscripcion',
         'estado',
         'created_at',
+        'becado',
     ];
 
 

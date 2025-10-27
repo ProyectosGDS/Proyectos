@@ -82,6 +82,9 @@ class InscripcionesCursosController extends Controller
             'beneficiarios.*.tarifas.no_cuotas' => 'required_if:paga,S|integer',
             'beneficiarios.*.tarifas.mes_inicial' => 'required_if:paga,S|date|date_format:Y-m',
             'beneficiarios.*.tarifas.mes_final' => 'required_if:paga,S|date|date_format:Y-m|after_or_equal:tarifas.mes_inicial',
+            'beneficiarios.*.objeto_contrato' => 'required_if:beneficiarios.*.paga,S',
+            'beneficiarios.*.op_principal' => 'required_if:beneficiarios.*.paga,S',
+            'beneficiarios.*.op_parcial' => 'required_if:beneficiarios.*.paga,S',
         ]);
 
         try {
@@ -93,8 +96,7 @@ class InscripcionesCursosController extends Controller
                     if(in_array($row['dependencia'],['5','8']) && $row['paga'] ==='S') {
                             
                         $params = [
-                            // 'TIPO_ESCUELA' => $row['dependencia'] == '8' ? '1' : '2', 
-                            'TIPO_ESCUELA' => '1', 
+                            'TIPO_ESCUELA' => $row['dependencia'] == '8' ? '1' : '2', 
                             'ALUMNO' => strval($row['beneficiario']['codigo_alumno']),
                             'DPI' => $row['cui'],
                             'PRIMER_NOMBRE' => $row['beneficiario']['primer_nombre'],
@@ -138,10 +140,9 @@ class InscripcionesCursosController extends Controller
                                 if($row['tarifas']['inscripcion']) {
                                     $params = [
                                         'INTERLOCUTOR' => $ic, 
-                                        'OP_PRINCIPAL' => '4010',
-                                        'OP_PARCIAL' => '0175',
-                                        'OBJETO_CONTRATO' => 'EJ04',
-                                        // 'OBJETO_CONTRATO' => $row['sede_oc'] ?? $row['objeto_contrato'],
+                                        'OP_PRINCIPAL' => $row['sede_op_principal'] ?? $row['op_principal'],
+                                        'OP_PARCIAL' => $row['sede_op_parcial'] ?? $row['op_parcial'],
+                                        'OBJETO_CONTRATO' => $row['sede_oc'] ?? $row['objeto_contrato'],
                                         'VALOR' => strval(floatval($row['tarifas']['inscripcion'])),
                                         'PERIODO' => date('my',strtotime($this->sumMonth($row['tarifas']['mes_inicial'],0))),
                                         'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($row['tarifas']['mes_inicial'],0)),
@@ -152,22 +153,34 @@ class InscripcionesCursosController extends Controller
 
                                 }
 
-                                for ($i=0; $i <= intval($row['tarifas']['no_cuotas']) - 1 ; $i++) { 
+                                // for ($i=0; $i <= intval($row['tarifas']['no_cuotas']) - 1 ; $i++) { 
                                 
+                                    // $params = [
+                                    //     'INTERLOCUTOR' => $ic, 
+                                    //     'OP_PRINCIPAL' => $row['sede_op_principal'] ?? $row['op_principal'],
+                                    //     'OP_PARCIAL' => $row['sede_op_parcial'] ?? $row['op_parcial'],
+                                    //     'OBJETO_CONTRATO' => $row['sede_oc'] ?? $row['objeto_contrato'],
+                                    //     'VALOR' => $row['edad'] > 18 ? strval(floatval($row['tarifas']['tarifa_mayor'])) : strval(floatval($row['tarifas']['tarifa_mayor'])),
+                                    //     'PERIODO' => date('my',strtotime($this->sumMonth($row['tarifas']['mes_inicial'],$i))),
+                                    //     'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($row['tarifas']['mes_inicial'],$i)),
+                                    //     'DESCRIPCION' => 'PAGO CUOTA '. mb_strtoupper($row['nombre_curso']),
+                                    //     'LLAVE_RECONCILIACION' => 'OCT2025'
+                                    // ];
+
                                     $params = [
                                         'INTERLOCUTOR' => $ic, 
-                                        'OP_PRINCIPAL' => '4010',
-                                        'OP_PARCIAL' => '0175',
-                                        'OBJETO_CONTRATO' => 'EJ04',
-                                        // 'OBJETO_CONTRATO' => $row['sede_oc'] ?? $row['objeto_contrato'],
-                                        'VALOR' => $row['edad'] > 18 ? strval(floatval($row['tarifas']['tarifa_mayor'])) : strval(floatval($row['tarifas']['tarifa_mayor'])),
-                                        'PERIODO' => date('my',strtotime($this->sumMonth($row['tarifas']['mes_inicial'],$i))),
-                                        'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($row['tarifas']['mes_inicial'],$i)),
+                                        'OP_PRINCIPAL' => $row['sede_op_principal'] ?? $row['op_principal'],
+                                        'OP_PARCIAL' => $row['sede_op_parcial'] ?? $row['op_parcial'],
+                                        'OBJETO_CONTRATO' => $row['sede_oc'] ?? $row['objeto_contrato'],
+                                        'VALOR' => $row['edad'] > 18 ? strval(floatval($row['tarifas']['tarifa_mayor'])) : strval(floatval($row['tarifas']['tarifa_menor'])),
+                                        'PERIODO' => date('my',strtotime($this->sumMonth($row['tarifas']['mes_inicial'],0))),
+                                        'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($row['tarifas']['mes_inicial'],0)),
                                         'DESCRIPCION' => 'PAGO CUOTA '. mb_strtoupper($row['nombre_curso']),
                                         'LLAVE_RECONCILIACION' => 'OCT2025'
                                     ];
+
                                     SAP::rfc_name('Z_ZFUN_PSCD_00003_005')->params($params);
-                                } 
+                                // } 
                             }
                         }   
                     } 
@@ -234,6 +247,23 @@ class InscripcionesCursosController extends Controller
         $timestamp = strtotime($fechaYm . "-01");
         $ultimoDia = date("t", $timestamp);
         return date("Ym", $timestamp) . $ultimoDia;
+    }
+
+    public function asignar_beca(beneficiarios_cursos $inscripcion) {
+        try {
+            $inscripcion->becado = 1;
+            $inscripcion->save();
+
+            return response([
+                'message' => 'Beca asignada correctamente',
+            ]);
+
+        } catch (\Throwable $th) {
+            return response([
+                'error' => 'Error en asignar beca',
+                'message' => $th->getMessage()
+            ]);
+        }
     }
 
 }

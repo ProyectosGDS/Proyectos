@@ -5,6 +5,7 @@ import { useCursosModuloStore } from '@/stores/Asignaciones/cursos-modulo'
 import { useHorariosStore } from '../Catalogos/horarios'
 import { ref } from 'vue'
 import axios from 'axios'
+import { useInstructoresStore } from '../Catalogos/instructores'
 
 export const useAsignacionesCursosModuloStore = defineStore('asignaciones-cursos-modulo', () => {
     
@@ -12,6 +13,7 @@ export const useAsignacionesCursosModuloStore = defineStore('asignaciones-cursos
     const programas = useProgramasStore()
     const cursosModulo = useCursosModuloStore()
     const storeHorarios = useHorariosStore()
+    const storeInstructores = useInstructoresStore()
 
     const headers = [
         { title : 'id', key : 'detalle_curso_id', type : 'numeric' },
@@ -19,9 +21,9 @@ export const useAsignacionesCursosModuloStore = defineStore('asignaciones-cursos
         { title : 'modulo', key : 'modulo.nombre' },
         { title : 'curso', key : 'curso.curso.nombre' },
         { title : 'seccion', key : 'curso.seccion', width : '10px', align : 'center' },
-        { title : 'instructor', key : 'curso.instructor.nombre', class: 'uppercase text-xs' },
+        { title : 'instructor', key : 'curso.instructores.nombre', class: 'uppercase text-xs' },
         { title : 'sede', key : 'curso.sede.nombre_completo' },
-        { title : 'horario', key : 'curso.horario.nombre_completo' },
+        { title : 'horario', key : 'curso.horarios.nombre_completo' },
         { title : 'temporalidad', key : 'curso.temporalidad.nombre', class: 'uppercase text-xs', width : '10px', align : 'center' },
         { title : 'modalidad', key : 'curso.modalidad', width : '10px', align : 'center' },
         { title : '', key : 'actions', width : '10px', align : 'center' },
@@ -31,6 +33,7 @@ export const useAsignacionesCursosModuloStore = defineStore('asignaciones-cursos
     const modulos = ref([])
     const cursos = ref([])
     const horarios = ref([])
+    const instructores = ref([])
     const copy_cursos = ref([])
     const curso = ref({})
     const copy_curso = ref({})
@@ -46,6 +49,7 @@ export const useAsignacionesCursosModuloStore = defineStore('asignaciones-cursos
         delete : false,
         disabled : false,
         horarios : false,
+        instructores : false,
     })
 
     const fetch = async (modulo_id) => {
@@ -73,6 +77,24 @@ export const useAsignacionesCursosModuloStore = defineStore('asignaciones-cursos
             curso.value = response.data
             copy_curso.value = JSON.parse(JSON.stringify(response.data))
             modal.value.edit = true
+        } catch (error) {
+            global.manejarError(error)
+            if(error.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.show = false
+        }
+    }
+
+    const showInstructores = async (id) => {
+        storeInstructores.fetch()
+        loading.value.show = true
+        try {
+            const response = await axios.get('detalles-curso/' + id)
+            curso.value = response.data
+            instructores.value = response.data.instructores
+            modal.value.instructores = true
         } catch (error) {
             global.manejarError(error)
             if(error.status === 422) {
@@ -196,6 +218,27 @@ export const useAsignacionesCursosModuloStore = defineStore('asignaciones-cursos
         }
     }
 
+    const syncInstructores = async () => {
+        loading.value.update = true
+        try {
+            if(global.hasChanged(curso.value, copy_curso.value)) {
+                const response = await axios.post('detalles-curso/sync-instructores/' + curso.value.id, {
+                    instructores : instructores.value
+                })
+                fetch(cursosModulo.modulo.id)
+                global.setAlert(response.data,'success')
+            }
+            resetData()
+        } catch (error) {
+            global.manejarError(error)
+            if(error.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.update = false
+        }
+    }
+
     const validateDuplicateCourseList = () => {
 
         let error = false
@@ -272,6 +315,9 @@ export const useAsignacionesCursosModuloStore = defineStore('asignaciones-cursos
     const selectHorario = (item) => {
         horarios.value = item
     }
+    const selectInstructores = (item) => {
+        instructores.value = item
+    }
     
     return {
         headers,
@@ -280,6 +326,7 @@ export const useAsignacionesCursosModuloStore = defineStore('asignaciones-cursos
         cursos,
         curso,
         horarios,
+        instructores,
         copy_curso,
         loading,
         errors,
@@ -288,6 +335,7 @@ export const useAsignacionesCursosModuloStore = defineStore('asignaciones-cursos
         fetch,
         show,
         showHorarios,
+        showInstructores,
         store,
         update,
         disabledCurso,
@@ -298,6 +346,8 @@ export const useAsignacionesCursosModuloStore = defineStore('asignaciones-cursos
         resetData,
         exportExcel,
         selectHorario,
+        selectInstructores,
         syncHorarios,
+        syncInstructores,
     }
 })
