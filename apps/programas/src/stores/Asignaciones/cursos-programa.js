@@ -45,7 +45,7 @@ export const useCursosProgramaStore = defineStore('cursos-programa', () => {
     const errorsDetails = ref([])
     const modal = ref({
         curso: false,
-        instructor: false,
+        instructores: false,
         sede: false,
         horarios: false,
     })

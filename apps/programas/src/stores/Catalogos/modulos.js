@@ -159,6 +159,7 @@ export const useModulosStore = defineStore('modulos', () => {
 
     const edit = (item) => {
         modulo.value = item
+        modulo.value.tarifas = item.tarifas ?? {}
         copy_modulo.value = JSON.parse(JSON.stringify(item))
         modal.value.edit = true
     }

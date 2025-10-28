@@ -36,20 +36,20 @@
         searchables.push(el.key.toLowerCase().trim())
     })
 
-    const mes_final = (mes_inicial,no_cuotas) => {
-        const [year, month] = mes_inicial.split("-").map(Number);
-        const date = new Date(year, month - 1, 1);
-        const cuotas = parseInt(no_cuotas)
-        date.setMonth(date.getMonth() + (cuotas - 1));
-        const newYear = date.getFullYear();
-        const newMonth = String(date.getMonth() + 1).padStart(2, "0");
+    // const mes_final = (mes_inicial,no_cuotas) => {
+    //     const [year, month] = mes_inicial.split("-").map(Number);
+    //     const date = new Date(year, month - 1, 1);
+    //     const cuotas = parseInt(no_cuotas)
+    //     date.setMonth(date.getMonth() + (cuotas - 1));
+    //     const newYear = date.getFullYear();
+    //     const newMonth = String(date.getMonth() + 1).padStart(2, "0");
 
-        return `${newYear}-${newMonth}`;
-    }
+    //     return `${newYear}-${newMonth}`;
+    // }
 
-    function calc_mes_final_edit (mes_inicial,no_cuotas) {
-        asignaciones.curso.tarifas.mes_final = mes_final(mes_inicial, no_cuotas)
-    }
+    // function calc_mes_final_edit (mes_inicial,no_cuotas) {
+    //     asignaciones.curso.tarifas.mes_final = mes_final(mes_inicial, no_cuotas)
+    // }
 
 
     const searching_cursos = computed(() => {
@@ -75,13 +75,13 @@
         catalogos.getTemporalidadesTarifas()
     })
 
-    watchEffect(() => {
-        if(store.curso.no_cuotas && store.curso.mes_inicial) {
-            store.curso.mes_final = mes_final(store.curso.mes_inicial,store.curso.no_cuotas)
-        } else { 
-            store.curso.mes_final = null
-        }
-    })
+    // watchEffect(() => {
+    //     if(store.curso.no_cuotas && store.curso.mes_inicial) {
+    //         store.curso.mes_final = mes_final(store.curso.mes_inicial,store.curso.no_cuotas)
+    //     } else { 
+    //         store.curso.mes_final = null
+    //     }
+    // })
 
 </script>
 
@@ -164,7 +164,7 @@
                     </div>
                     <Input option="label" title="Cantidad de cuotas" type="number" min="1" max="12" v-model="store.curso.no_cuotas" :error="store.errors.hasOwnProperty('no_cuotas')" />
                     <Input option="label" title="Mes inicial" type="month" v-model="store.curso.mes_inicial" :error="store.errors.hasOwnProperty('mes_inicial')" />
-                    <Input option="label" title="Mes final" type="month" v-model="store.curso.mes_final" :error="store.errors.hasOwnProperty('mes_final')" disabled />
+                    <!-- <Input option="label" title="Mes final" type="month" v-model="store.curso.mes_final" :error="store.errors.hasOwnProperty('mes_final')" disabled /> -->
                 </div>
                 <Validate-Errors :errors="store.errorsDetails" v-if="store.errorsDetails != 0" />
                 <div class="flex justify-center gap-4">
@@ -460,9 +460,9 @@
                         <option v-for="tempo in catalogos.tempo_tarifas">{{ tempo }}</option>
                     </Input>
                 </div>
-                <Input @change="calc_mes_final_edit(asignaciones.curso.tarifas.mes_inicial, asignaciones.curso.tarifas.no_cuotas)" option="label" title="Cantidad de cuotas" type="number" min="1" max="12" v-model="asignaciones.curso.tarifas.no_cuotas" :error="asignaciones.errors.hasOwnProperty('tarifas.no_cuotas')" />
-                <Input @change="calc_mes_final_edit(asignaciones.curso.tarifas.mes_inicial, asignaciones.curso.tarifas.no_cuotas)" option="label" title="Mes inicial" type="month" v-model="asignaciones.curso.tarifas.mes_inicial" :error="asignaciones.errors.hasOwnProperty('tarifas.mes_inicial')" />
-                <Input option="label" title="Mes final" type="month" v-model="asignaciones.curso.tarifas.mes_final" :error="asignaciones.errors.hasOwnProperty('tarifas.mes_final')" disabled />
+                <Input option="label" title="Cantidad de cuotas" type="number" min="1" max="12" v-model="asignaciones.curso.tarifas.no_cuotas" :error="asignaciones.errors.hasOwnProperty('tarifas.no_cuotas')" />
+                <Input option="label" title="Mes inicial" type="month" v-model="asignaciones.curso.tarifas.mes_inicial" :error="asignaciones.errors.hasOwnProperty('tarifas.mes_inicial')" />
+                <!-- <Input option="label" title="Mes final" type="month" v-model="asignaciones.curso.tarifas.mes_final" :error="asignaciones.errors.hasOwnProperty('tarifas.mes_final')" disabled /> -->
             </div>
         </div>
         <Validate-Errors :errors="asignaciones.errors" v-if="asignaciones.errors != 0" />

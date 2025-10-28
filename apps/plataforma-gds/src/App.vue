@@ -7,8 +7,8 @@
 	const auth = useAuthStore()
 	const global = useGlobalStore()
 
-	onMounted(() => {
-		if(window.location.pathname === '/login') return
+	onMounted(() => {		
+		if(window.location.pathname === '/plataforma-gds/login') return
 		auth.verifyAuth()
 	})
 

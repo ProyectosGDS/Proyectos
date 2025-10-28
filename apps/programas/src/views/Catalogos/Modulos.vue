@@ -36,14 +36,6 @@
         catalogos.getTemporalidadesTarifas()
     })
 
-    watchEffect(() => {
-        if(store.modulo.tarifas.no_cuotas && store.modulo.tarifas.mes_inicial) {
-            store.modulo.tarifas.mes_final = mes_final(store.modulo.tarifas.mes_inicial,store.modulo.tarifas.no_cuotas)
-        } else { 
-            store.modulo.tarifas.mes_final = null
-        }
-    })
-
 </script>
 
 <template>
@@ -162,7 +154,7 @@
                 </div>
                 <Input option="label" title="Cantidad de cuotas" type="number" min="1" max="12" v-model="store.modulo.tarifas.no_cuotas" :error="store.errors.hasOwnProperty('tarifas.no_cuotas')" />
                 <Input option="label" title="Mes inicial" type="month" v-model="store.modulo.tarifas.mes_inicial" :error="store.errors.hasOwnProperty('tarifas.mes_inicial')" />
-                <Input option="label" title="Mes final" type="month" v-model="store.modulo.tarifas.mes_final" :error="store.errors.hasOwnProperty('tarifas.mes_final')" />
+                <!-- <Input option="label" title="Mes final" type="month" v-model="store.modulo.tarifas.mes_final" :error="store.errors.hasOwnProperty('tarifas.mes_final')" /> -->
             </div>
         </div>
         <Validate-Errors :errors="store.errors" v-if="store.errors != 0" />
@@ -253,7 +245,7 @@
                 </div>
                 <Input option="label" title="Cantidad de cuotas" type="number" min="1" max="12" v-model="store.modulo.tarifas.no_cuotas" :error="store.errors.hasOwnProperty('tarifas.no_cuotas')" />
                 <Input option="label" title="Mes inicial" type="month" v-model="store.modulo.tarifas.mes_inicial" :error="store.errors.hasOwnProperty('tarifas.mes_inicial')" />
-                <Input option="label" title="Mes final" type="month" v-model="store.modulo.tarifas.mes_final" :error="store.errors.hasOwnProperty('tarifas.mes_final')" />
+                <!-- <Input option="label" title="Mes final" type="month" v-model="store.modulo.tarifas.mes_final" :error="store.errors.hasOwnProperty('tarifas.mes_final')" /> -->
             </div>
         </div>
         <Validate-Errors :errors="store.errors" v-if="store.errors != 0" />

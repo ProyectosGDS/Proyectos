@@ -9,15 +9,22 @@ export const useCargosStore = defineStore('cargos', () => {
 
 
     const programasEscuela = ref([])
+    const anio_mes = ref(null)
+    const escuela_id = ref(null)
+    const programasGenerados = ref([])
     const loading = ref({
-        programasEscuela : false
+        programasEscuela : false,
+        cargosPrograma : false,
     })
 
-    const getProgramasEscuela = async (id) => {
+
+    const errors = ref([])
+
+    const getProgramasEscuela = async () => {
         loading.value.programasEscuela = true
         programasEscuela.value = []
         try {
-            const response = await axios.get('programas/programas_escuela/' + id)
+            const response = await axios.get('programas/programas_escuela/' + escuela_id.value)
             programasEscuela.value = response.data.programas_escuela
         } catch (error) {
             global.manejarError(error)
@@ -26,10 +33,30 @@ export const useCargosStore = defineStore('cargos', () => {
         }
     }
 
+    const generarCargosPrograma = async (programa_id) => {
+        loading.value.cargosPrograma = true
+        programasGenerados.value.push(programa_id)
+        try {
+            const response = await axios.post('cargos/generar-partidas/'+programa_id,{
+                anio_mes : anio_mes.value
+            })
+            global.setAlert(response.data.message,'success')
+        } catch (error) {
+            global.manejarError(error)
+        } finally {
+            loading.value.cargosPrograma = false
+        }
+    }
+
     return {
         programasEscuela,
+        anio_mes,
+        escuela_id,
+        programasGenerados,
         loading,
+        errors,
 
         getProgramasEscuela,
+        generarCargosPrograma,
     }
 })

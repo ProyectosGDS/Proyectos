@@ -42,7 +42,7 @@ class modulos extends Model
 
     public function beneficiarios() {
         return $this->belongsToMany(beneficiarios::class,'beneficiarios_modulos','modulo_id','beneficiario_id')
-            ->where('BENEFICIARIOS_MODULOS.estado','A');
+            ->where('BENEFICIARIOS_MODULOS.estado','A')->withPivot('becado','anio_inscripcion');
     }
 
     public function tarifas() {

@@ -208,7 +208,7 @@ class ProgramasController extends Controller
                             'temporalidad_tarifa' => 'required|string',
                             'no_cuotas' => 'required|integer|min:1',
                             'mes_inicial' => 'required|date|date_format:Y-m',
-                            'mes_final' => 'required|date|date_format:Y-m|after_or_equal:mes_inicial',
+                            // 'mes_final' => 'required|date|date_format:Y-m|after_or_equal:mes_inicial',
                         ]);
                     }
                 }
@@ -254,7 +254,7 @@ class ProgramasController extends Controller
                                 'temporalidad' => $curso['temporalidad_tarifa'],
                                 'no_cuotas' => $curso['no_cuotas'],
                                 'mes_inicial' => $curso['mes_inicial'],
-                                'mes_final' => $curso['mes_final'],
+                                // 'mes_final' => $curso['mes_final'],
                             ]);
                         }
                     }

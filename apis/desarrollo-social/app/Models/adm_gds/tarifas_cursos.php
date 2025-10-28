@@ -11,7 +11,7 @@ class tarifas_cursos extends Model
     public $timestamps = false;
     protected $casts = [
         'inscripcion' => 'decimal:2',
-        'tarifa_menos' => 'decimal:2',
+        'tarifa_menor' => 'decimal:2',
         'tarifa_mayor' => 'decimal:2',
     ];
 

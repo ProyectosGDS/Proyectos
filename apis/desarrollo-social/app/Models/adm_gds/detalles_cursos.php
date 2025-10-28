@@ -68,7 +68,8 @@ class detalles_cursos extends Model
     }
 
     public function beneficiarios() {
-        return $this->belongsToMany(beneficiarios::class,'beneficiarios_cursos','detalle_curso_id','beneficiario_id')->where('BENEFICIARIOS_CURSOS.estado','A');
+        return $this->belongsToMany(beneficiarios::class,'beneficiarios_cursos','detalle_curso_id','beneficiario_id')
+            ->where('BENEFICIARIOS_CURSOS.estado','A')->withPivot('becado','anio_inscripcion');
     }
 
     public function  requisitos() {
