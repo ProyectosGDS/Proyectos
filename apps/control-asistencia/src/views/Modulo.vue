@@ -1,5 +1,5 @@
 <script setup>
-    import { computed, onBeforeMount } from 'vue'
+    import { computed, onMounted } from 'vue'
     import { useAuthStore } from '@/stores/auth'
     import { useCatalogosStore } from '@/stores/catalogos'
     import { useModuloStore } from '@/stores/modulo'
@@ -20,10 +20,10 @@
       return yearsList
     })
 
-    onBeforeMount(() => {
+    onMounted(() => {
 
-        if(auth.dependencia_id && auth.dependencia_id == 5) {
-            catalogos.getEscuelas()
+        if(["5","8"].includes(auth.dependencia_id)) {
+            catalogos.getEscuelas(auth.dependencia_id)
         }else{
             catalogos.getProgramas()
         }
@@ -39,14 +39,14 @@
                 </Input>
                 <Input @change="store.getBeneficiariosModulo()" option="label" title="*Seleccione fecha de asistencia" type="date" v-model="store.date" />
                 <div class="flex gap-3">
-                    <Input v-if="auth.user.dependencia_id == 5" @change="catalogos.getProgramasFromEscuelas(store.escuela)" v-model="store.escuela" option="select" title="*Seleccione una escuela">
+                    <Input v-if="['5','8'].includes(auth.dependencia_id)" @change="catalogos.getProgramasFromEscuelas(store.escuela)" v-model="store.escuela" option="select" title="*Seleccione una escuela">
                         <option selected></option>
-                        <option v-for="escuela in catalogos.escuelas" :value="escuela">{{ escuela }}</option>
+                        <option v-for="escuela in catalogos.escuelas" :value="escuela.id">{{ escuela.nombre }}</option>
                     </Input>
                     <Input @change="store.resetData()" v-model="catalogos.programa" option="select" title="*Seleccione programa">
                         <option selected></option>
                         <template v-for="programa in catalogos.programas">
-                            <option v-if="programa.modulos.length && programa.estado == 'A'" :value="programa.id">
+                            <option v-if="programa.estado == 'A'" :value="programa.id">
                                 {{ programa.nombre }}
                             </option>
                         </template>

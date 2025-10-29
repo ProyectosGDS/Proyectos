@@ -28,8 +28,10 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
     const errorsDetails = ref([])
 
     const openCursos = () => {
-        detalles.value = Object.keys(curso.value).length ? [curso.value] : []
-        modal.value.cursos = true
+        if(inscripcion.programa_id) {
+            detalles.value = Object.keys(curso.value).length ? [curso.value] : []
+            modal.value.cursos = true
+        }
     }
 
     const selectedCurso = () => {

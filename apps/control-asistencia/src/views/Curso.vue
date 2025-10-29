@@ -1,5 +1,5 @@
 <script setup>
-    import { computed, onBeforeMount } from 'vue'
+    import { computed, onMounted } from 'vue'
     import { useAuthStore } from '@/stores/auth'
     import { useCatalogosStore } from '@/stores/catalogos'
     import { useCursoStore } from '@/stores/curso'
@@ -20,10 +20,10 @@
       return yearsList
     })
 
-    onBeforeMount(() => {
+    onMounted(() => {
         
-        if(auth.dependencia_id && auth.dependencia_id == 5) {
-            catalogos.getEscuelas()
+        if(["5","8"].includes(auth.dependencia_id)) {
+            catalogos.getEscuelas(auth.dependencia_id)
         }else{
             catalogos.getProgramas()
         }
@@ -39,9 +39,9 @@
                 </Input>
                 <Input @change="store.getBeneficiariosCurso()" option="label" title="*Seleccione fecha de asistencia" type="date" v-model="store.date" />
                 <div class="flex gap-3">
-                    <Input v-if="auth.user.dependencia_id == 5" @change="catalogos.getProgramasFromEscuelas(store.escuela)" v-model="store.escuela" option="select" title="*Seleccione una escuela">
+                    <Input v-if="['5','8'].includes(auth.dependencia_id)" @change="catalogos.getProgramasFromEscuelas(store.escuela   )" v-model="store.escuela" option="select" title="*Seleccione una escuela">
                         <option selected></option>
-                        <option v-for="escuela in catalogos.escuelas" :value="escuela">{{ escuela }}</option>
+                        <option v-for="escuela in catalogos.escuelas" :value="escuela.id">{{ escuela.nombre }}</option>
                     </Input>
                     <Input @change="store.resetData()" v-model="catalogos.programa" option="select" title="*Seleccione programa">
                         <option selected></option>
@@ -72,12 +72,14 @@
                     </template>
                     <template #tbody>
                         <tr v-for="beneficiario in catalogos.beneficiarios" :key="beneficiario.cui">
-                            <td>{{ beneficiario.beneficiario.id }}</td>
-                            <td>{{ beneficiario.beneficiario.cui }}</td>
-                            <td>{{ beneficiario.beneficiario.nombre_completo }}</td>
-                            <td class="flex justify-center">
-                                <input type="checkbox" v-model="store.asistencia" class="h-8 w-8 cursor-pointer" :value="beneficiario.beneficiario.id" >
-                            </td>
+                            <template v-if="beneficiario.beneficiario">
+                                <td>{{ beneficiario.beneficiario.id }}</td>
+                                <td>{{ beneficiario.beneficiario.cui }}</td>
+                                <td class="uppercase">{{ beneficiario.beneficiario.nombre_completo }}</td>
+                                <td class="flex justify-center">
+                                    <input type="checkbox" v-model="store.asistencia" class="h-8 w-8 cursor-pointer" :value="beneficiario.beneficiario.id" >
+                                </td>
+                            </template>
                         </tr>
                         <tr v-if="catalogos.beneficiarios.length === 0 ">
                             <td align="center" colspan="4">

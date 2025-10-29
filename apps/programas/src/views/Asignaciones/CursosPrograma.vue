@@ -407,7 +407,7 @@
                 </template>
             </Input>
             <Select v-model="asignaciones.curso.curso_id" title="*seleccione curso" :items="catalogos.catalogos_curso.cursos" :fields="['id','nombre']" :error="asignaciones.errors.hasOwnProperty('curso_id')" />
-            <Select v-model="asignaciones.curso.instructor_id" title="*seleccione instructor" :items="catalogos.catalogos_curso.instructores" :fields="['id','nombre']" :error="asignaciones.errors.hasOwnProperty('instructor_id')" />
+            <!-- <Select v-model="asignaciones.curso.instructor_id" title="*seleccione instructor" :items="catalogos.catalogos_curso.instructores" :fields="['id','nombre']" :error="asignaciones.errors.hasOwnProperty('instructor_id')" /> -->
             <Select v-model="asignaciones.curso.sede_id" title="*seleccione sede" :items="catalogos.catalogos_curso.sedes" :fields="['id','nombre_completo']" :error="asignaciones.errors.hasOwnProperty('sede_id')" />
             <Input v-model="asignaciones.curso.temporalidad_id" option="select" title="*seleccione temporalidad" :error="asignaciones.errors.hasOwnProperty('temporalidad_id')">
                 <option value=""></option>

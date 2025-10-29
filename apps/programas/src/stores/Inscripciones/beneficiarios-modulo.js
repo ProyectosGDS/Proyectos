@@ -31,9 +31,9 @@ export const useBeneficiariosModuloStore = defineStore('beneficiarios-modulo', (
         modulos.fetch(inscripcion.programa_id)
     }
 
-    const selectedModulo = () => {
+    const selectedModulo = async () => {
         inscripcion.beneficiarios = []
-        inscripcion.fetch()
+        await inscripcion.fetch()
         
     }
 

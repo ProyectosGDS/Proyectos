@@ -13,6 +13,7 @@ export const useModuloStore = defineStore('modulo', () => {
     const asistencia = ref([])
     const year = ref(new Date().getFullYear())
     const date = ref(new Date().toISOString().slice(0, 10))
+    const escuela = ref(null)
     const modal = ref({
         modulos : false,
     })
@@ -140,6 +141,7 @@ export const useModuloStore = defineStore('modulo', () => {
         asistencia,
         year,
         date,
+        escuela,
         modal,
         loading,
 

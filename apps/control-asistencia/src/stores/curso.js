@@ -13,6 +13,7 @@ export const useCursoStore = defineStore('curso', () => {
     const asistencia = ref([])
     const year = ref(new Date().getFullYear())
     const date = ref(new Date().toISOString().slice(0, 10))
+    const escuela = ref(null)
     const modal = ref({
         cursos : false,
     })
@@ -147,6 +148,7 @@ export const useCursoStore = defineStore('curso', () => {
         asistencia,
         year,
         date,
+        escuela,
         modal,
         loading,
         label_curso,

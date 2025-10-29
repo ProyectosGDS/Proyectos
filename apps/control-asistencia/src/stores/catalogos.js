@@ -76,10 +76,14 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         }
     }
 
-    const getEscuelas = async () => {
+    const getEscuelas = async (dependencia_id) => {
         loading.value.escuelas = true
         try {                
-            const response = await axios.get('programas/get-escuelas')
+            const response = await axios.get('escuelas',{
+                params : {
+                    dependencia_id : dependencia_id
+                }
+            })
             escuelas.value = response.data
         } catch (error) {
             global.manejarError(error)
@@ -93,13 +97,13 @@ export const useCatalogosStore = defineStore('catalogos', () => {
 
     const getProgramasFromEscuelas = async (escuela) => {
         programas.value = []
-        loading.value.programas = true
+        loading.value.fetch = true
         try {
             if(!escuela){
                 return
             }
-            const response = await axios.get('programas/escuela/'+ escuela )
-            programas.value = response.data
+            const response = await axios.get('escuelas/'+ escuela )
+            programas.value = response.data.programas
         } catch (error) {
             programas.value = []
             global.manejarError(error)
@@ -107,7 +111,7 @@ export const useCatalogosStore = defineStore('catalogos', () => {
                 errors.value = error.response.data.errors
             }
         } finally {
-            loading.value.programas = false
+            loading.value.fetch = false
         }
     }
 

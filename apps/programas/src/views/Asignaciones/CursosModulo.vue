@@ -255,7 +255,7 @@
                 </div>
             </div>
             <Select v-model="asignaciones.curso.curso_id" title="*seleccione curso" :items="catalogos.catalogos_curso.cursos" :fields="['id','nombre']" :error="asignaciones.errors.hasOwnProperty('curso_id')" />
-            <Select v-model="asignaciones.curso.instructor_id" title="*seleccione instructor" :items="catalogos.catalogos_curso.instructores" :fields="['id','nombre']" :error="asignaciones.errors.hasOwnProperty('instructor_id')" />
+            <!-- <Select v-model="asignaciones.curso.instructor_id" title="*seleccione instructor" :items="catalogos.catalogos_curso.instructores" :fields="['id','nombre']" :error="asignaciones.errors.hasOwnProperty('instructor_id')" /> -->
             <div>
                 <fieldset class="border border-gray-200 text-color-1 p-4 rounded-lg">
                     <legend class="px-2 font-medium text-color-4">HORARIOS</legend>
