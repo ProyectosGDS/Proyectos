@@ -81,7 +81,7 @@ class InscripcionesModulosController extends Controller
             'beneficiarios.*.tarifas.tarifa_mayor' => 'required_if:paga,S',
             'beneficiarios.*.tarifas.no_cuotas' => 'required_if:paga,S|integer',
             'beneficiarios.*.tarifas.mes_inicial' => 'required_if:paga,S|date|date_format:Y-m',
-            'beneficiarios.*.tarifas.mes_final' => 'required_if:paga,S|date|date_format:Y-m|after_or_equal:tarifas.mes_inicial',
+            // 'beneficiarios.*.tarifas.mes_final' => 'required_if:paga,S|date|date_format:Y-m|after_or_equal:tarifas.mes_inicial',
         ]);
 
         try {
