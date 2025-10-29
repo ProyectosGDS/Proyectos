@@ -140,7 +140,7 @@
     } , { cache: true } )
 
     const nombre_modulo = (item) => {
-        let label = item.sede.nombre+' - '+item.nombre
+        let label = item.id+' - '+item.nombre
 
         if(item.seccion != null) {            
             label += ' - ' + item.seccion
