@@ -287,7 +287,7 @@ class ProgramasController extends Controller
                 ->join('SEDES S','DC.SEDE_ID','=','S.ID')
                 ->join('CURSOS C','DC.CURSO_ID','=','C.ID')
                 ->join('PROGRAMAS P','DC.PROGRAMA_ID','=','P.ID')
-                ->join('ESCUELAS E','P.ESCUELA_ID','=','E.ID')
+                ->leftJoin('ESCUELAS E','P.ESCUELA_ID','=','E.ID')
                 ->join('DEPENDENCIAS D','P.DEPENDENCIA_ID','=','D.ID')
                 ->select(
                     'BC.ID AS INSCRIPCION_ID',
@@ -327,7 +327,6 @@ class ProgramasController extends Controller
                 ->join('DETALLES_ACTIVIDADES DA','BA.DETALLE_ACTIVIDAD_ID','=','DA.ID')
                 ->join('ACTIVIDADES A','DA.ACTIVIDAD_ID','=','A.ID')
                 ->join('PROGRAMAS P','DA.PROGRAMA_ID','=','P.ID')
-                ->join('ESCUELAS E','P.ESCUELA_ID','=','E.ID')
                 ->join('DEPENDENCIAS D','P.DEPENDENCIA_ID','=','D.ID')
                 ->join('TIPOS_ACTIVIDADES TA','DA.TIPO_ACTIVIDAD_ID','=','TA.ID')
                 ->select(
@@ -340,7 +339,7 @@ class ProgramasController extends Controller
                     DB::raw("TRUNC(MONTHS_BETWEEN(SYSDATE, B.FECHA_NACIMIENTO) / 12) AS EDAD"),
                     'DO.ZONA_ID AS ZONA',
                     'B.ESTADO AS STATUS',
-                    'E.NOMBRE AS ESCUELA',
+                    DB::raw("NULL AS ESCUELA"),
                     'P.NOMBRE AS PROGRAMA',
                     'D.NOMBRE AS DEPENDENCIA',
                     'DA.ID AS ID_MODULO_CURSO',
@@ -367,7 +366,7 @@ class ProgramasController extends Controller
                 ->join('MODULOS M','BM.MODULO_ID','=','M.ID')
                 ->join('SEDES S','M.SEDE_ID','=','S.ID')
                 ->join('PROGRAMAS P','M.PROGRAMA_ID','=','P.ID')
-                ->join('ESCUELAS E','P.ESCUELA_ID','=','E.ID')
+                ->leftJoin('ESCUELAS E','P.ESCUELA_ID','=','E.ID')
                 ->join('DEPENDENCIAS D','P.DEPENDENCIA_ID','=','D.ID')
                 ->select(
                     'BM.ID AS INSCRIPCION_ID',
