@@ -203,7 +203,7 @@
                     <Input v-model="beneficiarios.beneficiario.nombre_completo" option="label" title="Beneficiario" readonly disabled />
                 </div>
                 <div v-else>
-                    <div v-if="[4,5].includes(beneficiarios.codeFetchBeneficiario)">
+                    <div v-if="[7,4,5].includes(beneficiarios.codeFetchBeneficiario)">
                         <DatosPersonales />
                         <Domicilio />
                         <DatosAcademicos />
@@ -219,7 +219,7 @@
                         <Button @click="store.addBeneficiario()" icon="fas fa-plus" class="btn-primary" />
                     </Tool-Tip>
                     <Tool-Tip v-else message="Agregar beneficiario al modulo" class="-mt-6 text-color-4">
-                        <Button v-if="[4,5].includes(beneficiarios.codeFetchBeneficiario)" @click="store.saveAddBeneficiario()" icon="fas fa-save" text="Guardar y agregar beneficiario" class="btn-primary" :loading="beneficiarios.loading.store" />
+                        <Button v-if="[7,4,5].includes(beneficiarios.codeFetchBeneficiario)" @click="store.saveAddBeneficiario()" icon="fas fa-save" text="Guardar y agregar beneficiario" class="btn-primary" :loading="beneficiarios.loading.store" />
                     </Tool-Tip>
                 </div>
             </div>

@@ -307,7 +307,7 @@ class BeneficiariosController extends Controller
                 'message' =>  $th->getMessage(),
                 'success' => false,
                 'data' => [],
-                'code' => 1,
+                'code' => $th->getMessage() === 'Respuesta no esperada de RENAP: EL CUI INGRESADO NO CORRESPONDE A UNA PERSONA MAYOR DE EDAD' ? 7 : 1,
             ]);
         }
     }
@@ -454,7 +454,7 @@ class BeneficiariosController extends Controller
                 'message' => $th->getMessage(),
                 'success' => false,
                 'data' => [],
-                'code' => 1,
+                'code' => $th->getMessage() === 'Respuesta no esperada de RENAP: EL CUI INGRESADO NO CORRESPONDE A UNA PERSONA MAYOR DE EDAD' ? 7 : 1,
             ]);
         }
     }

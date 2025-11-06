@@ -186,7 +186,7 @@
             </div>
             <small :class="store.success ? 'text-green-400' : 'text-red-400'">{{ store.messageCui }}</small>
         </div>
-        <div v-if="[4,5].includes(store.codeFetchBeneficiario)">
+        <div v-if="[7,4,5].includes(store.codeFetchBeneficiario)">
             <DatosPersonales />
             <Domicilio />
             <DatosMedicos />
@@ -197,7 +197,7 @@
         <Validate-Errors :errors="store.errors" v-if="store.errors != 0" />
         <template #footer>
             <Button @click="store.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
-            <Button v-if="[4,5].includes(store.codeFetchBeneficiario)" @click="store.store" text="Guardar" icon="fas fa-save" class="btn-primary" :loading="store.loading.store" />
+            <Button v-if="[7,4,5].includes(store.codeFetchBeneficiario)" @click="store.store" text="Guardar" icon="fas fa-save" class="btn-primary" :loading="store.loading.store" />
         </template>
     </Modal>
 
