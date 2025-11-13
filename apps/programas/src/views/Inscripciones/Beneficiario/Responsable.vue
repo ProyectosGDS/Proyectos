@@ -15,7 +15,7 @@
             <Input v-model="store.beneficiario.responsable.fecha_nacimiento" option="label" title="*fecha nacimiento" type="date" :error="store.errors.hasOwnProperty('responsable.fecha_nacimiento')"/>
             <Input v-model="store.beneficiario.responsable.nombres" option="label" title="*nombres" maxlength="150" :error="store.errors.hasOwnProperty('responsable.nombres')"/>
             <Input v-model="store.beneficiario.responsable.apellidos" option="label" title="*apellidos" maxlength="150" :error="store.errors.hasOwnProperty('responsable.apellidos')"/>
-            <Input v-model="store.beneficiario.responsable.celular" option="label" title="*celular" maxlength="12" :error="store.errors.hasOwnProperty('responsable.celular')"/>
+            <Input v-model="store.beneficiario.responsable.celular" option="label" title="*celular" maxlength="8" :error="store.errors.hasOwnProperty('responsable.celular')"/>
             <Input v-model="store.beneficiario.responsable.email" option="label" title="email" type="email" maxlength="60" :error="store.errors.hasOwnProperty('responsable.email')"/>
             <Input v-model="store.beneficiario.responsable.zona_id" option="select" title="seleccione zona" :error="store.errors.hasOwnProperty('responsable.zona_id')">
                 <option value=""></option>

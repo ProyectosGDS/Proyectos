@@ -72,7 +72,7 @@
                 <option value=""></option>
                 <option v-for="etnia in catalogos.catalogo.etnias" :value="etnia.id">{{ etnia.nombre }}</option>
             </Input>
-            <Input v-model="store.beneficiario.interlocutor" option="label" title="interlocutor" maxlength="10" :error="store.errors.hasOwnProperty('interlocutor')"/>
+            <Input v-model="store.beneficiario.interlocutor" option="label" title="interlocutor" maxlength="10" :error="store.errors.hasOwnProperty('interlocutor')" readonly/>
         </div>
     </details>
 </template>
