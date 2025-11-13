@@ -139,15 +139,14 @@ class InscripcionesModulosController extends Controller
                                 if($row['tarifas']['inscripcion']) {
                                     $params = [
                                         'INTERLOCUTOR' => $ic, 
-                                        'OP_PRINCIPAL' => '4010',
-                                        'OP_PARCIAL' => '0175',
-                                        'OBJETO_CONTRATO' => 'EJ04',
-                                        // 'OBJETO_CONTRATO' => $row['sede_oc'] ?? $row['objeto_contrato'],
+                                        'OP_PRINCIPAL' => $row['sede_op_principal'] ?? $row['op_principal'],
+                                        'OP_PARCIAL' => $row['sede_op_parcial'] ?? $row['op_parcial'],
+                                        'OBJETO_CONTRATO' => $row['sede_oc'] ?? $row['objeto_contrato'],
                                         'VALOR' => strval(floatval($row['tarifas']['inscripcion'])),
                                         'PERIODO' => date('my',strtotime($this->sumMonth($row['tarifas']['mes_inicial'],0))),
                                         'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($row['tarifas']['mes_inicial'],0)),
                                         'DESCRIPCION' => 'INSCRIPCION '.mb_strtoupper($row['nombre_modulo']),
-                                        'LLAVE_RECONCILIACION' => 'OCT2025'
+                                        'LLAVE_RECONCILIACION' => date('ymd')
                                     ];
                                     SAP::rfc_name('Z_ZFUN_PSCD_00003_005')->params($params);
 
@@ -169,15 +168,14 @@ class InscripcionesModulosController extends Controller
                                     // ];
                                     $params = [
                                         'INTERLOCUTOR' => $ic, 
-                                        'OP_PRINCIPAL' => '4010',
-                                        'OP_PARCIAL' => '0175',
-                                        'OBJETO_CONTRATO' => 'EJ04',
-                                        // 'OBJETO_CONTRATO' => $row['sede_oc'] ?? $row['objeto_contrato'],
+                                        'OP_PRINCIPAL' => $row['sede_op_principal'] ?? $row['op_principal'],
+                                        'OP_PARCIAL' => $row['sede_op_parcial'] ?? $row['op_parcial'],
+                                        'OBJETO_CONTRATO' => $row['sede_oc'] ?? $row['objeto_contrato'],
                                         'VALOR' => $row['edad'] > 18 ? strval(floatval($row['tarifas']['tarifa_mayor'])) : strval(floatval($row['tarifas']['tarifa_menor'])),
                                         'PERIODO' => date('my',strtotime($this->sumMonth($row['tarifas']['mes_inicial'],0))),
                                         'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($row['tarifas']['mes_inicial'],0)),
                                         'DESCRIPCION' => 'PAGO CUOTA '. mb_strtoupper($row['nombre_modulo']),
-                                        'LLAVE_RECONCILIACION' => 'OCT2025'
+                                        'LLAVE_RECONCILIACION' => date('ymd')
                                     ];
                                     SAP::rfc_name('Z_ZFUN_PSCD_00003_005')->params($params);
                                 // } 

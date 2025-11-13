@@ -147,7 +147,7 @@ class InscripcionesCursosController extends Controller
                                         'PERIODO' => date('my',strtotime($this->sumMonth($row['tarifas']['mes_inicial'],0))),
                                         'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($row['tarifas']['mes_inicial'],0)),
                                         'DESCRIPCION' => 'INSCRIPCION '.mb_strtoupper($row['nombre_curso']),
-                                        'LLAVE_RECONCILIACION' => 'OCT2025'
+                                        'LLAVE_RECONCILIACION' => date('ymd')
                                     ];
                                     SAP::rfc_name('Z_ZFUN_PSCD_00003_005')->params($params);
 
@@ -176,7 +176,7 @@ class InscripcionesCursosController extends Controller
                                         'PERIODO' => date('my',strtotime($this->sumMonth($row['tarifas']['mes_inicial'],0))),
                                         'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($row['tarifas']['mes_inicial'],0)),
                                         'DESCRIPCION' => 'PAGO CUOTA '. mb_strtoupper($row['nombre_curso']),
-                                        'LLAVE_RECONCILIACION' => 'OCT2025'
+                                        'LLAVE_RECONCILIACION' => date('ymd')
                                     ];
 
                                     SAP::rfc_name('Z_ZFUN_PSCD_00003_005')->params($params);

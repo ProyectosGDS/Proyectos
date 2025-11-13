@@ -98,7 +98,9 @@ class BeneficiariosController extends Controller
                 }
 
                 if (
-                    isset($request->emergencia['nombre'])
+                    isset($request->emergencia['nombres']) &&
+                    isset($request->emergencia['apellidos']) &&
+                    isset($request->emergencia['celular'])
                 ){
 
                     $this->storeEmergencia($request, $beneficiario->id);
@@ -195,8 +197,7 @@ class BeneficiariosController extends Controller
                 if (
                     isset($request->emergencia['nombres']) &&
                     isset($request->emergencia['apellidos']) &&
-                    isset($request->emergencia['cui']) &&
-                    isset($request->emergencia['fecha_nacimiento'])
+                    isset($request->emergencia['celular'])
                 ) {
                     $this->storeEmergencia($request, $beneficiario->id);
                 }
@@ -496,7 +497,9 @@ class BeneficiariosController extends Controller
                 }
 
                 if (
-                    isset($request->emergencia['nombre'])
+                    isset($request->emergencia['nombres']) &&
+                    isset($request->emergencia['apellidos']) &&
+                    isset($request->emergencia['celular'])
                 ){
 
                     $this->storeEmergencia($request, $beneficiario->id);
