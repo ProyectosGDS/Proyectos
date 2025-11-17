@@ -38,7 +38,7 @@ trait TraitBeneficiarios
             'fecha_nacimiento' => 'required|date|date_format:Y-m-d|after:' . (date('Y') - 100) . '-12-31|before :' . date('Y-m-d'),
             'celular' => 'required|numeric|digits:8',
             'sexo' => 'required',
-            'interlocutor' => 'nullable|numeric|digits:9',
+            'interlocutor' => 'nullable|numeric',
             'correo' => 'nullable|email'
         ]);
 
