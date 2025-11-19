@@ -144,7 +144,7 @@
         }
 
         const year = new Date()
-        inscripciones.year = year.getFullYear()
+        inscripciones.year = year.getFullYear() + 1
         catalogos.getCatalogoBeneficiario()
     })
 

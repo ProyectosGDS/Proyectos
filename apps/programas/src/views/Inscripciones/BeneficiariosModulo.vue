@@ -152,7 +152,7 @@
 
     onBeforeMount(() => {
         const year = new Date()
-        inscripciones.year = year.getFullYear()
+        inscripciones.year = year.getFullYear() + 1
 
         if(['5','8'].includes(auth.dependencia_id)) {
             catalogos.getEscuelas(auth.dependencia_id)   
