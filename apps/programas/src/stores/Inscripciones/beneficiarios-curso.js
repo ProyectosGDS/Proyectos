@@ -118,6 +118,7 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
                     op_parcial : escuela.value ? JSON.parse(escuela.value).op_parcial : null,
                     sede_op_principal : curso.value.sede.op_principal ?? null,
                     sede_op_parcial : curso.value.sede.op_parcial ?? null,
+                    asignacion_extra : curso.value.asignacion_extra ?? null
                 })
     
                 beneficiariosStore.resetData()
@@ -152,6 +153,7 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
                     op_parcial : escuela.value ? JSON.parse(escuela.value).op_parcial : null,
                     sede_op_principal : curso.value.sede.op_principal ?? null,
                     sede_op_parcial : curso.value.sede.op_parcial ?? null,
+                    asignacion_extra : curso.value.asignacion_extra ?? null
                 })
     
                 beneficiariosStore.resetData()
@@ -217,6 +219,7 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
                         op_parcial : escuela.value ? JSON.parse(escuela.value).op_parcial : null,
                         sede_op_principal : curso.value.sede.op_principal ?? null,
                         sede_op_parcial : curso.value.sede.op_parcial ?? null,
+                        asignacion_extra : curso.value.asignacion_extra ?? null
                     })
 
                     beneficiariosStore.resetData()
@@ -257,6 +260,7 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
                         op_parcial : escuela.value ? JSON.parse(escuela.value).op_parcial : null,
                         sede_op_principal : curso.value.sede.op_principal ?? null,
                         sede_op_parcial : curso.value.sede.op_parcial ?? null,
+                        asignacion_extra : curso.value.asignacion_extra ?? null
                     })
 
                     beneficiariosStore.resetData()
