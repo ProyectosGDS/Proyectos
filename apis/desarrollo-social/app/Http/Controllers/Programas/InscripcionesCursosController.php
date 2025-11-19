@@ -137,20 +137,22 @@ class InscripcionesCursosController extends Controller
                             ]);
 
                             if($persona){
-                                if($row['tarifas']['inscripcion']) {
-                                    $params = [
-                                        'INTERLOCUTOR' => $ic, 
-                                        'OP_PRINCIPAL' => $row['sede_op_principal'] ?? $row['op_principal'],
-                                        'OP_PARCIAL' => $row['sede_op_parcial'] ?? $row['op_parcial'],
-                                        'OBJETO_CONTRATO' => $row['sede_oc'] ?? $row['objeto_contrato'],
-                                        'VALOR' => strval(floatval($row['tarifas']['inscripcion'])),
-                                        'PERIODO' => date('my',strtotime($this->sumMonth($row['tarifas']['mes_inicial'],0))),
-                                        'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($row['tarifas']['mes_inicial'],0)),
-                                        'DESCRIPCION' => 'INSCRIPCION '.mb_strtoupper($row['nombre_curso']),
-                                        'LLAVE_RECONCILIACION' => date('ymd')
-                                    ];
-                                    SAP::rfc_name('Z_ZFUN_PSCD_00003_005')->params($params);
-
+                                if(!$row['asignacion_extra']) {
+                                    if($row['tarifas']['inscripcion']) {
+                                        $params = [
+                                            'INTERLOCUTOR' => $ic, 
+                                            'OP_PRINCIPAL' => $row['sede_op_principal'] ?? $row['op_principal'],
+                                            'OP_PARCIAL' => $row['sede_op_parcial'] ?? $row['op_parcial'],
+                                            'OBJETO_CONTRATO' => $row['sede_oc'] ?? $row['objeto_contrato'],
+                                            'VALOR' => strval(floatval($row['tarifas']['inscripcion'])),
+                                            'PERIODO' => date('my',strtotime($this->sumMonth($row['tarifas']['mes_inicial'],0))),
+                                            'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($row['tarifas']['mes_inicial'],0)),
+                                            'DESCRIPCION' => 'INSCRIPCION '.mb_strtoupper($row['nombre_curso']),
+                                            'LLAVE_RECONCILIACION' => date('ymd')
+                                        ];
+                                        SAP::rfc_name('Z_ZFUN_PSCD_00003_005')->params($params);
+    
+                                    }
                                 }
 
                                 // for ($i=0; $i <= intval($row['tarifas']['no_cuotas']) - 1 ; $i++) { 
