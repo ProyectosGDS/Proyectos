@@ -168,7 +168,7 @@ class CargosController extends Controller
     private function calcularTarifa($beneficiario, $modulo): float {
         $edad = $beneficiario->edad ?? 0;
         
-        if ($edad > 18) {
+        if ($edad >= 18) {
             return floatval($modulo->tarifas->tarifa_mayor ?? 0);
         }
         
