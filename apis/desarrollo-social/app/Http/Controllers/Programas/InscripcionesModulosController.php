@@ -198,6 +198,7 @@ class InscripcionesModulosController extends Controller
                         'created_at' => now(),
                         'usuario_id' => auth()->user()->id,
                         'beneficiario_id' => $row['beneficiario_id'],
+                        'identificador' => $inscripcion_modulo->id,
                     ]);
 
                     $count_beneficiarios ++;
