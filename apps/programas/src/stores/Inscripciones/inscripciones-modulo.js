@@ -33,6 +33,7 @@ export const useInscripcionesModuloStore = defineStore('inscripciones-modulo', (
         update :false,
         destroy : false,
         excel : false,
+        pdf : false,
     })
     const errors = ref([])
     const modal = ref({
@@ -173,6 +174,43 @@ export const useInscripcionesModuloStore = defineStore('inscripciones-modulo', (
         }
     }
 
+    const exportPdf = async () => {
+
+        loading.value.pdf = true
+    
+        try {
+    
+            const response = await axios.post('inscripciones-modulo/export-pdf',
+                {
+                    modulo_id: JSON.parse(modulo.value).id,
+                    anio_inscripcion: year.value
+                },
+                {
+                    responseType: 'blob'
+                })
+    
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+    
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', 'listados_inscritos.pdf')
+    
+            document.body.appendChild(link)
+            link.click();
+    
+            window.URL.revokeObjectURL(url)
+            document.body.removeChild(link)
+    
+    
+        } catch (error) {
+            global.manejarError(error);
+    
+        } finally {
+    
+            loading.value.pdf = false
+        }
+    }
+
     const resetData = () => {
         errors.value = []
         modal.value = {
@@ -203,5 +241,6 @@ export const useInscripcionesModuloStore = defineStore('inscripciones-modulo', (
         assignBeca,
         resetData,
         exportExcel,
+        exportPdf,
     }
 })

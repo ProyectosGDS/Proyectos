@@ -30,3 +30,4 @@ Route::get('distritos',function(){
 Route::apiResource('bitacora',BitacoraController::class)->middleware(['jwtAuth']);
 
 Route::post('exportar-excel',[ExportController::class,'exportExcel'])->middleware(['jwtAuth']);
+Route::post('exportar-pdf',[ExportController::class,'exportPdf'])->middleware(['jwtAuth']);

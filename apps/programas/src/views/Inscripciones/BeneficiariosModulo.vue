@@ -232,6 +232,9 @@
                     <Tool-Tip message="Excel" class="-mt-7 text-color-4">
                         <Icon v-if="auth.checkPermission('exportar excel inscripciones modulo')" @click="inscripciones.exportExcel" :icon="inscripciones.loading.excel ? 'fas fa-spinner' : 'fas fa-file-excel'" class="icon-button p-2 btn-success" :class="inscripciones.loading.excel ? 'animate-spin bg-gray-300 text-gray-500' : ''" :disabled="inscripciones.loading.excel" />
                     </Tool-Tip>
+                    <Tool-Tip message="Pdf" class="-mt-7 text-color-4">
+                        <Icon v-if="auth.checkPermission('exportar pdf inscripciones modulo')" @click="inscripciones.exportPdf" :icon="inscripciones.loading.pdf ? 'fas fa-spinner' : 'fas fa-file-pdf'" class="icon-button p-2 btn-danger" :class="inscripciones.loading.pdf ? 'animate-spin bg-gray-300 text-gray-500' : ''" :disabled="inscripciones.loading.pdf" />
+                    </Tool-Tip>
                 </div>
                 <br>
                 <div class="grid" v-if="inscripciones.loading.fetch" >

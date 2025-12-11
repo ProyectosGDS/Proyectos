@@ -17,7 +17,7 @@ export const useInscripcionesCursoStore = defineStore('inscripciones-curso', () 
         { title : 'programa', key : 'curso.programa.nombre' },
         { title : 'curso', key : 'curso.curso.nombre' },
         { title : 'sede', key : 'curso.sede.nombre_completo' },
-        { title : 'horario', key : 'curso.horario.nombre_completo' },
+        // { title : 'horario', key : 'curso.horario.nombre_completo' },
         { title : 'fecha inscripción', key : 'created_at', type : 'date', width :'10px', align : 'center' },
         { title : 'estado inscripción', key : 'estado', width :'10px', align : 'center' },
         { title : '', key : 'actions', width :'10px', align : 'center' },
@@ -36,6 +36,7 @@ export const useInscripcionesCursoStore = defineStore('inscripciones-curso', () 
         update :false,
         destroy : false,
         excel : false,
+        pdf : false,
         beca : false,
     })
     const errors = ref([])
@@ -177,6 +178,45 @@ export const useInscripcionesCursoStore = defineStore('inscripciones-curso', () 
         }
     }
 
+    const exportPdf = async (curso_id) => {
+
+        loading.value.pdf = true
+    
+        try {
+    
+            const response = await axios.post('inscripciones-cursos/export-pdf',
+                {
+                    detalle_curso_id: curso_id,
+                    anio_inscripcion: year.value,
+                },
+                {
+                    responseType: 'blob'
+                })
+    
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+    
+            const link = document.createElement('a')
+            link.href = url
+            let nombre_archivo = 'listado_inscritos.pdf'
+            link.setAttribute('download', nombre_archivo)
+            // link.setAttribute('target', '_blank')
+    
+            document.body.appendChild(link)
+            link.click();
+    
+            window.URL.revokeObjectURL(url)
+            document.body.removeChild(link)
+    
+    
+        } catch (error) {
+            global.manejarError(error);
+    
+        } finally {
+    
+            loading.value.pdf = false
+        }
+    }
+
     const resetData = () => {
         errors.value = []
         modal.value = {
@@ -207,5 +247,6 @@ export const useInscripcionesCursoStore = defineStore('inscripciones-curso', () 
         assingBeca,
         resetData,
         exportExcel,
+        exportPdf,
     }
 })

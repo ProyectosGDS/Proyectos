@@ -26,7 +26,7 @@ class InscripcionesActividadesController extends Controller
             
             bitacora::create([
                 'accion' => $request->estado == 'A' ? bitacora::$acciones[13] : bitacora::$acciones[14] ,
-                'tabla' => 'BENEFICIARIOS_CURSOS',
+                'tabla' => 'BENEFICIARIOS_ACTIVIDADES',
                 'descripcion' => 'SE CAMBIO DE ESTADO INSCRIPCION',
                 'created_at' => now(),
                 'usuario_id' => auth()->user()->id,

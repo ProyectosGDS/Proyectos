@@ -13,7 +13,7 @@ export const useBeneficiariosProgramaStore = defineStore('beneficiarios-programa
         { title : 'beneficiario', key : 'beneficiario' },
         { title : 'edad', key : 'edad', text : ' años' },
         { title : 'sexo', key : 'sexo' },
-        { title : 'zona', key : 'zona' },
+        // { title : 'zona', key : 'zona' },
         { title : 'dependencia', key : 'dependencia' },
         { title : 'escuela', key : 'escuela' },
         { title : 'programa', key : 'programa' },
@@ -25,6 +25,7 @@ export const useBeneficiariosProgramaStore = defineStore('beneficiarios-programa
         { title : 'tipo', key : 'tipo' },
         { title : 'impulsatec', key : 'impulsatec', width :'10px', align : 'center' },
         { title : 'estado', key : 'estado', width :'10px', align : 'center' },
+        { title : 'fecha registro', key : 'fecha_registro'},
         { title : '', key : 'actions', width :'10px', align : 'center' },
     ]
 

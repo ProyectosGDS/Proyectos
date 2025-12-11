@@ -47,6 +47,10 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
+    pdf: {
+        type: Boolean,
+        default: false
+    },
     filterAdvance: {
         type: Boolean,
         default: true
@@ -321,6 +325,43 @@ const exportData = async () => {
     }
 }
 
+const exportPdf = async () => {
+
+    loadingExportData.value = true
+
+    try {
+
+        const response = await axios.post('exportar-pdf',
+            {
+                columns: props.headers,
+                data: filteredData.value
+            },
+            {
+                responseType: 'blob'
+            })
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', 'export.pdf')
+
+        document.body.appendChild(link)
+        link.click();
+
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(link)
+
+
+    } catch (error) {
+        global.manejarError(error);
+
+    } finally {
+
+        loadingExportData.value = false
+    }
+}
+
 const addFilter = () => {
     filters.value.push({ field: '', value: '', operator : '=' })
 }
@@ -401,7 +442,7 @@ onMounted(() => {
                         <Icon v-if="props.excel && data.length > 0" @click="exportData" :icon="loadingExportData ? 'fas fa-spinner' : 'fas fa-file-excel'" class="icon-button p-2 btn-success" :class="loadingExportData ? 'animate-spin bg-gray-300 text-gray-500' : ''" :disabled="loadingExportData" />
                     </Tool-Tip>
                     <Tool-Tip message="Pdf" class="-mt-7 text-color-4">
-                        <Icon v-if="props.pdf && data.length > 0" :icon="loadingExportData ? 'fas fa-spinner' : 'fas fa-file-pdf'" class="icon-button p-2 btn-danger" :class="loadingExportData ? 'animate-spin bg-gray-300 text-gray-500' : ''" :disabled="loadingExportData" />
+                        <Icon v-if="props.pdf && data.length > 0" @click="exportPdf" :icon="loadingExportData ? 'fas fa-spinner' : 'fas fa-file-pdf'" class="icon-button p-2 btn-danger" :class="loadingExportData ? 'animate-spin bg-gray-300 text-gray-500' : ''" :disabled="loadingExportData" />
                     </Tool-Tip>
                 </div>
             </div>

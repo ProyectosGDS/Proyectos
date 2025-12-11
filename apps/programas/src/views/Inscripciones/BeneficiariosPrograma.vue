@@ -49,11 +49,12 @@
         <Data-Table v-if="auth.checkPermission('ver beneficiarios programa')" 
             :headers="store.headers"
             :data="store.beneficiarios?.beneficiarios_inscritos" :loading="store.loading.fetch"
-            :excel="auth.checkPermission('exportar excel beneficiarios programa')">
+            :excel="auth.checkPermission('exportar excel beneficiarios programa')"
+            :pdf="true" >
             <template #estado="{ item }">
                 <Badge  :color="item.estado == 'A' ? 'green' : 'red'" :text="item.estado == 'A' ? 'Activo' : 'Inactivo'" />
             </template>
-            <template #actions="{ item }">
+            <!-- <template #actions="{ item }">
                 <Drop-Down-Button icon="fas fa-ellipsis-v">
                     <ul>
                         <li @click="store.edit(item)" class="text-color-4">Editar</li>
@@ -62,7 +63,7 @@
                         </template>
                     </ul>
                 </Drop-Down-Button>
-            </template>
+            </template> -->
         </Data-Table>
     </Card>
 </template>

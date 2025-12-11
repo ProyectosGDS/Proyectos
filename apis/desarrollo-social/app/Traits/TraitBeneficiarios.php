@@ -70,8 +70,51 @@ trait TraitBeneficiarios
         return $beneficiario;
     }
 
-    public function storeDomicilio(Request $request, int $beneficiario_id)
-    {
+    public function storeExtranjero(Request $request) {
+
+        $validations = Validator::make($request->all(), [
+            'cui' => ['required', 'numeric', 'digits:13','unique:beneficiarios,cui'],
+            'pasaporte' => 'nullable|string|max:45',
+            'primer_nombre' => 'required|string|max:45',
+            'segundo_nombre' => 'nullable|string|max:45',
+            'primer_apellido' => 'required|string|max:45',
+            'segundo_apellido' => 'nullable|string|max:45',
+            'fecha_nacimiento' => 'required|date|date_format:Y-m-d|after:' . (date('Y') - 100) . '-12-31|before :' . date('Y-m-d'),
+            'celular' => 'required|numeric|digits:8',
+            'sexo' => 'required',
+            'interlocutor' => 'nullable|numeric',
+            'correo' => 'nullable|email'
+        ]);
+
+        if ($validations->fails()) {
+            $this->bagValidations = array_merge($this->bagValidations, $validations->errors()->toArray());
+            return;
+        }
+
+        $sequence = DB::getSequence();
+
+        $beneficiario = beneficiarios::create([
+            'cui'               => $request->cui,
+            'primer_nombre'     => mb_strtoupper(trim($request->primer_nombre)),
+            'segundo_nombre'    => mb_strtoupper(trim($request->segundo_nombre)) ?? null,
+            'primer_apellido'   => mb_strtoupper(trim($request->primer_apellido)),
+            'segundo_apellido'  => mb_strtoupper(trim($request->segundo_apellido)) ?? null,
+            'fecha_nacimiento'  => $request->fecha_nacimiento,
+            'sexo'              => $request->sexo,
+            'pasaporte'         => $request->pasaporte ?? null,
+            'etnia_id'          => $request->etnia_id ?? null,
+            'estado_civil_id'   => $request->estado_civil_id ?? null,
+            'interlocutor'      => $request->interlocutor ?? null,
+            'celular'           => trim($request->celular),
+            'correo'            => mb_strtoupper($request->correo),
+            'estado'            => $request->estado ?? null,
+            'codigo_alumno'     => intval(date('Y').$sequence->nextValue('COD_ALUMNO_SEQ')),
+        ]);
+
+        return $beneficiario;
+    }
+
+    public function storeDomicilio(Request $request, int $beneficiario_id) {
 
         $validations = Validator::make($request->all(), [
             'domicilio.direccion' => 'required|max:500',
@@ -94,8 +137,7 @@ trait TraitBeneficiarios
         return $domicilio;
     }
 
-    public function storeDatosMedicos(Request $request, int $beneficiario_id)
-    {
+    public function storeDatosMedicos(Request $request, int $beneficiario_id) {
 
         $validations = Validator::make($request->all(), [
             'datos_medicos.enfermedades_alergias' => 'nullable|string|max:500',
@@ -119,8 +161,7 @@ trait TraitBeneficiarios
         return $datosMedicos;
     }
 
-    public function storeResponsable(Request $request, int $beneficiario_id)
-    {
+    public function storeResponsable(Request $request, int $beneficiario_id) {
 
         $validations = Validator::make($request->all(), [
             'responsable.cui' => ['required', 'numeric', 'digits:13', new ValidateCui],
@@ -157,8 +198,46 @@ trait TraitBeneficiarios
         return $responsable;
     }
 
-    public function storeEmergencia(Request $request, int $beneficiario_id)
-    {
+    public function storeResponsableExtranjero(Request $request, int $beneficiario_id) {
+
+        $validations = Validator::make($request->all(), [
+            'responsable.cui' => ['required', 'numeric', 'digits:13'],
+            'responsable.pasaporte' => 'nullable|string|max:45',
+            'responsable.nombres' => 'required|string|max:150',
+            'responsable.apellidos' => 'required|string|max:150',
+            'responsable.fecha_nacimiento' => 'required|date|date_format:Y-m-d|after:' . (date('Y') - 100) . '-12-31|before :' . date('Y-m-d'),
+            'responsable.celular' => 'required|numeric|digits:8',
+            'responsable.email' => 'nullable|email',
+            'responsable.sexo' => 'required',
+            'responsable.direccion' => 'nullable|string|max:200',
+            'responsable.parentesco_id' => 'required',
+        ]);
+
+        if ($validations->fails()) {
+            $this->bagValidations = array_merge($this->bagValidations, $validations->errors()->toArray());
+            return;
+        }
+
+        $responsable = responsables::create([
+            'beneficiario_id' => $beneficiario_id,
+            'cui' => $request->responsable['cui'] ?? null,
+            'pasaporte' => $request->responsable['pasaporte'] ?? null,
+            'nombres' => mb_strtoupper(trim($request->responsable['nombres'])),
+            'apellidos' => mb_strtoupper(trim($request->responsable['apellidos'])),
+            'fecha_nacimiento' => $request->responsable['fecha_nacimiento'],
+            'celular' => $request->responsable['celular'],
+            'email' => $request->has('responsable.email') ? mb_strtoupper($request->responsable['email']) : null,
+            'sexo' => $request->responsable['sexo'],
+            'zona_id' => $request->responsable['zona_id'] ?? null,
+            'direccion' => $request->responsable['direccion'] ?? null,
+            'parentesco_id' => $request->responsable['parentesco_id'],
+            'categoria' => 'R',
+        ]);
+
+        return $responsable;
+    }
+
+    public function storeEmergencia(Request $request, int $beneficiario_id) {
 
         $validations = Validator::make($request->all(), [
             'emergencia.cui' => ['nullable', 'numeric', 'digits:13', new ValidateCui],
@@ -195,8 +274,7 @@ trait TraitBeneficiarios
         return $emergencia;
     }
 
-    public function storeDatosAcademicos(Request $request, int $beneficiario_id)
-    {
+    public function storeDatosAcademicos(Request $request, int $beneficiario_id) {
         $validations = Validator($request->all(), [
             'datos_academicos.escolaridad_id' => 'required',
             'datos_academicos.tipo' => 'required',
@@ -220,8 +298,7 @@ trait TraitBeneficiarios
 
     // --------------- UPDATE METHODS ---------------
 
-    public function updateBeneficiario(Request $request, beneficiarios $beneficiario)
-    {
+    public function updateBeneficiario(Request $request, beneficiarios $beneficiario) {
 
         $validations = Validator::make($request->all(), [
             'cui' => ['required', 'numeric', 'digits:13', new ValidateCui, Rule::unique('beneficiarios', 'cui')->ignore($beneficiario->id)],
@@ -263,8 +340,7 @@ trait TraitBeneficiarios
         return $beneficiario;
     }
 
-    public function updateDomicilio(Request $request, beneficiarios $beneficiario)
-    {
+    public function updateDomicilio(Request $request, beneficiarios $beneficiario) {
 
         $validations = Validator::make($request->all(), [
             'domicilio.direccion' => 'required|max:500',
@@ -286,8 +362,7 @@ trait TraitBeneficiarios
         return $domicilios;
     }
 
-    public function updateDatosMedicos(Request $request, beneficiarios $beneficiario)
-    {
+    public function updateDatosMedicos(Request $request, beneficiarios $beneficiario) {
 
         $validations = Validator::make($request->all(), [
             'datos_medicos.enfermedades_alergias' => 'nullable|string|max:500',
@@ -310,8 +385,7 @@ trait TraitBeneficiarios
         return $datosMedicos;
     }
 
-    public function updateResponsable(Request $request, beneficiarios $beneficiario)
-    {
+    public function updateResponsable(Request $request, beneficiarios $beneficiario) {
 
         $validations = Validator::make($request->all(), [
             'responsable.cui' => ['nullable', 'numeric', 'digits:13', new ValidateCui],
@@ -347,8 +421,7 @@ trait TraitBeneficiarios
         return $responsable;
     }
 
-    public function updateEmergencia(Request $request, beneficiarios $beneficiario)
-    {
+    public function updateEmergencia(Request $request, beneficiarios $beneficiario) {
 
         $validations = Validator::make($request->all(), [
             'emergencia.cui' => ['nullable', 'numeric', 'digits:13', new ValidateCui],
@@ -384,8 +457,7 @@ trait TraitBeneficiarios
         return $emergencia;
     }
 
-    public function updateDatosAcademicos(Request $request, beneficiarios $beneficiario)
-    {
+    public function updateDatosAcademicos(Request $request, beneficiarios $beneficiario) {
 
         $validations = Validator($request->all(), [
             'datos_academicos.escolaridad_id' => 'required',

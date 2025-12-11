@@ -24,6 +24,7 @@ class responsables extends Model
 
     protected $fillable = [
         'cui',
+        'pasaporte',
         'nombres',
         'apellidos',
         'fecha_nacimiento',

@@ -282,7 +282,6 @@ class ProgramasController extends Controller
             $beneficiarios_cursos = DB::connection('gds')
                 ->table('BENEFICIARIOS_CURSOS BC')
                 ->join('BENEFICIARIOS B','BC.BENEFICIARIO_ID','=','B.ID')
-                ->join('DOMICILIOS DO','DO.BENEFICIARIO_ID','=','B.ID')
                 ->join('DETALLES_CURSOS DC','BC.DETALLE_CURSO_ID','=','DC.ID')
                 ->join('SEDES S','DC.SEDE_ID','=','S.ID')
                 ->join('CURSOS C','DC.CURSO_ID','=','C.ID')
@@ -297,7 +296,6 @@ class ProgramasController extends Controller
                     'B.CELULAR',
                     'B.SEXO',
                     DB::raw("TRUNC(MONTHS_BETWEEN(SYSDATE, B.FECHA_NACIMIENTO) / 12) AS EDAD"),
-                    'DO.ZONA_ID AS ZONA',
                     'B.ESTADO AS STATUS',
                     'E.NOMBRE AS ESCUELA',
                     'P.NOMBRE AS PROGRAMA',
@@ -309,7 +307,8 @@ class ProgramasController extends Controller
                     'BC.ANIO_INSCRIPCION AS ANIO_INSCRIPCION',
                     'BC.ESTADO',
                     DB::raw("CAST(C.IMPULSATEC AS VARCHAR2(1)) AS IMPULSATEC"),
-                    DB::raw("CAST('CURSO' AS VARCHAR2(50)) AS TIPO")
+                    DB::raw("CAST('CURSO' AS VARCHAR2(50)) AS TIPO"),
+                    DB::raw("TO_CHAR(BC.CREATED_AT,'YYYY-MM-DD') AS FECHA_REGISTRO"),
                 )
                 ->where('BC.ANIO_INSCRIPCION',$year)
                 ->when(!empty($programa_id),function($query) use ($programa_id){
@@ -323,7 +322,6 @@ class ProgramasController extends Controller
             $beneficiarios_actividades = DB::connection('gds')
                 ->table('BENEFICIARIOS_ACTIVIDADES BA')
                 ->join('BENEFICIARIOS B','BA.BENEFICIARIO_ID','=','B.ID')
-                ->join('DOMICILIOS DO','DO.BENEFICIARIO_ID','=','B.ID')
                 ->join('DETALLES_ACTIVIDADES DA','BA.DETALLE_ACTIVIDAD_ID','=','DA.ID')
                 ->join('ACTIVIDADES A','DA.ACTIVIDAD_ID','=','A.ID')
                 ->join('PROGRAMAS P','DA.PROGRAMA_ID','=','P.ID')
@@ -337,7 +335,6 @@ class ProgramasController extends Controller
                     'B.CELULAR',
                     'B.SEXO',
                     DB::raw("TRUNC(MONTHS_BETWEEN(SYSDATE, B.FECHA_NACIMIENTO) / 12) AS EDAD"),
-                    'DO.ZONA_ID AS ZONA',
                     'B.ESTADO AS STATUS',
                     DB::raw("NULL AS ESCUELA"),
                     'P.NOMBRE AS PROGRAMA',
@@ -349,7 +346,8 @@ class ProgramasController extends Controller
                     DB::raw("EXTRACT(YEAR FROM BA.CREATED_AT) AS ANIO_INSCRIPCION"),
                     'BA.ESTADO',
                     DB::raw("CAST('N' AS VARCHAR2(1)) AS IMPULSATEC"),
-                    DB::raw("CAST(TA.NOMBRE AS VARCHAR2(50)) AS TIPO")
+                    DB::raw("CAST(TA.NOMBRE AS VARCHAR2(50)) AS TIPO"),
+                    DB::raw("TO_CHAR(BA.CREATED_AT,'YYYY-MM-DD') AS FECHA_REGISTRO"),
                 )
                 ->whereYear('BA.CREATED_AT',$year)
                 ->when(!empty($programa_id),function($query) use ($programa_id){
@@ -362,7 +360,6 @@ class ProgramasController extends Controller
             $beneficiarios_inscritos = DB::connection('gds')
                 ->table('BENEFICIARIOS_MODULOS BM')
                 ->join('BENEFICIARIOS B','BM.BENEFICIARIO_ID','=','B.ID')
-                ->join('DOMICILIOS DO','DO.BENEFICIARIO_ID','=','B.ID')
                 ->join('MODULOS M','BM.MODULO_ID','=','M.ID')
                 ->join('SEDES S','M.SEDE_ID','=','S.ID')
                 ->join('PROGRAMAS P','M.PROGRAMA_ID','=','P.ID')
@@ -376,7 +373,6 @@ class ProgramasController extends Controller
                     'B.CELULAR',
                     'B.SEXO',
                     DB::raw("TRUNC(MONTHS_BETWEEN(SYSDATE, B.FECHA_NACIMIENTO) / 12) AS EDAD"),
-                    'DO.ZONA_ID AS ZONA',
                     'B.ESTADO AS STATUS',
                     'E.NOMBRE AS ESCUELA',
                     'P.NOMBRE AS PROGRAMA',
@@ -388,7 +384,8 @@ class ProgramasController extends Controller
                     'BM.ANIO_INSCRIPCION AS ANIO_INSCRIPCION',
                     'BM.ESTADO',
                     DB::raw("CAST('N' AS VARCHAR2(1)) AS IMPULSATEC"),
-                    DB::raw("CAST('MODULO' AS VARCHAR2(50)) AS TIPO")
+                    DB::raw("CAST('MODULO' AS VARCHAR2(50)) AS TIPO"),
+                    DB::raw("TO_CHAR(BM.CREATED_AT,'YYYY-MM-DD') AS FECHA_REGISTRO"),
                 )
                 ->where('BM.ANIO_INSCRIPCION',$year)
                 ->when(!empty($programa_id),function($query) use ($programa_id){

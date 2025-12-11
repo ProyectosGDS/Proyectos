@@ -8,10 +8,10 @@
 </script>
 
 <template>
-    <details class="border-t-2 py-4">
+    <details :open="true" class="border-t-2 py-4">
         <summary class="text-color-4 text-lg mb-3 cursor-pointer hover:bg-gray-100 rounded-lg font-medium">RESPONSABLE</summary>
         <div class="grid lg:grid-cols-2 gap-4">
-            <Input v-model="store.beneficiario.responsable.cui" option="label" title="*cui" maxlength="13" :error="store.errors.hasOwnProperty('responsable.cui')"/>
+            <Input v-model="store.beneficiario.responsable.cui" option="label" title="*cui" maxlength="13" :error="store.errors.hasOwnProperty('responsable.cui')" />
             <Input v-model="store.beneficiario.responsable.fecha_nacimiento" option="label" title="*fecha nacimiento" type="date" :error="store.errors.hasOwnProperty('responsable.fecha_nacimiento')"/>
             <Input v-model="store.beneficiario.responsable.nombres" option="label" title="*nombres" maxlength="150" :error="store.errors.hasOwnProperty('responsable.nombres')"/>
             <Input v-model="store.beneficiario.responsable.apellidos" option="label" title="*apellidos" maxlength="150" :error="store.errors.hasOwnProperty('responsable.apellidos')"/>

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Beneficiarios\BeneficiariosController;
+use App\Http\Controllers\Beneficiarios\ExtranjerosController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('beneficiarios/bitacora/{beneficiario}',[BeneficiariosController::class,'bitacora']);
@@ -11,4 +12,8 @@ Route::post('beneficiarios/estado/{beneficiario}',[BeneficiariosController::clas
 Route::post('beneficiarios/consulta-back-up',[BeneficiariosController::class,'consultaBackUp']);
 Route::post('beneficiarios/consulta-beneficiario-unico',[BeneficiariosController::class,'consultaBeneficiarioUnico']);
 Route::apiResource('beneficiarios',BeneficiariosController::class);
+
+
+Route::post('extranjeros/buscar-extranjero',[ExtranjerosController::class,'searchExtranjero']);
+Route::post('extranjeros/store',[ExtranjerosController::class,'store']);
 

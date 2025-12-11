@@ -152,6 +152,14 @@ const router = createRouter({
 						auth : true,
 					}
 				},
+				{
+					path : 'extranjeros',
+					name : 'Extranjeros',
+					component : () => import('@/views/Extranjeros/Inscripciones.vue'),
+					meta : {
+						auth : true,
+					}
+				},
 			]
 		},
 		{

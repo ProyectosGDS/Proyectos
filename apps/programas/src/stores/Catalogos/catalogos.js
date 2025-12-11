@@ -3,10 +3,12 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useGlobalStore } from '@/stores/global'
 import { useBeneficiariosStore } from '@/stores/Inscripciones/beneficiarios'
+import { useExtranjerosStore } from '../Extranjeros/extranjeros'
 
 export const useCatalogosStore = defineStore('catalogos', () => {
     
     const beneficiarios = useBeneficiariosStore()
+    const extranjeros = useExtranjerosStore()
     const global = useGlobalStore()
 
     const dependencias = ref([])
@@ -178,6 +180,25 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         }
     }
 
+    const getMunicipiosDepartamentoExtrajeros = async () => {
+        loading.value.municipios = true
+        try {
+            if(extranjeros.extranjero.domicilio.departamento_id) {
+                const departamento_id = extranjeros.extranjero.domicilio.departamento_id
+                
+                const response = await axios.get(`municipios-departamento/${departamento_id}`)
+                municipios.value = response.data
+            }
+        } catch (error) {
+            global.manejarError(error)
+            if(error.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.municipios = false
+        }
+    }
+
     const getGruposZonas = async () => {
         loading.value.grupos_zonas = true
         
@@ -186,6 +207,28 @@ export const useCatalogosStore = defineStore('catalogos', () => {
                 
                 const zona_id = beneficiarios.beneficiario.domicilio.zona_id
                 const grupo_habitacional_id = beneficiarios.beneficiario.domicilio.grupo_habitacional_id
+                
+                const response = await axios.get(`grupos-zonas/${zona_id}/${grupo_habitacional_id}`)
+                grupos_zonas.value = response.data
+            }
+        } catch (error) {
+            global.manejarError(error)
+            if(error.status === 422) {
+                errors.value = error.response.data.errors
+            }
+        } finally {
+            loading.value.grupos_zonas = false
+        }
+    }
+
+    const getGruposZonasExtranjeros = async () => {
+        loading.value.grupos_zonas = true
+        
+        try {
+            if(extranjeros.extranjero.domicilio.zona_id && extranjeros.extranjero.domicilio.grupo_habitacional_id ) {
+                
+                const zona_id = extranjeros.extranjero.domicilio.zona_id
+                const grupo_habitacional_id = extranjeros.extranjero.domicilio.grupo_habitacional_id
                 
                 const response = await axios.get(`grupos-zonas/${zona_id}/${grupo_habitacional_id}`)
                 grupos_zonas.value = response.data
@@ -276,7 +319,9 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         getCatalogoBeneficiario,
         getCatalogosActividad,
         getMunicipiosDepartamento,
+        getMunicipiosDepartamentoExtrajeros,
         getGruposZonas,
+        getGruposZonasExtranjeros,
         getTiposActividades,
         getSedes,
         getEscuelas,

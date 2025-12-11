@@ -8,6 +8,7 @@ use App\Http\Controllers\Programas\DetallesCursosController;
 use App\Http\Controllers\Programas\HorariosController;
 use App\Http\Controllers\Programas\InscripcionesActividadesController;
 use App\Http\Controllers\Programas\InscripcionesCursosController;
+use App\Http\Controllers\Programas\InscripcionesExtranjerosController;
 use App\Http\Controllers\Programas\InscripcionesModulosController;
 use App\Http\Controllers\Programas\InstructoresController;
 use App\Http\Controllers\Programas\ModulosController;
@@ -63,6 +64,8 @@ Route::put('inscripciones-curso/asignar-beca/{inscripcion}',[InscripcionesCursos
 Route::apiResource('inscripciones-curso',InscripcionesCursosController::class)->parameters(['inscripciones-curso' => 'inscripcion']);
 
 Route::get('inscripciones-modulo/get-beneficiarios/{modulo_id}/{year}',[InscripcionesModulosController::class,'get_beneficiarios']);
+Route::post('inscripciones-cursos/export-pdf',[InscripcionesCursosController::class,'exportPdf']);
+Route::post('inscripciones-modulo/export-pdf',[InscripcionesModulosController::class,'exportPdf']);
 Route::post('inscripciones-modulo/store-beneficiarios',[InscripcionesModulosController::class,'store_beneficiarios']);
 Route::put('inscripciones-modulo/asignar-beca/{inscripcion}',[InscripcionesModulosController::class,'asignar_beca']);
 Route::apiResource('inscripciones-modulo',InscripcionesModulosController::class)->parameters(['inscripciones-modulo' => 'inscripcion']);
@@ -70,6 +73,8 @@ Route::apiResource('inscripciones-modulo',InscripcionesModulosController::class)
 Route::get('inscripciones-actividad/get-beneficiarios/{detalle_actividad_id}/{year}',[InscripcionesActividadesController::class,'get_beneficiarios']);
 Route::post('inscripciones-actividad/store-beneficiarios',[InscripcionesActividadesController::class,'store_beneficiarios']);
 Route::apiResource('inscripciones-actividad',InscripcionesActividadesController::class)->parameters(['inscripciones-actividad' => 'inscripcion']);
+
+Route::post('inscripciones-extranjeros',[InscripcionesExtranjerosController::class,'inscripcion']);
 
 Route::apiResource('requisitos',RequisitosController::class);
 

@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\adm_gds\beneficiarios;
 use App\Models\adm_gds\beneficiarios_modulos;
 use App\Models\adm_gds\bitacora;
+use App\Models\adm_gds\modulos;
 use App\Services\Sap\SapRfc as SAP;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class InscripcionesModulosController extends Controller
@@ -258,6 +260,40 @@ class InscripcionesModulosController extends Controller
                 'error' => 'Error en asignar beca',
                 'message' => $th->getMessage()
             ]);
+        }
+    }
+
+     public function exportPdf(Request $request) {
+        $request->validate([
+            'modulo_id' => 'required|exists:modulos,id',
+            'anio_inscripcion' => 'required|numeric|digits:4',
+        ]);
+
+        try {
+
+            $beneficiarios_inscritos = beneficiarios_modulos::with('beneficiario')
+                ->where('modulo_id', $request->modulo_id)
+                ->where('anio_inscripcion', $request->anio_inscripcion)
+                ->get()
+                ->sortBy(function ($item) {
+                    return $item->beneficiario->primer_nombre;
+                })
+                ->values();
+
+            $header = modulos::where('id',$request->modulo_id)
+                ->with([
+                    'programa.escuela',
+                    'sede',
+                    'temporalidad',
+                ])->first();
+            
+            $pdf = Pdf::loadView('Reports.PdfControlInscritosModulo', compact('header','beneficiarios_inscritos'))->setPaper('a4', 'landscape');
+
+            return $pdf->download('export.pdf');
+
+        } catch (\Throwable $th) {
+            
+            return response($th->getMessage());
         }
     }
 }
