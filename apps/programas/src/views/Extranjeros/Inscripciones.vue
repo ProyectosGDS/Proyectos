@@ -37,6 +37,8 @@ onMounted(() => {
 watchEffect(() => {
     if(extranjeros.pasaporte == '') {
         extranjeros.resetData()
+        extranjeros.codeResponse = null
+        extranjeros.messageResponse = null
     }
 })
 
@@ -50,12 +52,12 @@ watchEffect(() => {
                     <Input v-model="store.inscripcion.year" option="select" title="*seleccione año inscripción" :error="store.errors.hasOwnProperty('year')" required>
                         <option v-for="year in years" :value="year">{{ year }}</option>
                     </Input>
-                    <Input v-model="store.inscripcion.tipo" option="select" title="*Seleccione tipo de asignación" required>
+                    <Input v-model="store.inscripcion.tipo" option="select" title="*Seleccione tipo de asignación" :error="store.errors.hasOwnProperty('tipo')" required>
                         <option value="modulo">módulo</option>
                         <option value="curso">curso</option>
                         <option value="actividad">actividad</option>
                     </Input>
-                    <Input v-model="store.inscripcion.codigo" option="label" title="*Código de asignación" type="number" required />
+                    <Input v-model="store.inscripcion.codigo" option="label" title="*Código de asignación" type="number" :error="store.errors.hasOwnProperty('codigo')" required />
                     <div class="relative">
                         <Input 
                             @keypress.enter="extranjeros.searchExtranjero" 

@@ -263,7 +263,7 @@ class InscripcionesModulosController extends Controller
         }
     }
 
-     public function exportPdf(Request $request) {
+    public function exportPdf(Request $request) {
         $request->validate([
             'modulo_id' => 'required|exists:modulos,id',
             'anio_inscripcion' => 'required|numeric|digits:4',

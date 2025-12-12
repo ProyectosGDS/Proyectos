@@ -38,13 +38,13 @@
 
     const currentYear = new Date().getFullYear();
 
-    const years = computed(() => {
-        const yearsList = []
-        for (let i = 0; i <= 3; i++) {
-            yearsList.unshift(currentYear - i)
-        }
-        return yearsList
-    })
+    // const years = computed(() => {
+    //     const yearsList = []
+    //     for (let i = 0; i <= 3; i++) {
+    //         yearsList.unshift(currentYear - i)
+    //     }
+    //     return yearsList
+    // })
 
     const verificationFilledFields = () => {
         const requiredFields = [
@@ -63,8 +63,8 @@
     })
     
     onBeforeMount(() => {
-        const year = new Date()
-        asignaciones.year = year.getFullYear()
+        // const year = new Date()
+        // asignaciones.year = year.getFullYear()
 
         if(['5','8'].includes(auth.dependencia_id)){
             catalogos.getEscuelas(auth.dependencia_id)
@@ -81,9 +81,9 @@
     <Card v-if="auth.checkPermission('ver actividades programa')" class="bg-white p-4 xl:p-8">
         <div class="grid xl:grid-cols-2">
             <div class="space-y-4 xl:pr-8">
-                <Input v-model="asignaciones.year" option="select" title="*seleccione año" :error="store.errors.hasOwnProperty('year')">
+                <!-- <Input v-model="asignaciones.year" option="select" title="*seleccione año" :error="store.errors.hasOwnProperty('year')">
                     <option v-for="year in years" :value="year">{{ year }}</option>
-                </Input>
+                </Input> -->
                 <div class="flex items-center gap-2">
                     <Input v-if="['5','8'].includes(auth.user.dependencia_id)" @change="programas.getProgramasFromEscuelas(store.escuela)" v-model="store.escuela" option="select" title="*Seleccione una escuela">
                         <option selected></option>

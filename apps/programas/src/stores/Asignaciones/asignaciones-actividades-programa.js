@@ -22,7 +22,7 @@ export const useAsignacionesActividadesProgramaStore = defineStore('asignaciones
     ]
 
     const indice = ref(null)
-    const year = ref(null)
+    // const year = ref(null)
     const programa_id = ref(null)
     const actividades = ref([])
     const actividad = ref({})
@@ -46,7 +46,7 @@ export const useAsignacionesActividadesProgramaStore = defineStore('asignaciones
         loading.value.fetch = true
         try {
             if(programa_id != '') {
-                const response = await axios.get('programas/get-actividades/' + programa_id + '/' + year.value)
+                const response = await axios.get('programas/get-actividades/' + programa_id )
                 actividades.value = response.data
             }
         } catch (error) {
@@ -220,7 +220,7 @@ export const useAsignacionesActividadesProgramaStore = defineStore('asignaciones
     return {
         headers,
         indice,
-        year,
+        // year,
         programa_id,
         actividades,
         actividad,

@@ -34,6 +34,7 @@ export const useInscripcionesActividadStore = defineStore('inscripciones-activid
         update :false,
         destroy : false,
         excel : false,
+        pdf : false,
     })
     const errors = ref([])
     const modal = ref({
@@ -64,7 +65,8 @@ export const useInscripcionesActividadStore = defineStore('inscripciones-activid
         loading.value.store = true
         try {
             const response = await axios.post('inscripciones-actividad/store-beneficiarios', {
-                beneficiarios: beneficiarios.value
+                beneficiarios: beneficiarios.value,
+                anio_inscripcion : year.value
             })
             global.setAlert(response.data, 'success')
             fetch(beneficiario_actividad.actividad.id)
@@ -149,6 +151,44 @@ export const useInscripcionesActividadStore = defineStore('inscripciones-activid
         }
     }
 
+    const exportPdf = async (curso_id) => {
+
+        loading.value.pdf = true
+    
+        try {
+    
+            const response = await axios.post('inscripciones-actividad/export-pdf',
+                {
+                    detalle_actividad_id: beneficiario_actividad.actividad.id,
+                    anio_inscripcion: year.value,
+                },
+                {
+                    responseType: 'blob'
+                })
+    
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+    
+            const link = document.createElement('a')
+            link.href = url
+            let nombre_archivo = 'listado_inscritos.pdf'
+            link.setAttribute('download', nombre_archivo)
+    
+            document.body.appendChild(link)
+            link.click();
+    
+            window.URL.revokeObjectURL(url)
+            document.body.removeChild(link)
+    
+    
+        } catch (error) {
+            global.manejarError(error);
+    
+        } finally {
+    
+            loading.value.pdf = false
+        }
+    }
+
     const resetData = () => {
         errors.value = []
         modal.value = {
@@ -176,5 +216,6 @@ export const useInscripcionesActividadStore = defineStore('inscripciones-activid
         destroy,
         resetData,
         exportExcel,
+        exportPdf,
     }
 })

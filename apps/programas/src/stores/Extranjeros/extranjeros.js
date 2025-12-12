@@ -214,9 +214,6 @@ export const useExtranjerosStore = defineStore('extranjeros', () => {
             }
             
         }
-        codeResponse.value = null
-        messageResponse.value = null
-        pasaporte.value = null
     }
 
     return {

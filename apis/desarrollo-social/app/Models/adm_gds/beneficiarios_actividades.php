@@ -13,6 +13,7 @@ class beneficiarios_actividades extends Model
     protected $fillable = [
         'beneficiario_id',
         'detalle_actividad_id',
+        'anio_inscripcion',
         'created_at',
         'estado',
     ];

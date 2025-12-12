@@ -28,7 +28,7 @@ Route::get('temporalidades',function(){
 
 Route::get('programas/modulos-cursos',[ProgramasController::class,'get_modulos_cursos']);
 Route::get('programas/beneficiarios-modulo-curso',[ProgramasController::class,'get_beneficiarios_modulo_curso']);
-Route::get('programas/get-actividades/{programa_id}/{year}',[ProgramasController::class,'get_actividades']);
+Route::get('programas/get-actividades/{programa_id}',[ProgramasController::class,'get_actividades']);
 Route::get('programas/get-cursos/{programa}/{all}',[ProgramasController::class,'get_cursos']);
 Route::get('programas/get-modulos/{programa}',[ProgramasController::class,'get_modulos']);
 Route::get('programas/get-beneficiarios/{programa_id}/{year}',[ProgramasController::class,'get_beneficiarios']);
@@ -60,17 +60,18 @@ Route::apiResource('detalles-actividades',DetallesActividadesController::class)-
 
 Route::get('inscripciones-curso/get-beneficiarios/{detalle_curso_id}/{year}',[InscripcionesCursosController::class,'get_beneficiarios']);
 Route::post('inscripciones-curso/store-beneficiarios',[InscripcionesCursosController::class,'store_beneficiarios']);
+Route::post('inscripciones-curso/export-pdf',[InscripcionesCursosController::class,'exportPdf']);
 Route::put('inscripciones-curso/asignar-beca/{inscripcion}',[InscripcionesCursosController::class,'asignar_beca']);
 Route::apiResource('inscripciones-curso',InscripcionesCursosController::class)->parameters(['inscripciones-curso' => 'inscripcion']);
 
 Route::get('inscripciones-modulo/get-beneficiarios/{modulo_id}/{year}',[InscripcionesModulosController::class,'get_beneficiarios']);
-Route::post('inscripciones-cursos/export-pdf',[InscripcionesCursosController::class,'exportPdf']);
 Route::post('inscripciones-modulo/export-pdf',[InscripcionesModulosController::class,'exportPdf']);
 Route::post('inscripciones-modulo/store-beneficiarios',[InscripcionesModulosController::class,'store_beneficiarios']);
 Route::put('inscripciones-modulo/asignar-beca/{inscripcion}',[InscripcionesModulosController::class,'asignar_beca']);
 Route::apiResource('inscripciones-modulo',InscripcionesModulosController::class)->parameters(['inscripciones-modulo' => 'inscripcion']);
 
 Route::get('inscripciones-actividad/get-beneficiarios/{detalle_actividad_id}/{year}',[InscripcionesActividadesController::class,'get_beneficiarios']);
+Route::post('inscripciones-actividad/export-pdf',[InscripcionesActividadesController::class,'exportPdf']);
 Route::post('inscripciones-actividad/store-beneficiarios',[InscripcionesActividadesController::class,'store_beneficiarios']);
 Route::apiResource('inscripciones-actividad',InscripcionesActividadesController::class)->parameters(['inscripciones-actividad' => 'inscripcion']);
 

@@ -461,7 +461,7 @@ class ProgramasController extends Controller
         }
     }
 
-    public function get_actividades (int $programa_id, int $year) {
+    public function get_actividades (int $programa_id) {
         try {
 
             $query = "
@@ -488,12 +488,11 @@ class ProgramasController extends Controller
                             ON DA.TIPO_ACTIVIDAD_ID = TA.ID
                     LEFT JOIN ADM_GDS.ESTADOS_ACTIVIDADES EA
                             ON DA.ESTADO_ACTIVIDAD_ID = EA.ID
-                WHERE EXTRACT(YEAR FROM DA.FECHA_INICIAL) = ?
-                AND DA.PROGRAMA_ID = ?
+                WHERE DA.PROGRAMA_ID = ?
                 ORDER BY DA.ID DESC        
             ";
 
-            $actividades_programa = DB::connection('gds')->select($query,[$year,$programa_id]);
+            $actividades_programa = DB::connection('gds')->select($query,[$programa_id]);
             
             return response($actividades_programa);  
 

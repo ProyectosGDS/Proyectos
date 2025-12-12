@@ -184,7 +184,7 @@ export const useInscripcionesCursoStore = defineStore('inscripciones-curso', () 
     
         try {
     
-            const response = await axios.post('inscripciones-cursos/export-pdf',
+            const response = await axios.post('inscripciones-curso/export-pdf',
                 {
                     detalle_curso_id: curso_id,
                     anio_inscripcion: year.value,

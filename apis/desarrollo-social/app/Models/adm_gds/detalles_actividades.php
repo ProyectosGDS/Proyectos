@@ -9,7 +9,7 @@ class detalles_actividades extends Model
     protected $connection = 'gds';
     protected $table = 'DETALLES_ACTIVIDADES';
     public $timestamps = false;
-    protected $appends = ['horario','fechas'];
+    protected $appends = ['horario','fechas','direccion_completa'];
 
     protected $casts = [
         'fecha_inicial' => 'datetime:Y-m-d',
@@ -74,6 +74,20 @@ class detalles_actividades extends Model
         }
 
         return null;
+    }
+
+    public function getDireccionCompletaAttribute() {
+        $direcciones = [
+            $this->direccion,
+            $this->zona?->descripcion,
+            $this->distrito?->nombre,
+        ];
+
+        $direcciones = array_filter($direcciones, function ($direccion) {
+            return !is_null($direccion) && $direccion !== '';
+        });
+        
+        return implode(' ', $direcciones);
     }
 
 }
