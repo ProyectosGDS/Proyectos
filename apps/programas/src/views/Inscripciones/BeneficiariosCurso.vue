@@ -1,5 +1,5 @@
 <script setup>
-    import { computed, onBeforeMount } from 'vue'
+    import { computed, onBeforeMount, onMounted } from 'vue'
     import { useBeneficiariosCursoStore } from '@/stores/Inscripciones/beneficiarios-curso'
     import { useProgramasStore } from '@/stores/Catalogos/programas'
     import { useCatalogosStore } from '@/stores/Catalogos/catalogos'
@@ -135,7 +135,7 @@
         })
     } , { cache: true } )
   
-    onBeforeMount(() => {
+    onMounted(() => {
 
         if(['5','8'].includes(auth.dependencia_id)) {
             catalogos.getEscuelas(auth.dependencia_id)
@@ -143,8 +143,7 @@
             programas.fetch()
         }
 
-        const year = new Date()
-        inscripciones.year = year.getFullYear() + 1
+        inscripciones.year = JSON.parse(localStorage.getItem('anio_electivo')) ?? null
         catalogos.getCatalogoBeneficiario()
     })
 

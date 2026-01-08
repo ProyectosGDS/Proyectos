@@ -12,6 +12,7 @@ export const useAuthStore = defineStore('auth', () => {
     const userPermissions = ref(JSON.parse(localStorage.getItem('user_permissions')) || [])
     const userMenu = ref(JSON.parse(localStorage.getItem('user_menu')) || [])
     const dependencia_id = ref(JSON.parse(localStorage.getItem("dependencia_id")) || null)
+    const anio_electivo = ref(localStorage.getItem("anio_electivo") || null)
     const loading = ref(false)
     const credentials = ref({})
     const errors = ref([])
@@ -47,6 +48,10 @@ export const useAuthStore = defineStore('auth', () => {
         localStorage.setItem('dependencia_id',JSON.stringify(val))
     })
 
+    watch(anio_electivo, (val) => {
+        localStorage.setItem('anio_electivo',JSON.stringify(val))
+    })
+
     const getCsrfCookie = async () => {
         try {
             await axios.get('auth/csrf-cookie')
@@ -69,6 +74,7 @@ export const useAuthStore = defineStore('auth', () => {
             accessToken.value = response.data.access_token
             user.value = response.data.user
             dependencia_id.value = response.data.user.dependencia_id
+            anio_electivo.value = response.data.user.dependencia.anio_electivo
             userPermissions.value = response.data.user.permisos || []
             userMenu.value = response.data.user.menu || []
             credentials.value = {}

@@ -133,8 +133,7 @@
     } , { cache: true } )
 
     onBeforeMount(() => {
-        const year = new Date()
-        inscripcion.year = year.getFullYear()
+        inscripcion.year = JSON.parse(localStorage.getItem('anio_electivo')) ?? null
 
         if(['5','8'].includes(auth.dependencia_id)) {
             catalogos.getEscuelas(auth.dependencia_id)
