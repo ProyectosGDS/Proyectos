@@ -53,6 +53,8 @@ export const useProgramasStore = defineStore('programas', () => {
     const getProgramasFromEscuelas = async (escuela) => {
         programas.value = []
         loading.value.fetch = true
+        console.log(escuela);
+        
         try {
             if(!escuela){
                 return

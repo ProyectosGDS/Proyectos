@@ -16,10 +16,8 @@
             <template #tbody="{items}">
                 <tr v-for="item in items" @click="item.tipo == 'MODULO' ? store.detalleModulo(item) : store.detalleCurso(item)" title="Click para mas detalles">
                     <td>{{ item.id }}</td>
-                    <td>{{ item.modulo_curso }}</td>
+                    <td>{{ item.curso }}</td>
                     <td>{{ item.tipo }}</td>
-                    <td>{{ item.sede }}</td>
-                    <td>{{ item.temporalidad }}</td>
                     <td>{{ item.modalidad }}</td>
                 </tr>
             </template>

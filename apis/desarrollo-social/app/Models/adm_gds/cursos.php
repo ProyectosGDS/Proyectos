@@ -22,4 +22,8 @@ class cursos extends Model
         return $this->hasMany(detalles_cursos::class,'curso_id');
     }
 
+    public function sedes() {
+        return $this->hasManyThrough(sedes::class,detalles_cursos::class,'curso_id','id','id','sede_id');
+    }
+
 }

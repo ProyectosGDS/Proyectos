@@ -160,6 +160,14 @@ const router = createRouter({
 						auth : true,
 					}
 				},
+				{
+					path : 'generar-reporte',
+					name : 'Generar reporte',
+					component : () => import('@/views/Inscripciones/GenerarReporte.vue'),
+					meta : {
+						auth : true,
+					}
+				},
 			]
 		},
 		{

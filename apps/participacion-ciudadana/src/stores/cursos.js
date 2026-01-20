@@ -9,10 +9,8 @@ export const useCursosStore = defineStore('cursos', () => {
 
     const headers = [
         { title : 'id', key : 'id', type : 'numeric' },
-        { title : 'modulo/curso', key : 'modulo_curso' },
+        { title : 'modulo/curso', key : 'curso' },
         { title : 'tipo', key : 'tipo' },
-        { title : 'sede', key : 'sede' },
-        { title : 'temporalidad', key : 'temporalidad' },
         { title : 'modalidad', key : 'modalidad', width : '10px', align : 'center' },
 
     ]
@@ -20,10 +18,22 @@ export const useCursosStore = defineStore('cursos', () => {
     const categorias = ref([])
     const cursos = ref([])
     const curso = ref({})
+    const inscripcion = ref({})
+    const pivoteCurso = ref([])
     const modulo = ref({})
     const loading = ref(false)
     const errors = ref([])
 
+
+    const detalleHeaders = [
+        { title : 'curso id', key: 'id' },
+        { title : 'zona', key: 'sede.zona_id' },
+        { title : 'sede', key: 'sede.nombre_completo' },
+        { title : 'sección', key: 'seccion' },
+        { title : 'cupo disponible', key: 'capacidad' },
+        { title : 'temporalidad', key: 'temporalidad.nombre' },
+        { title : 'programa', key: 'programa.nombre' },
+    ]
 
     
     async function fetch () {
@@ -82,8 +92,10 @@ export const useCursosStore = defineStore('cursos', () => {
 
     return {
         headers,
+        detalleHeaders,
         router,
         categorias,
+        inscripcion,
         cursos,
         curso,
         modulo,

@@ -35,6 +35,7 @@ Route::get('programas/get-beneficiarios/{programa_id}/{year}',[ProgramasControll
 Route::get('programas/programas_escuela/{escuela_id}',[ProgramasController::class,'programas_escuela']);
 Route::post('programas/store-cursos',[ProgramasController::class,'store_cursos']);
 Route::post('programas/store-actividades',[ProgramasController::class,'store_actividades']);
+Route::post('programas/generar-reporte',[ProgramasController::class,'generar_reporte']);
 Route::apiResource('programas',ProgramasController::class);
 
 Route::get('modulos/get-cursos/{modulo_id}',[ModulosController::class,'get_cursos']);

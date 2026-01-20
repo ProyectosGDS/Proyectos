@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Programas;
 
+use App\Exports\GenerarReporteExcel;
 use App\Http\Controllers\Controller;
 use App\Models\adm_gds\beneficiarios_cursos;
 use App\Models\adm_gds\beneficiarios_modulos;
@@ -12,6 +13,7 @@ use App\Models\adm_gds\programas;
 use App\Models\adm_gds\tarifas_cursos;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProgramasController extends Controller
 {
@@ -632,5 +634,418 @@ class ProgramasController extends Controller
         }
     }
 
+    public function generar_reporte(Request $request) {
+        $request->validate([
+            'anio_inscripcion' => 'required|digits:4',
+            'programas' => 'required|array'
+        ]);
+
+        $programas = implode(",",$request->programas);
+        $anio_inscripcion = $request->anio_inscripcion;
+
+        try {
+            $query="
+                SELECT
+                    B.ID ID_BENEFICIARIO,
+                    B.CUI,
+                    B.INTERLOCUTOR,
+                    B.PASAPORTE,
+                    CONCATENARNOMBRES(B.PRIMER_NOMBRE, B.SEGUNDO_NOMBRE, B.PRIMER_APELLIDO, B.SEGUNDO_APELLIDO) BENEFICIARIO,
+                    B.SEXO,
+                    TO_CHAR(B.FECHA_NACIMIENTO,'DD-MM-YYYY') FECHA_NACIMIENTO,
+                    TRUNC(MONTHS_BETWEEN(SYSDATE, B.FECHA_NACIMIENTO) / 12) EDAD,
+                    B.CELULAR,
+                    B.CORREO,
+                    EC.NOMBRE ESTADO_CIVIL,
+                    ET.NOMBRE ETNIA,
+                    DEP.NOMBRE DEPARTAMENTO,
+                    M.NOMBRE MUNICIPIO,
+                    D.ZONA_ID ZONA,
+                    GH.NOMBRE GRUPO_HABITACIONAL,
+                    GZ.DESCRIPCION,
+                    D.DIRECCION,
+                    TO_CHAR(B.CREATED_AT,'DD-MM-YYYY') FECHA_PRIMER_REGISTRO,
+                    DM.ENFERMEDADES_ALERGIAS,
+                    DM.MEDICAMENTOS,
+                    DM.DOSIS,
+                    TS.NOMBRE TIPO_SANGRE,
+                    DA.ESTABLECIMIENTO,
+                    DA.TITULO_CARRERA,
+                    ESCO.NOMBRE ESCOLARIDAD,
+                    DA.TIPO TIPO_ESTABLECIMIENTO,
+                    RESP.CUI RESPONSABLE_CUI,
+                    RESP.NOMBRES RESPONSABLE_NOMBRES,
+                    RESP.APELLIDOS RESPONSABLE_APELLIDOS,
+                    TO_CHAR(RESP.FECHA_NACIMIENTO, 'DD-MM-YYYY') RESPONSABLE_FECHA_NACIMIENTO,
+                    RESP.CELULAR RESPONSABLE_CELULAR,
+                    RESP.EMAIL RESPONSABLE_CORREO,
+                    PARENT.NOMBRE RESPONSABLE_PARENTESCO,
+                    RESP.SEXO RESPONSABLE_SEXO,
+                    RESP.DIRECCION RESPONSABLE_DIRECCION,
+                    RESP.ZONA_ID RESPONSABLE_ZONA,
+                    EMER.CUI EMERGENCIA_CUI,
+                    EMER.NOMBRES EMERGENCIA_NOMBRES,
+                    EMER.APELLIDOS EMERGENCIA_APELLIDOS,
+                    TO_CHAR(EMER.FECHA_NACIMIENTO,'DD-MM-YYYY') EMERGENCIA_FECHA_NACIMIENTO,
+                    EMER.CELULAR EMERGENCIA_CELULAR,
+                    EMER.EMAIL EMERGENCIA_CORREO,
+                    PARENT_EMER.NOMBRE EMERGENCIA_PARENTESCO,
+                    EMER.SEXO EMERGENCIA_SEXO,
+                    EMER.DIRECCION EMERGENCIA_DIRECCION,
+                    EMER.ZONA_ID EMERGENCIA_ZONA,
+                    BA.ANIO_INSCRIPCION,
+                    CASE WHEN DA.TIPO_ACTIVIDAD_ID = 1 THEN 'SERVICIO' ELSE 'EVENTO' END AS TIPO_ACTIVIDAD,
+                    BA.ID ID_INSCRIPCION,
+                    BA.ESTADO ESTADO_INSCRIPCION,
+                    DEPEN.NOMBRE DEPENDENCIA,
+                    '' ESCUELA,
+                    PROG.NOMBRE PROGRAMA,
+                    DA.ID ID_ASIGNACION,
+                    ACT.NOMBRE ACTIVIDAD,
+                    'N' IMPULSATEC,
+                    '' SECCION,
+                    '' MODALIDAD,
+                    '' TEMPORALIDAD,
+                    '' SEDE,
+                    DA.DIRECCION ACTIVIDAD_DIRECCION,
+                    DA.ZONA_ID ACTIVIDAD_ZONA,
+                    '' PUBLICO,
+                    '' PAGA
+                FROM BENEFICIARIOS_ACTIVIDADES BA
+                    INNER JOIN BENEFICIARIOS B
+                        ON BENEFICIARIO_ID = B.ID
+                    LEFT JOIN(
+                        SELECT
+                            D.*,
+                            ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
+                        FROM DOMICILIOS D
+                    ) D
+                        ON B.ID = D.BENEFICIARIO_ID AND D.RNK = 1
+                    LEFT JOIN MUNICIPIOS M
+                        ON D.MUNICIPIO_ID = M.ID
+                    LEFT JOIN DEPARTAMENTOS DEP
+                        ON M.DEPARTAMENTO_ID = DEP.ID
+                    LEFT JOIN ESTADOS_CIVILES EC
+                        ON B.ESTADO_CIVIL_ID = EC.ID
+                    LEFT JOIN ETNIAS ET
+                        ON B.ETNIA_ID = ET.ID
+                    LEFT JOIN GRUPOS_ZONAS GZ
+                        ON D.GRUPO_ZONA_ID = GZ.ID
+                    LEFT JOIN GRUPOS_HABITACIONALES GH
+                        ON GZ.GRUPO_HABITACIONAL_ID = GH.ID
+                    LEFT JOIN DATOS_MEDICOS DM
+                        ON DM.BENEFICIARIO_ID = B.ID
+                    LEFT JOIN TIPOS_SANGRE TS
+                        ON DM.TIPO_SANGRE_ID = TS.ID
+                    LEFT JOIN DATOS_ACADEMICOS DA
+                        ON DA.BENEFICIARIO_ID = B.ID
+                    LEFT JOIN ESCOLARIDADES ESCO
+                        ON DA.ESCOLARIDAD_ID = ESCO.ID
+                    LEFT JOIN (
+                        SELECT
+                            RESP.*,
+                            ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
+                        FROM RESPONSABLES RESP
+                    ) RESP
+                        ON B.ID = RESP.BENEFICIARIO_ID AND RESP.RNK = 1 AND RESP.CATEGORIA = 'R'
+                    LEFT JOIN PARENTESCOS PARENT
+                        ON RESP.PARENTESCO_ID = PARENT.ID
+                    LEFT JOIN (
+                        SELECT
+                            EMER.*,
+                            ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
+                        FROM RESPONSABLES EMER
+                    ) EMER
+                        ON B.ID = EMER.BENEFICIARIO_ID AND EMER.RNK = 1 AND EMER.CATEGORIA = 'E'
+                    LEFT JOIN PARENTESCOS PARENT_EMER
+                        ON EMER.PARENTESCO_ID = PARENT_EMER.ID
+                    INNER JOIN DETALLES_ACTIVIDADES DA
+                        ON BA.DETALLE_ACTIVIDAD_ID = DA.ID
+                    INNER JOIN ACTIVIDADES ACT
+                        ON DA.ACTIVIDAD_ID = ACT.ID
+                    INNER JOIN PROGRAMAS PROG
+                        ON DA.PROGRAMA_ID = PROG.ID
+                    INNER JOIN DEPENDENCIAS DEPEN
+                        ON PROG.DEPENDENCIA_ID = DEPEN.ID
+                WHERE BA.ANIO_INSCRIPCION = $anio_inscripcion
+                AND PROG.ID IN($programas)
+
+                UNION
+
+                SELECT
+                    B.ID ID_BENEFICIARIO,
+                    B.CUI,
+                    B.INTERLOCUTOR,
+                    B.PASAPORTE,
+                    CONCATENARNOMBRES(B.PRIMER_NOMBRE, B.SEGUNDO_NOMBRE, B.PRIMER_APELLIDO, B.SEGUNDO_APELLIDO) BENEFICIARIO,
+                    B.SEXO,
+                    TO_CHAR(B.FECHA_NACIMIENTO,'DD-MM-YYYY') FECHA_NACIMIENTO,
+                    TRUNC(MONTHS_BETWEEN(SYSDATE, B.FECHA_NACIMIENTO) / 12) EDAD,
+                    B.CELULAR,
+                    B.CORREO,
+                    EC.NOMBRE ESTADO_CIVIL,
+                    ET.NOMBRE ETNIA,
+                    DEP.NOMBRE DEPARTAMENTO,
+                    M.NOMBRE MUNICIPIO,
+                    D.ZONA_ID ZONA,
+                    GH.NOMBRE GRUPO_HABITACIONAL,
+                    GZ.DESCRIPCION,
+                    D.DIRECCION,
+                    TO_CHAR(B.CREATED_AT,'DD-MM-YYYY') FECHA_PRIMER_REGISTRO,
+                    DM.ENFERMEDADES_ALERGIAS,
+                    DM.MEDICAMENTOS,
+                    DM.DOSIS,
+                    TS.NOMBRE TIPO_SANGRE,
+                    DA.ESTABLECIMIENTO,
+                    DA.TITULO_CARRERA,
+                    ESCO.NOMBRE ESCOLARIDAD,
+                    DA.TIPO TIPO_ESTABLECIMIENTO,
+                    RESP.CUI RESPONSABLE_CUI,
+                    RESP.NOMBRES RESPONSABLE_NOMBRES,
+                    RESP.APELLIDOS RESPONSABLE_APELLIDOS,
+                    TO_CHAR(RESP.FECHA_NACIMIENTO, 'DD-MM-YYYY') RESPONSABLE_FECHA_NACIMIENTO,
+                    RESP.CELULAR RESPONSABLE_CELULAR,
+                    RESP.EMAIL RESPONSABLE_CORREO,
+                    PARENT.NOMBRE RESPONSABLE_PARENTESCO,
+                    RESP.SEXO RESPONSABLE_SEXO,
+                    RESP.DIRECCION RESPONSABLE_DIRECCION,
+                    RESP.ZONA_ID RESPONSABLE_ZONA,
+                    EMER.CUI EMERGENCIA_CUI,
+                    EMER.NOMBRES EMERGENCIA_NOMBRES,
+                    EMER.APELLIDOS EMERGENCIA_APELLIDOS,
+                    TO_CHAR(EMER.FECHA_NACIMIENTO,'DD-MM-YYYY') EMERGENCIA_FECHA_NACIMIENTO,
+                    EMER.CELULAR EMERGENCIA_CELULAR,
+                    EMER.EMAIL EMERGENCIA_CORREO,
+                    PARENT_EMER.NOMBRE EMERGENCIA_PARENTESCO,
+                    EMER.SEXO EMERGENCIA_SEXO,
+                    EMER.DIRECCION EMERGENCIA_DIRECCION,
+                    EMER.ZONA_ID EMERGENCIA_ZONA,
+                    BC.ANIO_INSCRIPCION,
+                    'CURSO' TIPO_ACTIVIDAD,
+                    BC.ID ID_INSCRIPCION,
+                    BC.ESTADO ESTADO_INSCRIPCION,
+                    DEPEN.NOMBRE DEPENDENCIA,
+                    ESC.NOMBRE ESCUELA,
+                    PROG.NOMBRE PROGRAMA,
+                    DC.ID ID_ASIGNACION,
+                    C.NOMBRE CURSO,
+                    C.IMPULSATEC,
+                    DC.SECCION,
+                    DC.MODALIDAD,
+                    TEMP.NOMBRE TEMPORALIDAD,
+                    S.NOMBRE SEDE,
+                    S.DIRECCION SEDE_DIRECCION,
+                    S.ZONA_ID SEDE_ZONA,
+                    DC.PUBLICO,
+                    DC.PAGA
+                FROM BENEFICIARIOS_CURSOS BC
+                    INNER JOIN BENEFICIARIOS B
+                        ON BENEFICIARIO_ID = B.ID
+                    LEFT JOIN(
+                        SELECT
+                            D.*,
+                            ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
+                        FROM DOMICILIOS D
+                    ) D
+                        ON B.ID = D.BENEFICIARIO_ID AND D.RNK = 1
+                    LEFT JOIN MUNICIPIOS M
+                        ON D.MUNICIPIO_ID = M.ID
+                    LEFT JOIN DEPARTAMENTOS DEP
+                        ON M.DEPARTAMENTO_ID = DEP.ID
+                    LEFT JOIN ESTADOS_CIVILES EC
+                        ON B.ESTADO_CIVIL_ID = EC.ID
+                    LEFT JOIN ETNIAS ET
+                        ON B.ETNIA_ID = ET.ID
+                    LEFT JOIN GRUPOS_ZONAS GZ
+                        ON D.GRUPO_ZONA_ID = GZ.ID
+                    LEFT JOIN GRUPOS_HABITACIONALES GH
+                        ON GZ.GRUPO_HABITACIONAL_ID = GH.ID
+                    LEFT JOIN DATOS_MEDICOS DM
+                        ON DM.BENEFICIARIO_ID = B.ID
+                    LEFT JOIN TIPOS_SANGRE TS
+                        ON DM.TIPO_SANGRE_ID = TS.ID
+                    LEFT JOIN DATOS_ACADEMICOS DA
+                        ON DA.BENEFICIARIO_ID = B.ID
+                    LEFT JOIN ESCOLARIDADES ESCO
+                        ON DA.ESCOLARIDAD_ID = ESCO.ID
+                    LEFT JOIN (
+                        SELECT
+                            RESP.*,
+                            ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
+                        FROM RESPONSABLES RESP
+                    ) RESP
+                        ON B.ID = RESP.BENEFICIARIO_ID AND RESP.RNK = 1 AND RESP.CATEGORIA = 'R'
+                    LEFT JOIN PARENTESCOS PARENT
+                        ON RESP.PARENTESCO_ID = PARENT.ID
+                    LEFT JOIN (
+                        SELECT
+                            EMER.*,
+                            ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
+                        FROM RESPONSABLES EMER
+                    ) EMER
+                        ON B.ID = EMER.BENEFICIARIO_ID AND EMER.RNK = 1 AND EMER.CATEGORIA = 'E'
+                    LEFT JOIN PARENTESCOS PARENT_EMER
+                        ON EMER.PARENTESCO_ID = PARENT_EMER.ID
+                    INNER JOIN DETALLES_CURSOS DC
+                        ON BC.DETALLE_CURSO_ID = DC.ID
+                    INNER JOIN CURSOS C
+                        ON DC.CURSO_ID = C.ID
+                    INNER JOIN SEDES S
+                        ON DC.SEDE_ID = S.ID
+                    INNER JOIN TEMPORALIDADES TEMP
+                        ON DC.TEMPORALIDAD_ID = TEMP.ID
+                    INNER JOIN PROGRAMAS PROG
+                        ON DC.PROGRAMA_ID = PROG.ID
+                    LEFT JOIN ESCUELAS ESC
+                        ON PROG.ESCUELA_ID = ESC.ID
+                    INNER JOIN DEPENDENCIAS DEPEN
+                        ON PROG.DEPENDENCIA_ID = DEPEN.ID
+                WHERE BC.ANIO_INSCRIPCION = $anio_inscripcion
+                AND PROG.ID IN($programas)
+
+                UNION
+
+                SELECT
+                    B.ID ID_BENEFICIARIO,
+                    B.CUI,
+                    B.INTERLOCUTOR,
+                    B.PASAPORTE,
+                    CONCATENARNOMBRES(B.PRIMER_NOMBRE, B.SEGUNDO_NOMBRE, B.PRIMER_APELLIDO, B.SEGUNDO_APELLIDO) BENEFICIARIO,
+                    B.SEXO,
+                    TO_CHAR(B.FECHA_NACIMIENTO,'DD-MM-YYYY') FECHA_NACIMIENTO,
+                    TRUNC(MONTHS_BETWEEN(SYSDATE, B.FECHA_NACIMIENTO) / 12) EDAD,
+                    B.CELULAR,
+                    B.CORREO,
+                    EC.NOMBRE ESTADO_CIVIL,
+                    ET.NOMBRE ETNIA,
+                    DEP.NOMBRE DEPARTAMENTO,
+                    M.NOMBRE MUNICIPIO,
+                    D.ZONA_ID ZONA,
+                    GH.NOMBRE GRUPO_HABITACIONAL,
+                    GZ.DESCRIPCION,
+                    D.DIRECCION,
+                    TO_CHAR(B.CREATED_AT,'DD-MM-YYYY') FECHA_PRIMER_REGISTRO,
+                    DM.ENFERMEDADES_ALERGIAS,
+                    DM.MEDICAMENTOS,
+                    DM.DOSIS,
+                    TS.NOMBRE TIPO_SANGRE,
+                    DA.ESTABLECIMIENTO,
+                    DA.TITULO_CARRERA,
+                    ESCO.NOMBRE ESCOLARIDAD,
+                    DA.TIPO TIPO_ESTABLECIMIENTO,
+                    RESP.CUI RESPONSABLE_CUI,
+                    RESP.NOMBRES RESPONSABLE_NOMBRES,
+                    RESP.APELLIDOS RESPONSABLE_APELLIDOS,
+                    TO_CHAR(RESP.FECHA_NACIMIENTO, 'DD-MM-YYYY') RESPONSABLE_FECHA_NACIMIENTO,
+                    RESP.CELULAR RESPONSABLE_CELULAR,
+                    RESP.EMAIL RESPONSABLE_CORREO,
+                    PARENT.NOMBRE RESPONSABLE_PARENTESCO,
+                    RESP.SEXO RESPONSABLE_SEXO,
+                    RESP.DIRECCION RESPONSABLE_DIRECCION,
+                    RESP.ZONA_ID RESPONSABLE_ZONA,
+                    EMER.CUI EMERGENCIA_CUI,
+                    EMER.NOMBRES EMERGENCIA_NOMBRES,
+                    EMER.APELLIDOS EMERGENCIA_APELLIDOS,
+                    TO_CHAR(EMER.FECHA_NACIMIENTO,'DD-MM-YYYY') EMERGENCIA_FECHA_NACIMIENTO,
+                    EMER.CELULAR EMERGENCIA_CELULAR,
+                    EMER.EMAIL EMERGENCIA_CORREO,
+                    PARENT_EMER.NOMBRE EMERGENCIA_PARENTESCO,
+                    EMER.SEXO EMERGENCIA_SEXO,
+                    EMER.DIRECCION EMERGENCIA_DIRECCION,
+                    EMER.ZONA_ID EMERGENCIA_ZONA,
+                    BM.ANIO_INSCRIPCION,
+                    'MODULO' TIPO_ACTIVIDAD,
+                    BM.ID ID_INSCRIPCION,
+                    BM.ESTADO ESTADO_INSCRIPCION,
+                    DEPEN.NOMBRE DEPENDENCIA,
+                    ESC.NOMBRE ESCUELA,
+                    PROG.NOMBRE PROGRAMA,
+                    MOD.ID ID_ASIGNACION,
+                    MOD.NOMBRE MODULO,
+                    'N' IMPULSATEC,
+                    MOD.SECCION,
+                    MOD.MODALIDAD,
+                    TEMP.NOMBRE TEMPORALIDAD,
+                    S.NOMBRE SEDE,
+                    S.DIRECCION SEDE_DIRECCION,
+                    S.ZONA_ID SEDE_ZONA,
+                    MOD.PUBLICO,
+                    MOD.PAGA
+                FROM BENEFICIARIOS_MODULOS BM
+                    INNER JOIN BENEFICIARIOS B
+                        ON BENEFICIARIO_ID = B.ID
+                    LEFT JOIN(
+                        SELECT
+                            D.*,
+                            ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
+                        FROM DOMICILIOS D
+                    ) D
+                        ON B.ID = D.BENEFICIARIO_ID AND D.RNK = 1
+                    LEFT JOIN MUNICIPIOS M
+                        ON D.MUNICIPIO_ID = M.ID
+                    LEFT JOIN DEPARTAMENTOS DEP
+                        ON M.DEPARTAMENTO_ID = DEP.ID
+                    LEFT JOIN ESTADOS_CIVILES EC
+                        ON B.ESTADO_CIVIL_ID = EC.ID
+                    LEFT JOIN ETNIAS ET
+                        ON B.ETNIA_ID = ET.ID
+                    LEFT JOIN GRUPOS_ZONAS GZ
+                        ON D.GRUPO_ZONA_ID = GZ.ID
+                    LEFT JOIN GRUPOS_HABITACIONALES GH
+                        ON GZ.GRUPO_HABITACIONAL_ID = GH.ID
+                    LEFT JOIN DATOS_MEDICOS DM
+                        ON DM.BENEFICIARIO_ID = B.ID
+                    LEFT JOIN TIPOS_SANGRE TS
+                        ON DM.TIPO_SANGRE_ID = TS.ID
+                    LEFT JOIN DATOS_ACADEMICOS DA
+                        ON DA.BENEFICIARIO_ID = B.ID
+                    LEFT JOIN ESCOLARIDADES ESCO
+                        ON DA.ESCOLARIDAD_ID = ESCO.ID
+                    LEFT JOIN (
+                        SELECT
+                            RESP.*,
+                            ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
+                        FROM RESPONSABLES RESP
+                    ) RESP
+                        ON B.ID = RESP.BENEFICIARIO_ID AND RESP.RNK = 1 AND RESP.CATEGORIA = 'R'
+                    LEFT JOIN PARENTESCOS PARENT
+                        ON RESP.PARENTESCO_ID = PARENT.ID
+                    LEFT JOIN (
+                        SELECT
+                            EMER.*,
+                            ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
+                        FROM RESPONSABLES EMER
+                    ) EMER
+                        ON B.ID = EMER.BENEFICIARIO_ID AND EMER.RNK = 1 AND EMER.CATEGORIA = 'E'
+                    LEFT JOIN PARENTESCOS PARENT_EMER
+                        ON EMER.PARENTESCO_ID = PARENT_EMER.ID
+                    INNER JOIN MODULOS MOD
+                        ON BM.MODULO_ID = MOD.ID
+                    INNER JOIN SEDES S
+                        ON MOD.SEDE_ID = S.ID
+                    INNER JOIN TEMPORALIDADES TEMP
+                        ON MOD.TEMPORALIDAD_ID = TEMP.ID
+                    INNER JOIN PROGRAMAS PROG
+                        ON MOD.PROGRAMA_ID = PROG.ID
+                    LEFT JOIN ESCUELAS ESC
+                        ON PROG.ESCUELA_ID = ESC.ID
+                    INNER JOIN DEPENDENCIAS DEPEN
+                        ON PROG.DEPENDENCIA_ID = DEPEN.ID
+                WHERE BM.ANIO_INSCRIPCION = $anio_inscripcion
+                AND PROG.ID IN($programas)
+            ";
+
+            $rows = DB::connection('gds')->select($query);
+            $columns = collect($rows)->first();
+
+            return Excel::download(new GenerarReporteExcel($rows,$columns),'export.xlsx');
+
+        } catch (\Throwable $th) {
+            return response([
+                'error' => $th->getMessage(),
+                'message' => 'Error al realizar la consulta.',
+            ]);
+        }
+    }
 
 }
