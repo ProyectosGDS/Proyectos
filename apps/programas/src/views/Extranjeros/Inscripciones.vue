@@ -30,8 +30,7 @@ const years = computed(() => {
 onMounted(() => {
 
     catalogos.getCatalogoBeneficiario()
-    const year = new Date()
-    store.inscripcion.year = year.getFullYear() + 1
+    store.inscripcion.year = JSON.parse(localStorage.getItem('anio_electivo')) ?? null
 })
 
 watchEffect(() => {

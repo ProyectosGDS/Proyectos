@@ -1,4 +1,5 @@
 
+@if(!empty($rows))
 <table>
     <thead>
         <tr>
@@ -8,16 +9,21 @@
         </tr>
     </thead>
     <tbody>
-        @forelse ($rows as $row)
+        @foreach ($rows as $row)
         <tr>
             @foreach ($columns as $key => $value)
             <td>{{ mb_strtoupper($row->{$key}) }}</td>
             @endforeach
         </tr>
-        @empty
-        <tr>
-            <td colspan="{{ count($columns) }}"> NO HAY DATOS .....</td>
-        </tr>
-        @endforelse
+        @endforeach
     </tbody>
 </table>
+@else
+<table>
+    <thead>
+        <tr>
+            <th>No hay informacion</th>
+        </tr>
+    </thead>
+</table>
+@endif

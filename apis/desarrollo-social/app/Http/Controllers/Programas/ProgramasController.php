@@ -1039,7 +1039,13 @@ class ProgramasController extends Controller
             $rows = DB::connection('gds')->select($query);
             $columns = collect($rows)->first();
 
-            return Excel::download(new GenerarReporteExcel($rows,$columns),'export.xlsx');
+            if($rows) {
+                return Excel::download(new GenerarReporteExcel($rows,$columns),'export.xlsx');
+            }
+
+            return response([
+                'message' => 'No hay se genero por que no hay informacion.'
+            ],200);
 
         } catch (\Throwable $th) {
             return response([

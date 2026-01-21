@@ -34,11 +34,12 @@
     }
 
     function formatCui() {
-        let cadena = store.extranjero.pasaporte
+        let cadena = store.pasaporte
         if(cadena) {
             let numeros = cadena.replace(/\D+/g, "");
             let formatCui = numeros.padEnd(13, "0");
             store.extranjero.cui = formatCui
+            store.extranjero.pasaporte = store.pasaporte
         }
     }
 

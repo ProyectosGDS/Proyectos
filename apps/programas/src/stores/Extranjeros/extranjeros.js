@@ -211,8 +211,7 @@ export const useExtranjerosStore = defineStore('extranjeros', () => {
                 zona_id: null,
                 fecha_nacimiento: null,
                 categoria: 'E'
-            }
-            
+            } 
         }
     }
 
