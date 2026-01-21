@@ -644,13 +644,14 @@ class ProgramasController extends Controller
         $anio_inscripcion = $request->anio_inscripcion;
 
         try {
+            
             $query="
                 SELECT
                     B.ID ID_BENEFICIARIO,
                     B.CUI,
                     B.INTERLOCUTOR,
                     B.PASAPORTE,
-                    CONCATENARNOMBRES(B.PRIMER_NOMBRE, B.SEGUNDO_NOMBRE, B.PRIMER_APELLIDO, B.SEGUNDO_APELLIDO) BENEFICIARIO,
+                    ADM_GDS.CONCATENARNOMBRES(B.PRIMER_NOMBRE, B.SEGUNDO_NOMBRE, B.PRIMER_APELLIDO, B.SEGUNDO_APELLIDO) BENEFICIARIO,
                     B.SEXO,
                     TO_CHAR(B.FECHA_NACIMIENTO,'DD-MM-YYYY') FECHA_NACIMIENTO,
                     TRUNC(MONTHS_BETWEEN(SYSDATE, B.FECHA_NACIMIENTO) / 12) EDAD,
@@ -711,61 +712,61 @@ class ProgramasController extends Controller
                     DA.ZONA_ID ACTIVIDAD_ZONA,
                     '' PUBLICO,
                     '' PAGA
-                FROM BENEFICIARIOS_ACTIVIDADES BA
-                    INNER JOIN BENEFICIARIOS B
+                FROM ADM_GDS.BENEFICIARIOS_ACTIVIDADES BA
+                    INNER JOIN ADM_GDS.BENEFICIARIOS B
                         ON BENEFICIARIO_ID = B.ID
-                    LEFT JOIN(
+                    LEFT JOIN (
                         SELECT
                             D.*,
                             ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
-                        FROM DOMICILIOS D
+                        FROM ADM_GDS.DOMICILIOS D
                     ) D
                         ON B.ID = D.BENEFICIARIO_ID AND D.RNK = 1
-                    LEFT JOIN MUNICIPIOS M
+                    LEFT JOIN ADM_GDS.MUNICIPIOS M
                         ON D.MUNICIPIO_ID = M.ID
-                    LEFT JOIN DEPARTAMENTOS DEP
+                    LEFT JOIN ADM_GDS.DEPARTAMENTOS DEP
                         ON M.DEPARTAMENTO_ID = DEP.ID
-                    LEFT JOIN ESTADOS_CIVILES EC
+                    LEFT JOIN ADM_GDS.ESTADOS_CIVILES EC
                         ON B.ESTADO_CIVIL_ID = EC.ID
-                    LEFT JOIN ETNIAS ET
+                    LEFT JOIN ADM_GDS.ETNIAS ET
                         ON B.ETNIA_ID = ET.ID
-                    LEFT JOIN GRUPOS_ZONAS GZ
+                    LEFT JOIN ADM_GDS.GRUPOS_ZONAS GZ
                         ON D.GRUPO_ZONA_ID = GZ.ID
-                    LEFT JOIN GRUPOS_HABITACIONALES GH
+                    LEFT JOIN ADM_GDS.GRUPOS_HABITACIONALES GH
                         ON GZ.GRUPO_HABITACIONAL_ID = GH.ID
-                    LEFT JOIN DATOS_MEDICOS DM
+                    LEFT JOIN ADM_GDS.DATOS_MEDICOS DM
                         ON DM.BENEFICIARIO_ID = B.ID
-                    LEFT JOIN TIPOS_SANGRE TS
+                    LEFT JOIN ADM_GDS.TIPOS_SANGRE TS
                         ON DM.TIPO_SANGRE_ID = TS.ID
-                    LEFT JOIN DATOS_ACADEMICOS DA
+                    LEFT JOIN ADM_GDS.DATOS_ACADEMICOS DA
                         ON DA.BENEFICIARIO_ID = B.ID
-                    LEFT JOIN ESCOLARIDADES ESCO
+                    LEFT JOIN ADM_GDS.ESCOLARIDADES ESCO
                         ON DA.ESCOLARIDAD_ID = ESCO.ID
                     LEFT JOIN (
                         SELECT
                             RESP.*,
                             ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
-                        FROM RESPONSABLES RESP
+                        FROM ADM_GDS.RESPONSABLES RESP
                     ) RESP
                         ON B.ID = RESP.BENEFICIARIO_ID AND RESP.RNK = 1 AND RESP.CATEGORIA = 'R'
-                    LEFT JOIN PARENTESCOS PARENT
+                    LEFT JOIN ADM_GDS.PARENTESCOS PARENT
                         ON RESP.PARENTESCO_ID = PARENT.ID
                     LEFT JOIN (
                         SELECT
                             EMER.*,
                             ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
-                        FROM RESPONSABLES EMER
+                        FROM ADM_GDS.RESPONSABLES EMER
                     ) EMER
                         ON B.ID = EMER.BENEFICIARIO_ID AND EMER.RNK = 1 AND EMER.CATEGORIA = 'E'
-                    LEFT JOIN PARENTESCOS PARENT_EMER
+                    LEFT JOIN ADM_GDS.PARENTESCOS PARENT_EMER
                         ON EMER.PARENTESCO_ID = PARENT_EMER.ID
-                    INNER JOIN DETALLES_ACTIVIDADES DA
+                    INNER JOIN ADM_GDS.DETALLES_ACTIVIDADES DA
                         ON BA.DETALLE_ACTIVIDAD_ID = DA.ID
-                    INNER JOIN ACTIVIDADES ACT
+                    INNER JOIN ADM_GDS.ACTIVIDADES ACT
                         ON DA.ACTIVIDAD_ID = ACT.ID
-                    INNER JOIN PROGRAMAS PROG
+                    INNER JOIN ADM_GDS.PROGRAMAS PROG
                         ON DA.PROGRAMA_ID = PROG.ID
-                    INNER JOIN DEPENDENCIAS DEPEN
+                    INNER JOIN ADM_GDS.DEPENDENCIAS DEPEN
                         ON PROG.DEPENDENCIA_ID = DEPEN.ID
                 WHERE BA.ANIO_INSCRIPCION = $anio_inscripcion
                 AND PROG.ID IN($programas)
@@ -777,7 +778,7 @@ class ProgramasController extends Controller
                     B.CUI,
                     B.INTERLOCUTOR,
                     B.PASAPORTE,
-                    CONCATENARNOMBRES(B.PRIMER_NOMBRE, B.SEGUNDO_NOMBRE, B.PRIMER_APELLIDO, B.SEGUNDO_APELLIDO) BENEFICIARIO,
+                    ADM_GDS.CONCATENARNOMBRES(B.PRIMER_NOMBRE, B.SEGUNDO_NOMBRE, B.PRIMER_APELLIDO, B.SEGUNDO_APELLIDO) BENEFICIARIO,
                     B.SEXO,
                     TO_CHAR(B.FECHA_NACIMIENTO,'DD-MM-YYYY') FECHA_NACIMIENTO,
                     TRUNC(MONTHS_BETWEEN(SYSDATE, B.FECHA_NACIMIENTO) / 12) EDAD,
@@ -838,67 +839,67 @@ class ProgramasController extends Controller
                     S.ZONA_ID SEDE_ZONA,
                     DC.PUBLICO,
                     DC.PAGA
-                FROM BENEFICIARIOS_CURSOS BC
-                    INNER JOIN BENEFICIARIOS B
+                FROM ADM_GDS.BENEFICIARIOS_CURSOS BC
+                    INNER JOIN ADM_GDS.BENEFICIARIOS B
                         ON BENEFICIARIO_ID = B.ID
-                    LEFT JOIN(
+                    LEFT JOIN (
                         SELECT
                             D.*,
                             ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
-                        FROM DOMICILIOS D
+                        FROM ADM_GDS.DOMICILIOS D
                     ) D
                         ON B.ID = D.BENEFICIARIO_ID AND D.RNK = 1
-                    LEFT JOIN MUNICIPIOS M
+                    LEFT JOIN ADM_GDS.MUNICIPIOS M
                         ON D.MUNICIPIO_ID = M.ID
-                    LEFT JOIN DEPARTAMENTOS DEP
+                    LEFT JOIN ADM_GDS.DEPARTAMENTOS DEP
                         ON M.DEPARTAMENTO_ID = DEP.ID
-                    LEFT JOIN ESTADOS_CIVILES EC
+                    LEFT JOIN ADM_GDS.ESTADOS_CIVILES EC
                         ON B.ESTADO_CIVIL_ID = EC.ID
-                    LEFT JOIN ETNIAS ET
+                    LEFT JOIN ADM_GDS.ETNIAS ET
                         ON B.ETNIA_ID = ET.ID
-                    LEFT JOIN GRUPOS_ZONAS GZ
+                    LEFT JOIN ADM_GDS.GRUPOS_ZONAS GZ
                         ON D.GRUPO_ZONA_ID = GZ.ID
-                    LEFT JOIN GRUPOS_HABITACIONALES GH
+                    LEFT JOIN ADM_GDS.GRUPOS_HABITACIONALES GH
                         ON GZ.GRUPO_HABITACIONAL_ID = GH.ID
-                    LEFT JOIN DATOS_MEDICOS DM
+                    LEFT JOIN ADM_GDS.DATOS_MEDICOS DM
                         ON DM.BENEFICIARIO_ID = B.ID
-                    LEFT JOIN TIPOS_SANGRE TS
+                    LEFT JOIN ADM_GDS.TIPOS_SANGRE TS
                         ON DM.TIPO_SANGRE_ID = TS.ID
-                    LEFT JOIN DATOS_ACADEMICOS DA
+                    LEFT JOIN ADM_GDS.DATOS_ACADEMICOS DA
                         ON DA.BENEFICIARIO_ID = B.ID
-                    LEFT JOIN ESCOLARIDADES ESCO
+                    LEFT JOIN ADM_GDS.ESCOLARIDADES ESCO
                         ON DA.ESCOLARIDAD_ID = ESCO.ID
                     LEFT JOIN (
                         SELECT
                             RESP.*,
                             ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
-                        FROM RESPONSABLES RESP
+                        FROM ADM_GDS.RESPONSABLES RESP
                     ) RESP
                         ON B.ID = RESP.BENEFICIARIO_ID AND RESP.RNK = 1 AND RESP.CATEGORIA = 'R'
-                    LEFT JOIN PARENTESCOS PARENT
+                    LEFT JOIN ADM_GDS.PARENTESCOS PARENT
                         ON RESP.PARENTESCO_ID = PARENT.ID
                     LEFT JOIN (
                         SELECT
                             EMER.*,
                             ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
-                        FROM RESPONSABLES EMER
+                        FROM ADM_GDS.RESPONSABLES EMER
                     ) EMER
                         ON B.ID = EMER.BENEFICIARIO_ID AND EMER.RNK = 1 AND EMER.CATEGORIA = 'E'
-                    LEFT JOIN PARENTESCOS PARENT_EMER
+                    LEFT JOIN ADM_GDS.PARENTESCOS PARENT_EMER
                         ON EMER.PARENTESCO_ID = PARENT_EMER.ID
-                    INNER JOIN DETALLES_CURSOS DC
+                    INNER JOIN ADM_GDS.DETALLES_CURSOS DC
                         ON BC.DETALLE_CURSO_ID = DC.ID
-                    INNER JOIN CURSOS C
+                    INNER JOIN ADM_GDS.CURSOS C
                         ON DC.CURSO_ID = C.ID
-                    INNER JOIN SEDES S
+                    INNER JOIN ADM_GDS.SEDES S
                         ON DC.SEDE_ID = S.ID
-                    INNER JOIN TEMPORALIDADES TEMP
+                    INNER JOIN ADM_GDS.TEMPORALIDADES TEMP
                         ON DC.TEMPORALIDAD_ID = TEMP.ID
-                    INNER JOIN PROGRAMAS PROG
+                    INNER JOIN ADM_GDS.PROGRAMAS PROG
                         ON DC.PROGRAMA_ID = PROG.ID
-                    LEFT JOIN ESCUELAS ESC
+                    LEFT JOIN ADM_GDS.ESCUELAS ESC
                         ON PROG.ESCUELA_ID = ESC.ID
-                    INNER JOIN DEPENDENCIAS DEPEN
+                    INNER JOIN ADM_GDS.DEPENDENCIAS DEPEN
                         ON PROG.DEPENDENCIA_ID = DEPEN.ID
                 WHERE BC.ANIO_INSCRIPCION = $anio_inscripcion
                 AND PROG.ID IN($programas)
@@ -910,7 +911,7 @@ class ProgramasController extends Controller
                     B.CUI,
                     B.INTERLOCUTOR,
                     B.PASAPORTE,
-                    CONCATENARNOMBRES(B.PRIMER_NOMBRE, B.SEGUNDO_NOMBRE, B.PRIMER_APELLIDO, B.SEGUNDO_APELLIDO) BENEFICIARIO,
+                    ADM_GDS.CONCATENARNOMBRES(B.PRIMER_NOMBRE, B.SEGUNDO_NOMBRE, B.PRIMER_APELLIDO, B.SEGUNDO_APELLIDO) BENEFICIARIO,
                     B.SEXO,
                     TO_CHAR(B.FECHA_NACIMIENTO,'DD-MM-YYYY') FECHA_NACIMIENTO,
                     TRUNC(MONTHS_BETWEEN(SYSDATE, B.FECHA_NACIMIENTO) / 12) EDAD,
@@ -971,65 +972,65 @@ class ProgramasController extends Controller
                     S.ZONA_ID SEDE_ZONA,
                     MOD.PUBLICO,
                     MOD.PAGA
-                FROM BENEFICIARIOS_MODULOS BM
-                    INNER JOIN BENEFICIARIOS B
+                FROM ADM_GDS.BENEFICIARIOS_MODULOS BM
+                    INNER JOIN ADM_GDS.BENEFICIARIOS B
                         ON BENEFICIARIO_ID = B.ID
-                    LEFT JOIN(
+                    LEFT JOIN (
                         SELECT
                             D.*,
                             ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
-                        FROM DOMICILIOS D
+                        FROM ADM_GDS.DOMICILIOS D
                     ) D
                         ON B.ID = D.BENEFICIARIO_ID AND D.RNK = 1
-                    LEFT JOIN MUNICIPIOS M
+                    LEFT JOIN ADM_GDS.MUNICIPIOS M
                         ON D.MUNICIPIO_ID = M.ID
-                    LEFT JOIN DEPARTAMENTOS DEP
+                    LEFT JOIN ADM_GDS.DEPARTAMENTOS DEP
                         ON M.DEPARTAMENTO_ID = DEP.ID
-                    LEFT JOIN ESTADOS_CIVILES EC
+                    LEFT JOIN ADM_GDS.ESTADOS_CIVILES EC
                         ON B.ESTADO_CIVIL_ID = EC.ID
-                    LEFT JOIN ETNIAS ET
+                    LEFT JOIN ADM_GDS.ETNIAS ET
                         ON B.ETNIA_ID = ET.ID
-                    LEFT JOIN GRUPOS_ZONAS GZ
+                    LEFT JOIN ADM_GDS.GRUPOS_ZONAS GZ
                         ON D.GRUPO_ZONA_ID = GZ.ID
-                    LEFT JOIN GRUPOS_HABITACIONALES GH
+                    LEFT JOIN ADM_GDS.GRUPOS_HABITACIONALES GH
                         ON GZ.GRUPO_HABITACIONAL_ID = GH.ID
-                    LEFT JOIN DATOS_MEDICOS DM
+                    LEFT JOIN ADM_GDS.DATOS_MEDICOS DM
                         ON DM.BENEFICIARIO_ID = B.ID
-                    LEFT JOIN TIPOS_SANGRE TS
+                    LEFT JOIN ADM_GDS.TIPOS_SANGRE TS
                         ON DM.TIPO_SANGRE_ID = TS.ID
-                    LEFT JOIN DATOS_ACADEMICOS DA
+                    LEFT JOIN ADM_GDS.DATOS_ACADEMICOS DA
                         ON DA.BENEFICIARIO_ID = B.ID
-                    LEFT JOIN ESCOLARIDADES ESCO
+                    LEFT JOIN ADM_GDS.ESCOLARIDADES ESCO
                         ON DA.ESCOLARIDAD_ID = ESCO.ID
                     LEFT JOIN (
                         SELECT
                             RESP.*,
                             ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
-                        FROM RESPONSABLES RESP
+                        FROM ADM_GDS.RESPONSABLES RESP
                     ) RESP
                         ON B.ID = RESP.BENEFICIARIO_ID AND RESP.RNK = 1 AND RESP.CATEGORIA = 'R'
-                    LEFT JOIN PARENTESCOS PARENT
+                    LEFT JOIN ADM_GDS.PARENTESCOS PARENT
                         ON RESP.PARENTESCO_ID = PARENT.ID
                     LEFT JOIN (
                         SELECT
                             EMER.*,
                             ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
-                        FROM RESPONSABLES EMER
+                        FROM ADM_GDS.RESPONSABLES EMER
                     ) EMER
                         ON B.ID = EMER.BENEFICIARIO_ID AND EMER.RNK = 1 AND EMER.CATEGORIA = 'E'
-                    LEFT JOIN PARENTESCOS PARENT_EMER
+                    LEFT JOIN ADM_GDS.PARENTESCOS PARENT_EMER
                         ON EMER.PARENTESCO_ID = PARENT_EMER.ID
-                    INNER JOIN MODULOS MOD
+                    INNER JOIN ADM_GDS.MODULOS MOD
                         ON BM.MODULO_ID = MOD.ID
-                    INNER JOIN SEDES S
+                    INNER JOIN ADM_GDS.SEDES S
                         ON MOD.SEDE_ID = S.ID
-                    INNER JOIN TEMPORALIDADES TEMP
+                    INNER JOIN ADM_GDS.TEMPORALIDADES TEMP
                         ON MOD.TEMPORALIDAD_ID = TEMP.ID
-                    INNER JOIN PROGRAMAS PROG
+                    INNER JOIN ADM_GDS.PROGRAMAS PROG
                         ON MOD.PROGRAMA_ID = PROG.ID
-                    LEFT JOIN ESCUELAS ESC
+                    LEFT JOIN ADM_GDS.ESCUELAS ESC
                         ON PROG.ESCUELA_ID = ESC.ID
-                    INNER JOIN DEPENDENCIAS DEPEN
+                    INNER JOIN ADM_GDS.DEPENDENCIAS DEPEN
                         ON PROG.DEPENDENCIA_ID = DEPEN.ID
                 WHERE BM.ANIO_INSCRIPCION = $anio_inscripcion
                 AND PROG.ID IN($programas)
