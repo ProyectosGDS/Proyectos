@@ -747,8 +747,9 @@ class ProgramasController extends Controller
                             RESP.*,
                             ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
                         FROM ADM_GDS.RESPONSABLES RESP
+                        WHERE RESP.CATEGORIA = 'R'
                     ) RESP
-                        ON B.ID = RESP.BENEFICIARIO_ID AND RESP.RNK = 1 AND RESP.CATEGORIA = 'R'
+                        ON B.ID = RESP.BENEFICIARIO_ID AND RESP.RNK = 1
                     LEFT JOIN ADM_GDS.PARENTESCOS PARENT
                         ON RESP.PARENTESCO_ID = PARENT.ID
                     LEFT JOIN (
@@ -756,8 +757,9 @@ class ProgramasController extends Controller
                             EMER.*,
                             ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
                         FROM ADM_GDS.RESPONSABLES EMER
+                        WHERE EMER.CATEGORIA = 'E'
                     ) EMER
-                        ON B.ID = EMER.BENEFICIARIO_ID AND EMER.RNK = 1 AND EMER.CATEGORIA = 'E'
+                        ON B.ID = EMER.BENEFICIARIO_ID AND EMER.RNK = 1
                     LEFT JOIN ADM_GDS.PARENTESCOS PARENT_EMER
                         ON EMER.PARENTESCO_ID = PARENT_EMER.ID
                     INNER JOIN ADM_GDS.DETALLES_ACTIVIDADES DA
@@ -874,8 +876,9 @@ class ProgramasController extends Controller
                             RESP.*,
                             ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
                         FROM ADM_GDS.RESPONSABLES RESP
+                        WHERE RESP.CATEGORIA = 'R'
                     ) RESP
-                        ON B.ID = RESP.BENEFICIARIO_ID AND RESP.RNK = 1 AND RESP.CATEGORIA = 'R'
+                        ON B.ID = RESP.BENEFICIARIO_ID AND RESP.RNK = 1
                     LEFT JOIN ADM_GDS.PARENTESCOS PARENT
                         ON RESP.PARENTESCO_ID = PARENT.ID
                     LEFT JOIN (
@@ -883,8 +886,9 @@ class ProgramasController extends Controller
                             EMER.*,
                             ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
                         FROM ADM_GDS.RESPONSABLES EMER
+                        WHERE EMER.CATEGORIA = 'E'
                     ) EMER
-                        ON B.ID = EMER.BENEFICIARIO_ID AND EMER.RNK = 1 AND EMER.CATEGORIA = 'E'
+                        ON B.ID = EMER.BENEFICIARIO_ID AND EMER.RNK = 1
                     LEFT JOIN ADM_GDS.PARENTESCOS PARENT_EMER
                         ON EMER.PARENTESCO_ID = PARENT_EMER.ID
                     INNER JOIN ADM_GDS.DETALLES_CURSOS DC
@@ -1007,8 +1011,9 @@ class ProgramasController extends Controller
                             RESP.*,
                             ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
                         FROM ADM_GDS.RESPONSABLES RESP
+                        WHERE RESP.CATEGORIA = 'R'
                     ) RESP
-                        ON B.ID = RESP.BENEFICIARIO_ID AND RESP.RNK = 1 AND RESP.CATEGORIA = 'R'
+                        ON B.ID = RESP.BENEFICIARIO_ID AND RESP.RNK = 1
                     LEFT JOIN ADM_GDS.PARENTESCOS PARENT
                         ON RESP.PARENTESCO_ID = PARENT.ID
                     LEFT JOIN (
@@ -1016,8 +1021,9 @@ class ProgramasController extends Controller
                             EMER.*,
                             ROW_NUMBER() OVER (PARTITION BY BENEFICIARIO_ID ORDER BY ID DESC) as RNK
                         FROM ADM_GDS.RESPONSABLES EMER
+                        WHERE EMER.CATEGORIA = 'E'
                     ) EMER
-                        ON B.ID = EMER.BENEFICIARIO_ID AND EMER.RNK = 1 AND EMER.CATEGORIA = 'E'
+                        ON B.ID = EMER.BENEFICIARIO_ID AND EMER.RNK = 1
                     LEFT JOIN ADM_GDS.PARENTESCOS PARENT_EMER
                         ON EMER.PARENTESCO_ID = PARENT_EMER.ID
                     INNER JOIN ADM_GDS.MODULOS MOD
