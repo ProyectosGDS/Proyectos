@@ -57,10 +57,27 @@
                 <Input v-model="store.beneficiario.edad" type="number" min="1" option="label" title="edad" readonly :error="store.errors.hasOwnProperty('edad')"/>
                 <div>
                     <h1 class="uppercase text-color-4 text-center">*sexo</h1>
-                    <div class="flex items-center gap-1">
-                        <Icon icon="fas fa-person-dress" class="text-fuchsia-500 text-2xl" />
-                        <Switch class="w-auto h-6 bg-blue-500 has-[:checked]:bg-fuchsia-500" :values="['F','M']" v-model="store.beneficiario.sexo" :error="store.errors.hasOwnProperty('sexo')" />
-                        <Icon icon="fas fa-person" class="text-blue-500 text-2xl" />
+                    <div 
+                        class="flex flex-col items-center gap-1 rounded-lg p-1" 
+                        :class="{'border border-red-500' : store.errors.hasOwnProperty('sexo') }" >
+                        <label class="flex gap-3 items-center">
+                            <input 
+                                v-model="store.beneficiario.sexo" 
+                                type="radio" 
+                                name="sexo" 
+                                value="M"
+                            >
+                            <small>Masculino</small>
+                        </label>
+                        <label class="flex gap-3 items-center">
+                            <input 
+                                v-model="store.beneficiario.sexo" 
+                                type="radio" 
+                                name="sexo" 
+                                value="F"
+                            >
+                            <small>Femenino</small>
+                        </label>
                     </div>
                 </div>
             </div>

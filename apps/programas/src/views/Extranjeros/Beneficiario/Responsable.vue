@@ -24,10 +24,27 @@
             <Input v-model="store.extranjero.responsable.email" option="label" title="email" type="email" maxlength="60" :error="store.errors.hasOwnProperty('responsable.email')"/>
             <div class="grid justify-items-center">
                 <h1 class="uppercase text-color-4 text-center">*sexo</h1>
-                <div class="flex items-center gap-1">
-                    <Icon icon="fas fa-person-dress" class="text-fuchsia-500 text-2xl" />
-                    <Switch class="w-auto h-6 bg-blue-500 has-[:checked]:bg-fuchsia-500" :values="['F','M']" v-model="store.extranjero.responsable.sexo" :error="store.errors.hasOwnProperty('responsable.sexo')" />
-                    <Icon icon="fas fa-person" class="text-blue-500 text-2xl" />
+                <div    
+                    class="flex flex-col items-center gap-1 rounded-lg p-1" 
+                    :class="{'border border-red-500' : store.errors.hasOwnProperty('responsable.sexo') }" >
+                    <label class="flex gap-3 items-center">
+                        <input 
+                            v-model="store.extranjero.responsable.sexo" 
+                            type="radio" 
+                            name="responsable-sexo" 
+                            value="M"
+                        >
+                        <small>Masculino</small>
+                    </label>
+                    <label class="flex gap-3 items-center">
+                        <input 
+                            v-model="store.extranjero.responsable.sexo" 
+                            type="radio" 
+                            name="responsable-sexo" 
+                            value="F"
+                        >
+                        <small>Femenino</small>
+                    </label>
                 </div>
             </div>
             <Input v-model="store.extranjero.responsable.zona_id" option="select" title="seleccione zona" :error="store.errors.hasOwnProperty('responsable.zona_id')">
