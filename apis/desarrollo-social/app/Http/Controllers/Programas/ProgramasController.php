@@ -345,13 +345,14 @@ class ProgramasController extends Controller
                     'A.NOMBRE AS MODULO_CURSO',
                     DB::raw("NULL AS SECCION"),
                     DB::raw("NULL AS SEDE"),
-                    DB::raw("EXTRACT(YEAR FROM BA.CREATED_AT) AS ANIO_INSCRIPCION"),
+                    // DB::raw("EXTRACT(YEAR FROM BA.CREATED_AT) AS ANIO_INSCRIPCION"),
+                    'BA.ANIO_INSCRIPCION',
                     'BA.ESTADO',
                     DB::raw("CAST('N' AS VARCHAR2(1)) AS IMPULSATEC"),
                     DB::raw("CAST(TA.NOMBRE AS VARCHAR2(50)) AS TIPO"),
                     DB::raw("TO_CHAR(BA.CREATED_AT,'YYYY-MM-DD') AS FECHA_REGISTRO"),
                 )
-                ->whereYear('BA.CREATED_AT',$year)
+                ->where('BA.ANIO_INSCRIPCION',$year)
                 ->when(!empty($programa_id),function($query) use ($programa_id){
                     return $query->where('P.ID',$programa_id);
                 })
@@ -427,7 +428,7 @@ class ProgramasController extends Controller
                 ->join('PROGRAMAS P','DA.PROGRAMA_ID','=','P.ID')
                 ->select('B.CUI')
                 
-                ->whereYear('BA.CREATED_AT',$year)
+                ->where('BA.ANIO_INSCRIPCION',$year)
                 ->when(!empty($programa_id),function($query) use ($programa_id){
                     return $query->where('P.ID',$programa_id);
                 })
