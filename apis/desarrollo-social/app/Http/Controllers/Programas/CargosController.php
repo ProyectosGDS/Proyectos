@@ -21,14 +21,18 @@ class CargosController extends Controller
 
     public function generar_partidas(Request $request, programas $programa) {
 
+        $validated = $request->validate([
+            'anio' => 'required|digits:4',
+            'mes' => 'required|digits:2'
+        ]);
+        
         try {
-            $validated = $request->validate([
-                'anio_mes' => 'required|date|date_format:Y-m'
-            ]);
 
-            $mesPago = (int) date('m', strtotime($validated['anio_mes'] . '-01'));
-            $anioPago = (int) date('Y', strtotime($validated['anio_mes'] . '-01'));
-            
+            $mesPago = (int) $validated['mes'];
+            $anioPago = (int) $validated['anio'];
+
+            $anio_mes = $validated['anio'] . '-' . $validated['mes'];
+
             $modulos = $programa->modulos()
                 ->where('paga', 'S')
                 ->with(['tarifas', 'beneficiarios'])
@@ -40,8 +44,8 @@ class CargosController extends Controller
                 ->with(['tarifas', 'beneficiarios','curso'])
                 ->get();
 
-            $partidasGeneradas = $this->procesarModulos($modulos, $mesPago,$anioPago, $validated['anio_mes'], $programa);
-            $partidasGeneradas += $this->procesarCursos($cursos, $mesPago,$anioPago, $validated['anio_mes'], $programa);
+            $partidasGeneradas = $this->procesarModulos($modulos, $mesPago,$anioPago, $anio_mes, $programa);
+            $partidasGeneradas += $this->procesarCursos($cursos, $mesPago,$anioPago, $anio_mes, $programa);
 
             return response()->json([
                 'message' => 'Partidas generadas exitosamente',
@@ -56,7 +60,7 @@ class CargosController extends Controller
         } catch (\Throwable $th) {
             Log::error('Error al generar partidas', [
                 'programa_id' => $programa->id ?? 'N/A',
-                'anio_mes' => $request->anio_mes ?? 'N/A',
+                'anio_mes' => $anio_mes ?? 'N/A',
                 'error' => $th->getMessage()
             ]);
 

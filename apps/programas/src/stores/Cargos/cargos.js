@@ -9,7 +9,8 @@ export const useCargosStore = defineStore('cargos', () => {
 
 
     const programasEscuela = ref([])
-    const anio_mes = ref(null)
+    const anio = ref(null)
+    const mes = ref(null)
     const escuela_id = ref(null)
     const programasGenerados = ref([])
     const loading = ref({
@@ -38,10 +39,14 @@ export const useCargosStore = defineStore('cargos', () => {
         programasGenerados.value.push(programa_id)
         try {
             const response = await axios.post('cargos/generar-partidas/'+programa_id,{
-                anio_mes : anio_mes.value
+                anio : anio.value,
+                mes : mes.value
             })
             global.setAlert(response.data.message,'success')
         } catch (error) {
+            if(error.response.status === 422) {
+                errors.value = error.response.data.errors
+            }
             global.manejarError(error)
         } finally {
             loading.value.cargosPrograma = false
@@ -50,7 +55,8 @@ export const useCargosStore = defineStore('cargos', () => {
 
     return {
         programasEscuela,
-        anio_mes,
+        anio,
+        mes,
         escuela_id,
         programasGenerados,
         loading,
