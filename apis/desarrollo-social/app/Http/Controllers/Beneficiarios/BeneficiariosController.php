@@ -318,7 +318,7 @@ class BeneficiariosController extends Controller
 
             $query = "
                 SELECT
-                    bm.id inscripcion_id,
+                    m.id asignacion_id,
                     p.nombre programa,
                     m.nombre modulo_curso,
                     bm.created_at fecha_inscripcion,
@@ -332,11 +332,11 @@ class BeneficiariosController extends Controller
                 INNER JOIN ADM_GDS.programas p
                     ON m.programa_id = p.id
                 WHERE bm.beneficiario_id = ?
-                
+
                 UNION ALL
-                    
+                        
                 SELECT
-                    bc.id inscripcion_id,
+                    dc.id asignacion_id,
                     p.nombre programa,
                     c.nombre modulo_curso,
                     bc.created_at fecha_inscripcion,
@@ -352,9 +352,31 @@ class BeneficiariosController extends Controller
                 INNER JOIN ADM_GDS.programas p
                     ON dc.programa_id = p.id
                 WHERE bc.beneficiario_id = ?
+
+                UNION ALL
+
+                SELECT
+                    da.id asignacion_id,
+                    p.nombre programa,
+                    a.nombre modulo_curso,
+                    ba.created_at fecha_inscripcion,
+                    ba.estado,
+                    ta.nombre tipo
+                FROM ADM_GDS.beneficiarios_actividades ba
+                INNER JOIN ADM_GDS.beneficiarios b
+                    ON ba.beneficiario_id = b.id
+                INNER JOIN ADM_GDS.detalles_actividades da
+                    ON ba.detalle_actividad_id = da.id
+                INNER JOIN ADM_GDS.tipos_actividades ta
+                    ON da.tipo_actividad_id = ta.id
+                INNER JOIN ADM_GDS.actividades a
+                    ON da.actividad_id = a.id
+                INNER JOIN ADM_GDS.programas p
+                    ON da.programa_id = p.id
+                WHERE ba.beneficiario_id = ?
             ";
 
-            $inscripciones = DB::connection('gds')->select($query,[$beneficiario->id,$beneficiario->id]);
+            $inscripciones = DB::connection('gds')->select($query,[$beneficiario->id,$beneficiario->id,$beneficiario->id]);
 
             return response([
                 'inscripciones' => $inscripciones,

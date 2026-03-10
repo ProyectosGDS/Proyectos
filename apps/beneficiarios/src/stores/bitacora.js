@@ -16,7 +16,7 @@ export const useBitacoraStore = defineStore('bitacora', () => {
     ]
 
     const headersInscripciones = [
-        { title : 'id', key : 'inscripcion_id', type : 'numeric' },
+        { title : 'id', key : 'asignacion_id', type : 'numeric' },
         { title : 'tipo', key : 'tipo' },
         { title : 'programa', key : 'programa' },
         { title : 'módulo / curso', key : 'modulo_curso' },
