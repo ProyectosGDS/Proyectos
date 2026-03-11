@@ -19,7 +19,9 @@ class InscripcionesModulosController extends Controller
         $request->validate([
             'beneficiario_id' => 'required',
             'modulo_id' => 'required',
-            'estado' => 'nullable'
+            'estado' => 'nullable',
+            'tipo_baja' => 'required_if:estado,I|nullable|in:Inasistencia,Voluntario',
+            'observacion_baja' => 'nullable|string|max:500',
         ]);
 
         try {
@@ -32,10 +34,11 @@ class InscripcionesModulosController extends Controller
             bitacora::create([
                 'accion' => $request->estado == 'A' ? bitacora::$acciones[9] : bitacora::$acciones[10] ,
                 'tabla' => 'BENEFICIARIOS_MODULOS',
-                'descripcion' => 'SE CAMBIO DE ESTADO INSCRIPCION ID : '.$inscripcion->id,
+                'descripcion' => ($request->estado == 'I') ? mb_strtoupper($request->tipo_baja.': '.($request->observacion_baja ?? 'SE CAMBIO DE ESTADO INSCRIPCION ID :'.$inscripcion->id)) : mb_strtoupper($request->observacion_baja ?? 'SE CAMBIO DE ESTADO INSCRIPCION ID :'.$inscripcion->id),
                 'created_at' => now(),
                 'usuario_id' => auth()->user()->id,
                 'beneficiario_id' => $inscripcion->beneficiario_id,
+                'identificador' => $inscripcion->id,
             ]);
 
             return response('Inscripción actualizada correctamente');

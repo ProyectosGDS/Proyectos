@@ -387,7 +387,7 @@ import ValidateErrors from '@/components/ValidateErrors.vue'
                 class="w-full mt-2 border-gray-300 rounded focus:ring focus:ring-blue-200 focus:outline-none border p-2"
             />
         </div>
-        <ValidateErrors :errors="inscripciones.errors" v-if="inscripciones.errors != 0" />
+        <Validate-Errors :errors="inscripciones.errors" v-if="inscripciones.errors != 0" />
         <template #footer>
             <Button 
                 @click="inscripciones.resetData" 

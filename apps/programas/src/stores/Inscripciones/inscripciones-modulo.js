@@ -89,6 +89,7 @@ export const useInscripcionesModuloStore = defineStore('inscripciones-modulo', (
             fetch()
             resetData()
         } catch (error) {
+            inscripcion.value.estado = inscripcion.value.estado == 'A' ? 'I' : 'A'
             global.manejarError(error)
             if (error.status === 422) {
                 errors.value = error.response.data.errors
@@ -96,6 +97,11 @@ export const useInscripcionesModuloStore = defineStore('inscripciones-modulo', (
         } finally {
             loading.value.update = false
         }
+    }
+    const changeStatusInscripcion = async () => {
+        loading.value.update = true
+        inscripcion.value.estado = inscripcion.value.estado == 'A' ? 'I' : 'A'
+        await update()
     }
 
     const destroy = async () => {
@@ -136,6 +142,8 @@ export const useInscripcionesModuloStore = defineStore('inscripciones-modulo', (
             loading.value.update = false
         }
     }
+
+
 
     const exportExcel = async () => {
 
@@ -221,6 +229,7 @@ export const useInscripcionesModuloStore = defineStore('inscripciones-modulo', (
         inscripcion.value = {}
     }
 
+
     return {
         headers,
         year,
@@ -242,5 +251,6 @@ export const useInscripcionesModuloStore = defineStore('inscripciones-modulo', (
         resetData,
         exportExcel,
         exportPdf,
+        changeStatusInscripcion,
     }
 })
