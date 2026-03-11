@@ -13,6 +13,7 @@
     import DatosPersonales from './Beneficiario/DatosPersonales.vue'
     import Domicilio from './Beneficiario/Domicilio.vue'
     import Responsable from './Beneficiario/Responsable.vue'
+import ValidateErrors from '@/components/ValidateErrors.vue'
 
     const auth = useAuthStore()
     const global = useGlobalStore()
@@ -361,13 +362,46 @@
         <div class="flex items-center justify-center gap-4">
             <Icon icon="fas fa-exclamation-triangle" class="text-orange-500 text-5xl" />
             <div>
-                <p class="text-center text-lg">¿Estás seguro de deshabilitar/habilitar la inscripción de:?</p>
+                <p class="text-center text-lg">¿Estás seguro de {{ inscripciones.inscripcion?.estado == 'A' ? 'deshabilitar' : 'habilitar' }} la inscripción de:?</p>
                 <h1 class="text-center font-semibold">{{ inscripciones.inscripcion?.beneficiario?.nombre_completo }}</h1>
             </div>
+            
         </div>
+        <br>
+        <div>
+            <div v-if="inscripciones.inscripcion.estado == 'A'" class="flex justify-around" :class="{'border border-red-500 rounded-lg p-2' : inscripciones.errors.hasOwnProperty('tipo_baja')}">
+                <label>
+                    <input v-model="inscripciones.inscripcion.tipo_baja" type="radio" name="tipo_baja" value="Inasistencia">
+                    <span>Inasistencia</span>
+                </label>
+                <label>
+                    <input v-model="inscripciones.inscripcion.tipo_baja" type="radio" name="tipo_baja" value="Voluntario">
+                    <span>Voluntario</span>
+                </label>
+            </div>
+            <textarea
+                v-model="inscripciones.inscripcion.observacion_baja"
+                placeholder="Observaciones..."
+                rows="4"
+                maxlength="500"
+                class="w-full mt-2 border-gray-300 rounded focus:ring focus:ring-blue-200 focus:outline-none border p-2"
+            />
+        </div>
+        <ValidateErrors :errors="inscripciones.errors" v-if="inscripciones.errors != 0" />
         <template #footer>
-            <Button @click="inscripciones.resetData" text="Cancelar" icon="fas fa-xmark" class="btn-secondary" />
-            <Button @click="inscripciones.update" :text="inscripciones.inscripcion?.estado == 'A' ? 'Sí, habilitar' : 'Sí, deshabilitar'" :icon="inscripciones.inscripcion?.estado == 'A' ? 'fas fa-check' : 'fas fa-xmark'" class="btn-danger" :loading="inscripciones.loading.update" />
+            <Button 
+                @click="inscripciones.resetData" 
+                text="Cancelar" 
+                icon="fas fa-xmark" 
+                class="btn-secondary" 
+            />
+            <Button 
+                @click="inscripciones.changeStatusInscripcion()" 
+                :text="inscripciones.inscripcion?.estado == 'A' ? 'Sí, deshabilitar' : 'Sí, habilitar'" 
+                :icon="inscripciones.inscripcion?.estado == 'A' ? 'fas fa-xmark' : 'fas fa-check'" 
+                class="btn-danger" 
+                :loading="inscripciones.loading.update" 
+            />
         </template>
     </Modal>
 </template>

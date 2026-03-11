@@ -93,6 +93,7 @@ export const useInscripcionesCursoStore = defineStore('inscripciones-curso', () 
             fetch(beneficiario_curso.curso.id)
             resetData()
         } catch (error) {
+            inscripcion.value.estado = inscripcion.value.estado == 'A' ? 'I' : 'A'
             global.manejarError(error)
             if (error.status === 422) {
                 errors.value = error.response.data.errors
@@ -140,6 +141,12 @@ export const useInscripcionesCursoStore = defineStore('inscripciones-curso', () 
             loading.value.beca = false
         }
     }
+    const changeStatusInscripcion = async () => {
+        loading.value.update = true
+        inscripcion.value.estado = inscripcion.value.estado == 'A' ? 'I' : 'A'
+        await update()
+    }
+
 
     const exportExcel = async () => {
 
@@ -248,5 +255,6 @@ export const useInscripcionesCursoStore = defineStore('inscripciones-curso', () 
         resetData,
         exportExcel,
         exportPdf,
+        changeStatusInscripcion,
     }
 })

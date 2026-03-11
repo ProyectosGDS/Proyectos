@@ -68,7 +68,7 @@ export const useBeneficiariosCursoStore = defineStore('beneficiarios-curso', () 
 
     const changeEstadoInscripcion = (item) => {
         inscripcion.inscripcion = item
-        inscripcion.inscripcion.estado = item.estado == 'A' ? 'I' : 'A'
+        // inscripcion.inscripcion.estado = item.estado == 'A' ? 'I' : 'A'
         inscripcion.modal.disabled = true
     }
 
