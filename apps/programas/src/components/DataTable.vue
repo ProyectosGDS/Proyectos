@@ -397,6 +397,7 @@ onMounted(() => {
                     <option>25</option>
                     <option>50</option>
                     <option>100</option>
+                    <option>1000</option>
                 </select>
                 <span>registros</span>
             </div>

@@ -54,6 +54,11 @@
             <template #estado="{ item }">
                 <Badge  :color="item.estado == 'A' ? 'green' : 'red'" :text="item.estado == 'A' ? 'Activo' : 'Inactivo'" />
             </template>
+            <template #becado="{ item }">
+                <small>
+                    {{ item.becado ? 'Sí' : 'No' }}
+                </small>
+            </template>
             <!-- <template #actions="{ item }">
                 <Drop-Down-Button icon="fas fa-ellipsis-v">
                     <ul>
