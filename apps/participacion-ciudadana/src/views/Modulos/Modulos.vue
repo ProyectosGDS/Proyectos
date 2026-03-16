@@ -1,9 +1,9 @@
 <script setup>
     import { onMounted } from 'vue'
-    import { useCursosStore } from '@/stores/cursos'
+    import { useModulosStore } from '@/stores/modulos'
     import LoadingBar from '@/components/LoadingBar.vue';
 
-    const store = useCursosStore()
+    const store = useModulosStore()
 
     onMounted(() => {
         store.fetch()
@@ -12,16 +12,15 @@
 
 <template>
     <div class="p-4">
-        <Data-Table :headers="store.headers" :data="store.cursos" color="text-color-9">
+        <Data-Table :headers="store.headers" :data="store.modulos" color="text-color-9">
             <template #tbody="{items}">
                 <tr 
                     v-for="item in items" 
-                    @click="store.detalleCurso(item)" 
+                    @click="store.detallesPrograma(item)" 
                     title="Click para mas detalles">
                     
                     <td>{{ item.id }}</td>
-                    <td>{{ item.curso }}</td>
-                    <td>{{ item.modalidad }}</td>
+                    <td>{{ item.programa }}</td>
                 </tr>
             </template>
         </Data-Table>    

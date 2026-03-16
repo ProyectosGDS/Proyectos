@@ -2,10 +2,12 @@ import { defineStore } from 'pinia'
 import { useGlobalStore } from '@/stores/global'
 import { ref } from 'vue'
 import axios from 'axios'
+import { useCursosStore } from '../cursos'
 
 export const useBeneficiariosStore = defineStore('beneficiarios', () => {
 
     const global = useGlobalStore()
+    const cursosStore = useCursosStore()
 
     const beneficiario = ref({
         sexo : 'M',
@@ -85,28 +87,27 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
                cui : cui
             })
                 success.value = true
-                const beneficiario = response.data
+                const beneficiario = response.data.data
 
                 if(!beneficiario.id) {
                     nuevo_registro.value = true
-                    messageCui.value = 'Se encontro información en sistema antiguo'
-                } else {
-                    messageCui.value = 'Se encontro información'
                 }
-                
-                beneficiario.domicilio = response.data.domicilio == null ? { departamento_id : 7, grupo_zona : {} } : response.data.domicilio
-                beneficiario.datos_medicos = response.data.datos_medicos == null ? {} : response.data.datos_medicos
-                beneficiario.datos_academicos = response.data.datos_academicos == null ? {} : response.data.datos_academicos
-                beneficiario.responsable = response.data.responsable == null ? {} : response.data.responsable
-                beneficiario.emergencia = response.data.emergencia == null ? {} : response.data.emergencia
+
+                messageCui.value = response.data.message
+            
+                beneficiario.domicilio = response.data.data.domicilio == null ? { departamento_id : 7, grupo_zona : {} } : response.data.data.domicilio
+                beneficiario.datos_medicos = response.data.data.datos_medicos == null ? {} : response.data.data.datos_medicos
+                beneficiario.datos_academicos = response.data.data.datos_academicos == null ? {} : response.data.data.datos_academicos
+                beneficiario.responsable = response.data.data.responsable == null ? {} : response.data.data.responsable
+                beneficiario.emergencia = response.data.data.emergencia == null ? {} : response.data.data.emergencia
                 
                 updatePropertyBeneficiario(beneficiario)
     
         } catch (error) {
             nuevo_registro.value = true
-            messageCui.value = error.response.data
+            messageCui.value = error.response.data.message
             success.value = true
-            console.error(error)
+            // console.error(error)
         }finally {
             loading.value.show = false
         }
@@ -149,7 +150,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         reload,
         success,
         nuevo_registro,
-
+        params,
         loading,
         errors,
         modal,

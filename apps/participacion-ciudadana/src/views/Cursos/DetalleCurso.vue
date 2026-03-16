@@ -115,6 +115,11 @@
         }
     }
 
+    const inscripcionBeneficiario = async () => {
+        await inscripcion.store()
+        store.show_curso(props.curso_id);
+    }
+
     watchEffect(() => {
         store.show_curso(props.curso_id)
         store.inscripcion.curso_id = props.curso_id
@@ -144,13 +149,25 @@
         <p class="text-center py-6">
             {{ store.curso.descripcion }}
         </p>
-        <div class="flex justify-center items-center py-6">
-            <Button @click="inscripcion.inscripcion(props.modulo_id,'curso')" icon="fas fa-thumbs-up" text="Pre-Inscribete" class="bg-color-9 btn text-white rounded-full text-3xl text-nowrap" />
-        </div>
-        <Data-Table 
-            :headers="store.detalleHeaders" 
-            :data="store.curso.detalles" 
-        />
+        <Data-Table :headers="store.detalleHeaders" :data="store.curso.detalles" color="text-color-9">
+            <template #tbody="{items}">
+                <tr 
+                    @click="inscripcion.inscripcion(item.id,'curso')"
+                    v-for="item in items" 
+                    title="Click para pre-inscribirse">
+                    <template v-if="item.cupos_disponibles > 0">
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.sede.zona_id }}</td>
+                        <td class=" text-start">{{ item.sede.nombre_completo }}</td>
+                        <td>{{ item.seccion }}</td>
+                        <td>{{ item.horarios[0]?.nombre_completo }}</td>
+                        <td>{{ item.cupos_disponibles +' de ' + item.capacidad }}</td>
+                        <td>{{ item.temporalidad.nombre }}</td>
+                        <!-- <td>{{ item.programa.nombre }}</td> -->
+                    </template>
+                </tr>
+            </template>
+        </Data-Table>
     </div>
 
     <Modal :open="inscripcion.modal.new" title="Pre inscripción" icon="fas fa-user-graduate" class="w-1/2"> 
@@ -161,13 +178,14 @@
             <div class="text-color-9 grid gap-4">
                 <div>
                     <div class="relative">
-                        <Input @keyup="verifyCui()" v-model="inscripcion.cui" option="label" title="*Ingresa cui" maxlength="13" type="search" :class="{'focus:border-red-400 border-red-400 focus:outline-red-400': !inscripcion.success, 'focus:border-green-500 border-green-500 focus:outline-green-400' : inscripcion.success }" required />
+                        <Input @keyup="verifyCui()" v-model="inscripcion.cui" option="label" title="*Ingresa cui/dpi" maxlength="13" type="search" :class="{'focus:border-red-400 border-red-400 focus:outline-red-400': !inscripcion.success, 'focus:border-green-500 border-green-500 focus:outline-green-400' : inscripcion.success }" required />
                         <Icon v-if="inscripcion.loading.show" icon="fas fa-spinner" class="animate-spin absolute top-3 right-3 text-gray-500" />
                     </div>
                     <small :class="inscripcion.success ? 'text-green-400' : 'text-red-400'">{{ inscripcion.messageCui }}</small>
                 </div>
                 <Input v-if="!inscripcion.nuevo_registro" v-model="inscripcion.beneficiario.nombre_completo" option="label" title="Beneficiario registrado" readonly disabled />
                 <div v-else>
+                    
                     <DatosPersonales />
                     <Domicilio />
                     <DatosMedicos />
@@ -180,8 +198,18 @@
         <Validate-Errors v-if="inscripcion.errors != 0" :errors="inscripcion.errors" />
         <template #footer>
             <Button @click="inscripcion.resetData()" text="Cancelar" class="btn-secondary rounded-full" icon="fas fa-xmark" />
-            <Button v-if="inscripcion.success" @click="inscripcion.store" text="Pre-inscribirse" class="btn-primary rounded-full" icon="fas fa-save" :loading="store.loading.store" />
+            <Button v-if="inscripcion.success" @click="inscripcionBeneficiario" text="Pre-inscribirse" class="btn-primary rounded-full" icon="fas fa-save" :loading="store.loading.store" />
         </template>
     </Modal>
 
 </template>
+
+<style scoped>
+    td {
+        @apply py-2 text-gray-800 px-4 text-xs;
+    }
+
+    tr {
+        @apply cursor-pointer hover:bg-violet-50 text-center;
+    }
+</style>

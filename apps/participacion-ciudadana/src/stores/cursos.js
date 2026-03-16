@@ -9,8 +9,7 @@ export const useCursosStore = defineStore('cursos', () => {
 
     const headers = [
         { title : 'id', key : 'id', type : 'numeric' },
-        { title : 'modulo/curso', key : 'curso' },
-        { title : 'tipo', key : 'tipo' },
+        { title : 'curso', key : 'curso' },
         { title : 'modalidad', key : 'modalidad', width : '10px', align : 'center' },
 
     ]
@@ -19,7 +18,6 @@ export const useCursosStore = defineStore('cursos', () => {
     const cursos = ref([])
     const curso = ref({})
     const inscripcion = ref({})
-    const pivoteCurso = ref([])
     const modulo = ref({})
     const loading = ref(false)
     const errors = ref([])
@@ -27,19 +25,24 @@ export const useCursosStore = defineStore('cursos', () => {
 
     const detalleHeaders = [
         { title : 'curso id', key: 'id' },
-        { title : 'zona', key: 'sede.zona_id' },
+        { title : 'zona', key: 'sede.zona_id', type : 'numeric' },
         { title : 'sede', key: 'sede.nombre_completo' },
         { title : 'sección', key: 'seccion' },
-        { title : 'cupo disponible', key: 'capacidad' },
+        { title : 'horarios', key: 'horarios' },
+        { title : 'cupo / capacidad', key: 'capacidad' },
         { title : 'temporalidad', key: 'temporalidad.nombre' },
-        { title : 'programa', key: 'programa.nombre' },
+        // { title : 'programa', key: 'programa.nombre' },
     ]
 
     
     async function fetch () {
         try {
             loading.value = true
-            const response = await axios.get('participacion-ciudadana')
+            const response = await axios.get('participacion-ciudadana',{
+                params : {
+                    tipo : 'CURSO',
+                }
+            })
             cursos.value = response.data
         } catch (error) {
             console.error(error)
@@ -60,27 +63,10 @@ export const useCursosStore = defineStore('cursos', () => {
         } finally {
             loading.value = false
         }
-    }
-
-    async function show_modulo(modulo_id) {
-        try {
-            loading.value = true
-            const response = await axios.get('participacion-ciudadana/modulo/' + modulo_id )
-            modulo.value = response.data
-        } catch (error) {
-            console.error(error)
-            errors.value = error
-        } finally {
-            loading.value = false
-        }
-    }
+    }    
 
     function detalleCurso (item) {
         router.push({ name : 'Detalle del curso', params : { curso_id : item.id } } )
-    }
-
-    function detalleModulo (item) {
-        router.push({ name : 'Detalle del módulo', params : { modulo_id : item.id } } )
     }
 
     function fetchCategorias () {
@@ -105,8 +91,6 @@ export const useCursosStore = defineStore('cursos', () => {
         fetch,
         fetchCategorias,
         detalleCurso,
-        detalleModulo,
         show_curso,
-        show_modulo,
     }
 })

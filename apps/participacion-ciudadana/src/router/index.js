@@ -28,19 +28,26 @@ const router = createRouter({
 							component: () => import('@/views/Cursos/DetalleCurso.vue'),
 							props : true,
 						},
-						{
-							path: 'detalle-modulo/:modulo_id',
-							name: 'Detalle del módulo',
-							component: () => import('@/views/Cursos/DetalleModulo.vue'),
-							props : true,
-						}
 					]
 				},
-				{
-					path: 'eventos',
-					name: 'Eventos',
-					component: () => import('@/views/Eventos.vue'),
-				},
+				// {
+				// 	path: 'modulos',
+				// 	name: 'Módulos',
+				// 	redirect : { name : 'Modulos1'},
+				// 	children : [
+				// 		{
+				// 			path: '',
+				// 			name : 'Modulos1',
+				// 			component: () => import('@/views/Modulos/Modulos.vue'),
+				// 		},
+				// 		{
+				// 			path: 'detalle-modulo/:modulo_id',
+				// 			name: 'Detalle del módulo',
+				// 			component: () => import('@/views/Modulos/DetalleModulo.vue'),
+				// 			props : true,
+				// 		}
+				// 	]
+				// },
 				// {
 				// 	path: 'servicios',
 				// 	name: 'Servicios',
