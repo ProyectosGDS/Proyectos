@@ -595,7 +595,7 @@ class ProgramasController extends Controller
                     })
                     ->with(['beneficiario'])
                     ->where('modulo_id',$modulo_curso_id)
-                    ->whereYear('created_at',$year)
+                    ->where('anio_inscripcion',$year)
                     ->get();
             } else {
                 $inscritos = beneficiarios_cursos::whereHas('beneficiario',function($query) {
@@ -603,7 +603,7 @@ class ProgramasController extends Controller
                     })  
                     ->with(['beneficiario'])
                     ->where('detalle_curso_id',$modulo_curso_id)
-                    ->whereYear('created_at',$year)
+                    ->where('anio_inscripcion',$year)
                     ->get();
             }
             

@@ -4,96 +4,60 @@ namespace App\Http\Controllers\ParticipacionCiudadana;
 
 use App\Http\Controllers\Controller;
 use App\Models\adm_gds\cursos;
-use App\Models\adm_gds\detalles_cursos;
 use App\Models\adm_gds\modulos;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class CursosController extends Controller
 {
-    public function index() {
+    public function index(Request $request) {
+        $this->validate($request, [
+            'tipo' => 'required|in:CURSO,MODULO'
+        ]);
         try {
+            $query ="";
 
-            // $query = "
-            //     SELECT
-            //         DC.ID,
-            //         C.NOMBRE MODULO_CURSO,
-            //         S.NOMBRE SEDE,
-            //         T.NOMBRE TEMPORALIDAD,
-            //         DC.MODALIDAD,
-            //         DC.ESTADO,
-            //         DC.PUBLICO,
-            //         CAST('CURSO' AS VARCHAR2(100)) AS TIPO
-            //     FROM ADM_GDS.DETALLES_CURSOS DC
-            //         INNER JOIN ADM_GDS.TEMPORALIDADES T
-            //             ON T.ID = DC.TEMPORALIDAD_ID
-            //         INNER JOIN ADM_GDS.SEDES S
-            //             ON S.ID = DC.SEDE_ID
-            //         INNER JOIN ADM_GDS.CURSOS C
-            //             ON C.ID = DC.CURSO_ID
-            //     WHERE DC.ESTADO = 'A'
-            //     AND DC.PUBLICO = 'S'
-            //     AND TO_CHAR(DC.FECHA_FINAL,'YYYY-MM-DD') >= TO_CHAR(SYSDATE,'YYYY-MM-DD')
-            //     AND EXTRACT(YEAR FROM DC.FECHA_FINAL) = EXTRACT(YEAR FROM SYSDATE)
+            if($request->tipo == 'CURSO') {
+                $query = "
+                    SELECT
+                        DC.MODALIDAD,
+                        DC.CURSO_ID ID,
+                        C.NOMBRE CURSO,
+                        'CURSO' TIPO
+                    FROM ADM_GDS.DETALLES_CURSOS DC
+                        INNER JOIN ADM_GDS.CURSOS C
+                            ON DC.CURSO_ID = C.ID
+                    WHERE DC.MODALIDAD IS NOT NULL
+                    AND DC.PUBLICO = 'S'
+                    AND DC.ESTADO = 'A'
+                    GROUP BY DC.MODALIDAD, DC.CURSO_ID, C.NOMBRE
+                ";
 
-            //     UNION ALL
+            }
 
-            //     SELECT DISTINCT
-            //         M.ID,
-            //         M.NOMBRE MODULO_CURSO,
-            //         S.NOMBRE SEDE,
-            //         T.NOMBRE TEMPORALIDAD,
-            //         DC.MODALIDAD,
-            //         M.ESTADO,
-            //         M.PUBLICO,
-            //         CAST('MODULO' AS VARCHAR2(100)) AS TIPO
-            //     FROM ADM_GDS.MODULOS M
-            //         INNER JOIN ADM_GDS.CURSOS_MODULOS CM
-            //             ON CM.MODULO_ID = M.ID
-            //         INNER JOIN ADM_GDS.DETALLES_CURSOS DC
-            //             ON CM.DETALLE_CURSO_ID = DC.ID
-            //         INNER JOIN ADM_GDS.SEDES S
-            //             ON DC.SEDE_ID = S.ID
-            //         INNER JOIN ADM_GDS.TEMPORALIDADES T
-            //             ON DC.TEMPORALIDAD_ID = T.ID
-            //     WHERE M.ESTADO = 'A'
-            //     AND M.PUBLICO = 'S'
-            //     AND TO_CHAR(M.FECHA_FINAL,'YYYY-MM-DD') >= TO_CHAR(SYSDATE,'YYYY-MM-DD')
-            //     AND EXTRACT(YEAR FROM M.FECHA_FINAL) = EXTRACT(YEAR FROM SYSDATE)
-            // ";
+            if($request->tipo == 'MODULO') {
+                $query = "
+                    SELECT
+                        P.ID,
+                        P.NOMBRE PROGRAMA
+                    FROM ADM_GDS.MODULOS M
+                        INNER JOIN ADM_GDS.PROGRAMAS P
+                            ON M.PROGRAMA_ID =  P.ID
+                    WHERE P.ESTADO = 'A'
+                    GROUP BY
+                        P.ID,
+                        P.NOMBRE
+                    ORDER BY 2
+                ";
+            }
 
-            $query = "
-                SELECT
-                    DC.MODALIDAD,
-                    DC.CURSO_ID ID,
-                    C.NOMBRE CURSO,
-                    'CURSO' TIPO
-                FROM DETALLES_CURSOS DC
-                    INNER JOIN CURSOS C
-                        ON DC.CURSO_ID = C.ID
-                WHERE DC.MODALIDAD IS NOT NULL
-                AND DC.PUBLICO = 'S'
-                AND DC.ESTADO = 'A'
-                GROUP BY DC.MODALIDAD, DC.CURSO_ID, C.NOMBRE
+            
+            if(!empty($query)) {
+                $cursos_programas = DB::connection('gds')->select($query);
+                return response($cursos_programas);
+            }
 
-                UNION ALL
 
-                SELECT
-                    M.MODALIDAD,
-                    M.PROGRAMA_ID ID,
-                    P.NOMBRE CURSO,
-                    'MODULO' TIPO
-                FROM PROGRAMAS P
-                    INNER JOIN MODULOS M
-                        ON M.PROGRAMA_ID = P.ID
-                WHERE M.PUBLICO = 'S'
-                AND M.ESTADO = 'A'
-                GROUP BY M.MODALIDAD, M.PROGRAMA_ID, P.NOMBRE
-            ";
-
-            $cursos_programas = DB::connection('gds')->select($query);
-
-            return response($cursos_programas);
 
         } catch (\Throwable $th) {
             return response($th->getMessage(),422);
@@ -102,15 +66,6 @@ class CursosController extends Controller
 
     public function getCurso (cursos $curso) {
         try {
-            // return response($curso->load([
-            //     'programa',
-            //     'curso',
-            //     'instructores',
-            //     'temporalidad',
-            //     'horarios',
-            //     'sede.zona',
-            //     'requisitos',
-            // ])->loadCount('beneficiarios'));
 
             return response($curso->load([
                 'detalles.instructores',

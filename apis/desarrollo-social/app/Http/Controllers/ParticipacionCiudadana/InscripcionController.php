@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\ParticipacionCiudadana;
 
 use App\Http\Controllers\Controller;
+use App\Models\adm_gds\beneficiarios;
 use App\Models\adm_gds\beneficiarios_cursos;
 use App\Models\adm_gds\beneficiarios_modulos;
 use App\Models\adm_gds\bitacora;
+use App\Models\adm_gds\detalles_cursos;
+use App\Models\adm_gds\modulos;
 use App\Traits\TraitBeneficiarios;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -97,9 +100,12 @@ class InscripcionController extends Controller
 
         if($formacion_tipo == 'modulo') {
 
+            $modulo = modulos::with('programa.dependencia')->findOrFail($formacion_id);
+
+
             $inscripcion = beneficiarios_modulos::where('beneficiario_id',$beneficiario_id)
                 ->where('modulo_id',$formacion_id)
-                ->whereYear('created_at',date('Y'))
+                ->where('anio_inscripcion',$modulo->programa?->dependencia?->anio_electivo)
                 ->first();
 
             if($inscripcion) {
@@ -109,16 +115,19 @@ class InscripcionController extends Controller
             beneficiarios_modulos::create([
                 'beneficiario_id' => $beneficiario_id,
                 'modulo_id' => $formacion_id,
+                'anio_inscripcion' => $modulo->programa->dependencia->anio_electivo,
                 'created_at' => now(),
-                'estado' => 'A',
+                'estado' => 'P',
             ]);
             
 
         } else {
 
+            $curso = detalles_cursos::with('programa.dependencia')->findOrFail($formacion_id);
+
             $inscripcion = beneficiarios_cursos::where('beneficiario_id',$beneficiario_id)
                 ->where('detalle_curso_id',$formacion_id)
-                ->whereYear('created_at',date('Y'))
+                ->where('anio_inscripcion',$curso->programa->dependencia->anio_electivo)
                 ->first();
 
             if($inscripcion) {
@@ -128,10 +137,18 @@ class InscripcionController extends Controller
             beneficiarios_cursos::create([
                 'beneficiario_id' => $beneficiario_id,
                 'detalle_curso_id' => $formacion_id,
+                'anio_inscripcion' => $curso->programa->dependencia->anio_electivo,
                 'created_at' => now(),
-                'estado' => 'A',
+                'estado' => 'P',
             ]);
 
+        }
+
+        $beneficiario = beneficiarios::where('id',$beneficiario_id)->first();
+
+        if($beneficiario) {
+            $beneficiario->estado = 'P';
+            $beneficiario->save();
         }
 
         return response('Pre-inscripcion realizada con exito');

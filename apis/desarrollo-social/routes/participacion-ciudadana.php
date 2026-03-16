@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Beneficiarios\BeneficiariosController;
+use App\Http\Controllers\ParticipacionCiudadana\Beneficiarios;
 use App\Http\Controllers\ParticipacionCiudadana\CarouselController;
 use App\Http\Controllers\ParticipacionCiudadana\CursosController;
 use App\Http\Controllers\ParticipacionCiudadana\EventosController;
@@ -19,4 +20,5 @@ Route::post('participacion-ciudadana/inscripcion',[InscripcionController::class,
 
 Route::get('carrusel-imagenes',[CarouselController::class,'index']);
 
-Route::post('participacion-ciudadana/consulta-beneficiario-unico',[BeneficiariosController::class,'consultaBeneficiarioUnico']);
+// Route::post('participacion-ciudadana/consulta-beneficiario-unico',[BeneficiariosController::class,'consultaBeneficiarioUnico']);
+Route::post('participacion-ciudadana/consulta-beneficiario-unico',[Beneficiarios::class,'searchBeneficiario']);

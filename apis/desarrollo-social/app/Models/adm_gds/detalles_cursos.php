@@ -14,6 +14,10 @@ class detalles_cursos extends Model
         'fecha_final' => 'datetime:Y-m-d',
     ];
 
+    protected $appends = [
+        'cupos_disponibles'
+    ];
+
     protected $fillable = [
         'seccion',
         'capacidad',
@@ -72,12 +76,28 @@ class detalles_cursos extends Model
             ->where('BENEFICIARIOS_CURSOS.estado','A')->withPivot('becado','anio_inscripcion');
     }
 
+    public function beneficiariosTodos() {
+        return $this->belongsToMany(beneficiarios::class,'beneficiarios_cursos','detalle_curso_id','beneficiario_id')
+            ->withPivot('becado','anio_inscripcion');
+    }
+
     public function  requisitos() {
         return $this->belongsToMany(requisitos::class,'requisitos_cursos','detalle_curso_id','requisito_id');
     }
 
     public function control_asistencia() {
         return $this->belongsToMany(beneficiarios::class,'control_asistencia','curso_modulo_id','beneficiario_id');
+    }
+
+    public function getCuposDisponiblesAttribute() {
+        $inscritos = $this->beneficiariosTodos()->count();
+        $total = $this->capacidad - $inscritos;
+        if($total <= 0) {
+            return 0;
+        }else {
+            return $total;
+        }
+        
     }
 
 }

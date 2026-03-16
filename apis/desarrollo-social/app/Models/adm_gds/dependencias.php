@@ -13,6 +13,7 @@ class dependencias extends Model
 
     protected $fillable = [
         'nombre',
+        'anio_lectivo'
     ];
 
     // RELACIONES

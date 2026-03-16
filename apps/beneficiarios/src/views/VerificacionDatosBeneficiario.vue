@@ -19,16 +19,16 @@
     const currentYear = new Date().getFullYear();
 
     const years = computed(() => {
-        const yearsList = []
-        for (let i = 0; i <= 3; i++) {
-            yearsList.unshift(currentYear - i)
-        }
-        return yearsList
+      const yearsList = []
+      for (let i = 0; i <= 1; i++) {
+        yearsList.unshift(currentYear - i)
+      }
+      yearsList.push(currentYear + 1)
+      return yearsList
     })
 
     onBeforeMount(() => {
-        const year = new Date()
-        store.year = year.getFullYear()
+        store.year = JSON.parse(localStorage.getItem('anio_electivo')) ?? null
 
         catalogos.getProgramas()
         catalogos.fetch() 
