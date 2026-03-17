@@ -2,10 +2,12 @@ import axios from 'axios'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useBeneficiariosStore } from './Inscripciones/beneficiarios'
 
 export const useCursosStore = defineStore('cursos', () => {
 
     const router = useRouter()
+    const beneficiariosStore = useBeneficiariosStore()
 
     const headers = [
         { title : 'id', key : 'id', type : 'numeric' },
@@ -17,6 +19,7 @@ export const useCursosStore = defineStore('cursos', () => {
     const categorias = ref([])
     const cursos = ref([])
     const curso = ref({})
+    const detalle = ref({})
     const inscripcion = ref({})
     const modulo = ref({})
     const loading = ref(false)
@@ -31,7 +34,6 @@ export const useCursosStore = defineStore('cursos', () => {
         { title : 'horarios', key: 'horarios' },
         { title : 'cupo / capacidad', key: 'capacidad' },
         { title : 'temporalidad', key: 'temporalidad.nombre' },
-        // { title : 'programa', key: 'programa.nombre' },
     ]
 
     
@@ -75,6 +77,11 @@ export const useCursosStore = defineStore('cursos', () => {
         .catch(error => console.error(error))
     }
 
+    const getCurso = (item, type) => {
+        detalle.value = item
+        beneficiariosStore.inscripcion(item.id, type)
+    }
+
 
     return {
         headers,
@@ -84,6 +91,7 @@ export const useCursosStore = defineStore('cursos', () => {
         inscripcion,
         cursos,
         curso,
+        detalle,
         modulo,
         loading,
         errors,
@@ -92,5 +100,6 @@ export const useCursosStore = defineStore('cursos', () => {
         fetchCategorias,
         detalleCurso,
         show_curso,
+        getCurso,
     }
 })

@@ -148,7 +148,7 @@
         <Data-Table :headers="store.detalleHeaders" :data="store.curso.detalles" color="text-color-9">
             <template #tbody="{items}">
                 <tr 
-                    @click="inscripcion.inscripcion(item.id,'curso')"
+                    @click="store.getCurso(item,'curso')"
                     v-for="item in items" 
                     title="Click para pre-inscribirse">
                     <template v-if="item.cupos_disponibles > 0">
@@ -170,6 +170,28 @@
             <Icon @click="inscripcion.resetData()" icon="fas fa-xmark" class="text-white text-2xl cursor-pointer" />
         </template>
         <div>
+            <div class="grid gap-4 text-xs text-color-1">
+                <div class="uppercase border rounded-lg p-4">
+                    <div class="flex gap-2">
+                        <label>Curso: </label>
+                        <strong>{{ store.curso.nombre ?? null }}</strong>
+                    </div>
+                    <div class="flex gap-2">
+                        <label>Horario: </label>
+                        <strong>{{ store.detalle.horarios[0]?.nombre_completo ?? null }}</strong>
+                    </div>
+                    <div class="flex gap-2">
+                        <label>sede: </label>
+                        <strong>{{ store.detalle.sede.nombre_completo ?? null }}</strong>
+                    </div>
+                    <div class="flex gap-2">
+                        <label>seccion: </label>
+                        <strong>{{ store.detalle.seccion ?? null }}</strong>
+                    </div>
+                </div>
+            </div>
+            <br>
+
             <div class="text-color-9 grid gap-4">
                 <div>
                     <div class="relative">
