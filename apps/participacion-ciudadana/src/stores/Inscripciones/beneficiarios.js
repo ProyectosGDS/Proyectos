@@ -2,12 +2,10 @@ import { defineStore } from 'pinia'
 import { useGlobalStore } from '@/stores/global'
 import { ref } from 'vue'
 import axios from 'axios'
-import { useCursosStore } from '../cursos'
 
 export const useBeneficiariosStore = defineStore('beneficiarios', () => {
 
     const global = useGlobalStore()
-    const cursosStore = useCursosStore()
 
     const beneficiario = ref({
         sexo : 'M',
@@ -50,7 +48,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         estado : false,
     })
 
-    function inscripcion (id, formacion_tipo) {
+    const inscripcion = (id, formacion_tipo) => {
         params.value = {
             formacion_id : id,
             formacion_tipo : formacion_tipo

@@ -15,6 +15,7 @@ Route::get('participacion-ciudadana',[CursosController::class,'index']);
 
 Route::get('participacion-ciudadana/curso/{curso}',[CursosController::class,'getCurso']);
 Route::get('participacion-ciudadana/modulo/{modulo}',[CursosController::class,'getModulo']);
+Route::get('participacion-ciudadana/programa/{programa}',[CursosController::class,'getPrograma']);
 
 Route::post('participacion-ciudadana/inscripcion',[InscripcionController::class,'store']);
 

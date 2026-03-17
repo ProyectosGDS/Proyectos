@@ -1,9 +1,9 @@
 <script setup>
-    import { useCursosStore } from '@/stores/cursos'
+    import { useProgramasStore } from '@/stores/programas'
     import { useBeneficiariosStore } from '@/stores/Inscripciones/beneficiarios'
     import { useCatalogosStore } from '@/stores/Catalogos/catalogos'
 
-    import { computed, onBeforeMount, watchEffect } from 'vue'
+    import { onMounted, watchEffect } from 'vue'
     
     import DatosPersonales from './Inscripcion/DatosPersonales.vue'
     import Domicilio from './Inscripcion/Domicilio.vue'
@@ -11,17 +11,15 @@
     import DatosAcademicos from './Inscripcion/DatosAcademicos.vue'
     import Responsable from './Inscripcion/Responsable.vue'
     import Emergencia from './Inscripcion/Emergencia.vue'
+    import { useRouter } from 'vue-router'
 
 
-    const props = defineProps(['modulo_id'])
-
-    const store = useCursosStore()
+    const props = defineProps(['programa_id'])
+    const router = useRouter()
+    const store = useProgramasStore()
     const inscripcion = useBeneficiariosStore()
     const catalogos = useCatalogosStore()
 
-    const cupo = computed(() => {
-        return (parseInt(store.modulo.capacidad) - parseInt(store.modulo.beneficiarios_count));
-    })
 
     function verifyCui () {
         const cui = inscripcion.cui;
@@ -30,6 +28,7 @@
             inscripcion.messageCui = 'Ingrese cui'
             inscripcion.success = false
             inscripcion.nuevo_registro = false
+            inscripcion.beneficiario.nombre_completo = ''
             return false 
         }
 
@@ -114,20 +113,26 @@
         }
     }
 
+    const inscripcionBeneficiario = async () => {
+        await inscripcion.store()
+        store.show_programa(props.programa_id);
+    }
+
     watchEffect(() => {
-        store.show_modulo(props.modulo_id)
+        store.show_programa(props.programa_id)
+        // store.inscripcion.curso_id = props.curso_id
     })
 
-    onBeforeMount(() => {
+    onMounted(() => {
         catalogos.fetch()
     })
     
 </script>
 
 <template>
-    <div class="p-2 md:p-4 lg:p-8" v-if="store.modulo?.hasOwnProperty('nombre')">
+    <div class="p-2 md:p-4 lg:p-8" v-if="store.programa?.hasOwnProperty('modulos')">
         <div class="flex">
-            <div @click="store.router.go(-1)" class="flex items-center justify-center gap-2 text-color-9 cursor-pointer">
+            <div @click="router.go(-1)" class="flex items-center justify-center gap-2 text-color-9 cursor-pointer">
                 <Icon icon="fas fa-arrow-left" class="text-xl" />
                 <span>REGRESAR</span>
             </div>
@@ -135,83 +140,30 @@
         <br>
         <header class="w-full flex items-center justify-center h-48 bg-color-9 rounded-lg overflow-hidden relative">
             <h1 class="text-white text-3xl lg:text-7xl uppercase text-center drop-shadow-xl">
-                {{ store.modulo.nombre }}
+                {{ store.programa?.nombre }}
             </h1>
         </header>
-        <br>
-        <div class="grid lg:grid-cols-2 gap-4 text-gray-500">
-            <div>
-                <div>
-                    <h1 class="text-3xl text-color-9">Información del módulo/taller</h1>
-                    <br>
-                    <ul class="uppercase">
-                        <li class="flex gap-3 items-center">
-                            <Icon icon="fas fa-calendar-days" class=" text-[1.3rem]"/>
-                            <span class="font-medium">Inicia :</span>
-                            <span>{{ store.modulo.fecha_inicial }}</span>
-                        </li>
-                        <li class="flex gap-3 items-center">
-                            <Icon icon="fas fa-calendar-days" class=" text-[1.3rem]"/>
-                            <span class="font-medium">Termina :</span>
-                            <span>{{ store.modulo.fecha_final }}</span>
-                        </li>
-                        <li class="flex gap-3 items-center">
-                            <Icon icon="fas fa-users"/>
-                            <span class="font-medium">Cupo disponible :</span>
-                            <span>{{ cupo == 0 ? 'Cupo lleno' : cupo }}</span>
-                        </li>
-                        <li class="flex gap-3 items-center">
-                            <Icon icon="fas fa-layer-group" class="text-lg"/>
-                            <span class="font-medium">Modalidad :</span>
-                            <span>{{ store.modulo?.modalidad }}</span>
-                        </li>
-                        <li class="flex gap-3 items-center">
-                            <Icon icon="fas fa-city"/>
-                            <span class="font-medium">Sede :</span>
-                            <span class="text-xs">{{ store.modulo?.sede?.nombre_completo }}</span>
-                        </li>
-                    </ul>
-                </div>
-                <br>
-                <div>
-                    <h1 class="text-3xl text-color-9">Pénsum</h1>
-                    <br>
-                    <ul class="uppercase text-sm">
-                        <li v-for="curso in store.modulo.cursos">
-                            <label class="flex items-center gap-4">
-                                <Icon icon="fas fa-book"/>
-                                <span>{{ curso?.curso?.nombre }}</span>
-                            </label>
-                        </li>
-                    </ul>
-                </div>
-                <br>
-                <div>
-                    <h1 class="text-3xl text-color-9">Requisitos</h1>
-                    <br>
-                    <ul class="uppercase text-sm">
-                        <li v-for="requisito in store.modulo.requisitos">
-                            <label class="flex items-center gap-4">
-                                <Icon icon="fas fa-check" />
-                                <span >{{ requisito.nombre }}</span>
-                            </label>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="grid grid-rows-2">
-                <div>
-                    <h3 class="text-3xl text-color-9">Descripción</h3>
-                    <br>
-                    <p>
-                        {{ store.modulo.descripcion }}
-                    </p>
-                </div>
-                <div class="flex justify-center items-center">
-                    <Button @click="inscripcion.inscripcion(props.modulo_id,'modulo')" icon="fas fa-thumbs-up" text="Inscribete" class="bg-color-9 btn text-white rounded-full h-16 w-40 text-3xl self-center mx-auto" />
-                </div>
-            </div>
-        </div>
+        <p class="text-center py-6">
+            {{ store.programa?.descripcion }}
+        </p>
+        <Data-Table :headers="store.detalleHeaders" :data="store.programa.modulos" color="text-color-9">
+            <template #tbody="{items}">
+                <tr 
+                    v-for="item in items" 
+                    @click="store.getModulo(item,'modulo')"
+                    title="Click para pre-inscribirse">
+                    <template v-if="item.cupos_disponibles > 0" >
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.sede.zona_id }}</td>
+                        <td align="left">{{ item.nombre }}</td>
+                        <td class="uppercase">{{ item.seccion ?? null }}</td>
+                        <td align="center" class="text-center">{{  item.cupos_disponibles+' de '+item.capacidad }}</td>
+                        <td>{{ item.sede.nombre_completo }}</td>
+                        <td>{{ item.modalidad }}</td>
+                    </template>
+                </tr>
+            </template>
+        </Data-Table>
     </div>
 
     <Modal :open="inscripcion.modal.new" title="Pre inscripción" icon="fas fa-user-graduate" class="w-1/2"> 
@@ -220,15 +172,40 @@
         </template>
         <div>
             <div class="text-color-9 grid gap-4">
+                <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div class="uppercase border rounded-lg p-4">
+                        <div class="flex gap-2">
+                            <label>Módulo: </label>
+                            <strong>{{ store.modulo.nombre ?? null }}</strong>
+                        </div>
+                        <div class="flex gap-2">
+                            <label>sede: </label>
+                            <strong>{{ store.modulo.sede.nombre_completo ?? null }}</strong>
+                        </div>
+                        <div class="flex gap-2">
+                            <label>seccion: </label>
+                            <strong>{{ store.modulo.seccion ?? null }}</strong>
+                        </div>
+                    </div>
+                    <fielset class="uppercase border rounded-lg p-4">
+                        <legend class="font-semibold">Cursos</legend>
+                        <ul class="list-disc list-inside">
+                            <li v-for="curso in store.modulo.cursos" :key="curso.id">
+                                {{ curso.curso.nombre }}
+                            </li>
+                        </ul>
+                    </fielset>
+                </div>
                 <div>
                     <div class="relative">
-                        <Input @keyup="verifyCui()" v-model="inscripcion.cui" option="label" title="*Cui" maxlength="13" type="search" :class="{'focus:border-red-400 border-red-400 focus:outline-red-400': !inscripcion.success, 'focus:border-green-500 border-green-500 focus:outline-green-400' : inscripcion.success }" required />
+                        <Input @keyup="verifyCui()" v-model="inscripcion.cui" option="label" title="*Ingresa cui/dpi" maxlength="13" type="search" :class="{'focus:border-red-400 border-red-400 focus:outline-red-400': !inscripcion.success, 'focus:border-green-500 border-green-500 focus:outline-green-400' : inscripcion.success }" required />
                         <Icon v-if="inscripcion.loading.show" icon="fas fa-spinner" class="animate-spin absolute top-3 right-3 text-gray-500" />
                     </div>
                     <small :class="inscripcion.success ? 'text-green-400' : 'text-red-400'">{{ inscripcion.messageCui }}</small>
                 </div>
                 <Input v-if="!inscripcion.nuevo_registro" v-model="inscripcion.beneficiario.nombre_completo" option="label" title="Beneficiario registrado" readonly disabled />
                 <div v-else>
+                    
                     <DatosPersonales />
                     <Domicilio />
                     <DatosMedicos />
@@ -241,8 +218,18 @@
         <Validate-Errors v-if="inscripcion.errors != 0" :errors="inscripcion.errors" />
         <template #footer>
             <Button @click="inscripcion.resetData()" text="Cancelar" class="btn-secondary rounded-full" icon="fas fa-xmark" />
-            <Button v-if="inscripcion.success" @click="inscripcion.store" text="Pre-inscribirse" class="btn-primary rounded-full" icon="fas fa-save" :loading="store.loading.store" />
+            <Button v-if="inscripcion.success" @click="inscripcionBeneficiario" text="Pre-inscribirse" class="btn-primary rounded-full" icon="fas fa-save" :loading="store.loading.store" />
         </template>
     </Modal>
-    
+
 </template>
+
+<style scoped>
+    td {
+        @apply py-2 text-gray-800 px-4 text-xs;
+    }
+
+    tr {
+        @apply cursor-pointer hover:bg-violet-50 text-center;
+    }
+</style>

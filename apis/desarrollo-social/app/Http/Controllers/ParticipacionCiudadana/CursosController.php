@@ -5,6 +5,7 @@ namespace App\Http\Controllers\ParticipacionCiudadana;
 use App\Http\Controllers\Controller;
 use App\Models\adm_gds\cursos;
 use App\Models\adm_gds\modulos;
+use App\Models\adm_gds\programas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -12,7 +13,7 @@ class CursosController extends Controller
 {
     public function index(Request $request) {
         $this->validate($request, [
-            'tipo' => 'required|in:CURSO,MODULO'
+            'tipo' => 'required|in:CURSO,PROGRAMA'
         ]);
         try {
             $query ="";
@@ -35,7 +36,7 @@ class CursosController extends Controller
 
             }
 
-            if($request->tipo == 'MODULO') {
+            if($request->tipo == 'PROGRAMA') {
                 $query = "
                     SELECT
                         P.ID,
@@ -92,6 +93,19 @@ class CursosController extends Controller
 
             return response($modulo);
 
+        } catch (\Throwable $th) {
+            return response($th->getMessage(),422);
+        }
+    }
+
+    public function getPrograma(programas $programa) {
+        try {
+            return response($programa->load([
+                'modulos.cursos.curso',
+                'modulos.requisitos',
+                'modulos.sede',
+                'modulos.temporalidad'
+            ]));
         } catch (\Throwable $th) {
             return response($th->getMessage(),422);
         }

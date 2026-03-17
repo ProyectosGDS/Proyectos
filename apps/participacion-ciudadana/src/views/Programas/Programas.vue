@@ -1,9 +1,9 @@
 <script setup>
     import { onMounted } from 'vue'
-    import { useModulosStore } from '@/stores/modulos'
+    import { useProgramasStore } from '@/stores/programas'
     import LoadingBar from '@/components/LoadingBar.vue';
 
-    const store = useModulosStore()
+    const store = useProgramasStore()
 
     onMounted(() => {
         store.fetch()
@@ -12,7 +12,7 @@
 
 <template>
     <div class="p-4">
-        <Data-Table :headers="store.headers" :data="store.modulos" color="text-color-9">
+        <Data-Table :headers="store.headers" :data="store.programas" color="text-color-9">
             <template #tbody="{items}">
                 <tr 
                     v-for="item in items" 

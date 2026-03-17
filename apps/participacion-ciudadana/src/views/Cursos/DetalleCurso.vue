@@ -3,7 +3,7 @@
     import { useBeneficiariosStore } from '@/stores/Inscripciones/beneficiarios'
     import { useCatalogosStore } from '@/stores/Catalogos/catalogos'
 
-    import { computed, onBeforeMount, watchEffect } from 'vue'
+    import { onMounted, watchEffect } from 'vue'
     
     import DatosPersonales from './Inscripcion/DatosPersonales.vue'
     import Domicilio from './Inscripcion/Domicilio.vue'
@@ -18,10 +18,6 @@
     const store = useCursosStore()
     const inscripcion = useBeneficiariosStore()
     const catalogos = useCatalogosStore()
-
-    const cupo = computed(() => {
-        return (parseInt(store.curso.capacidad) - parseInt(store.curso.beneficiarios_count));
-    })
 
     function verifyCui () {
         const cui = inscripcion.cui;
@@ -125,7 +121,7 @@
         store.inscripcion.curso_id = props.curso_id
     })
 
-    onBeforeMount(() => {
+    onMounted(() => {
         catalogos.fetch()
     })
     
@@ -163,7 +159,6 @@
                         <td>{{ item.horarios[0]?.nombre_completo }}</td>
                         <td>{{ item.cupos_disponibles +' de ' + item.capacidad }}</td>
                         <td>{{ item.temporalidad.nombre }}</td>
-                        <!-- <td>{{ item.programa.nombre }}</td> -->
                     </template>
                 </tr>
             </template>

@@ -14,6 +14,8 @@ class modulos extends Model
         'fecha_final' => 'datetime:Y-m-d',
     ];
 
+    protected $appends = ['cupos_disponibles'];
+
     protected $fillable = [
         'nombre',
         'descripcion',
@@ -44,6 +46,10 @@ class modulos extends Model
         return $this->belongsToMany(beneficiarios::class,'beneficiarios_modulos','modulo_id','beneficiario_id')
             ->where('BENEFICIARIOS_MODULOS.estado','A')->withPivot('becado','anio_inscripcion');
     }
+    public function beneficiariosTodos() {
+        return $this->belongsToMany(beneficiarios::class,'beneficiarios_modulos','modulo_id','beneficiario_id')
+            ->withPivot('becado','anio_inscripcion');
+    }
 
     public function tarifas() {
         return $this->hasOne(tarifas_cursos::class,'curso_modulo_id')->where('tipo','MODULO');
@@ -65,6 +71,17 @@ class modulos extends Model
 
     public function temporalidad() {
         return $this->belongsTo(temporalidades::class);
+    }
+
+    public function getCuposDisponiblesAttribute() {
+        $inscritos = $this->beneficiariosTodos()->count();
+        $total = $this->capacidad - $inscritos;
+        if($total <= 0) {
+            return 0;
+        }else {
+            return $total;
+        }
+        
     }
 
 
