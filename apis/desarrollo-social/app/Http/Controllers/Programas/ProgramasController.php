@@ -11,6 +11,7 @@ use App\Models\adm_gds\detalles_cursos;
 use App\Models\adm_gds\modulos;
 use App\Models\adm_gds\programas;
 use App\Models\adm_gds\tarifas_cursos;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -290,6 +291,11 @@ class ProgramasController extends Controller
                 ->join('PROGRAMAS P','DC.PROGRAMA_ID','=','P.ID')
                 ->leftJoin('ESCUELAS E','P.ESCUELA_ID','=','E.ID')
                 ->join('DEPENDENCIAS D','P.DEPENDENCIA_ID','=','D.ID')
+                ->leftJoin('BITACORA BI', function(JoinClause $join){
+                    $join->on('BC.ID', '=', 'BI.IDENTIFICADOR')
+                        ->where('BI.ACCION', '=', 'INSCRIPCION BENEFICIARIO A CURSO');
+                })
+                ->leftJoin('USUARIOS U','BI.USUARIO_ID','=','U.ID')
                 ->select(
                     'BC.ID AS INSCRIPCION_ID',
                     'B.CUI',
@@ -311,6 +317,7 @@ class ProgramasController extends Controller
                     DB::raw("CAST(C.IMPULSATEC AS VARCHAR2(1)) AS IMPULSATEC"),
                     DB::raw("CAST('CURSO' AS VARCHAR2(50)) AS TIPO"),
                     DB::raw("TO_CHAR(BC.CREATED_AT,'YYYY-MM-DD') AS FECHA_REGISTRO"),
+                    'U.NOMBRE AS USUARIO'
                 )
                 ->where('BC.ANIO_INSCRIPCION',$year)
                 ->when(!empty($programa_id),function($query) use ($programa_id){
@@ -329,6 +336,11 @@ class ProgramasController extends Controller
                 ->join('PROGRAMAS P','DA.PROGRAMA_ID','=','P.ID')
                 ->join('DEPENDENCIAS D','P.DEPENDENCIA_ID','=','D.ID')
                 ->join('TIPOS_ACTIVIDADES TA','DA.TIPO_ACTIVIDAD_ID','=','TA.ID')
+                ->leftJoin('BITACORA BI', function(JoinClause $join){
+                    $join->on('BA.ID', '=', 'BI.IDENTIFICADOR')
+                        ->where('BI.ACCION', '=', 'INSCRIPCION BENEFICIARIO A MODULO');
+                })
+                ->leftJoin('USUARIOS U','BI.USUARIO_ID','=','U.ID')
                 ->select(
                     'BA.ID AS INSCRIPCION_ID',
                     'B.CUI',
@@ -345,12 +357,12 @@ class ProgramasController extends Controller
                     'A.NOMBRE AS MODULO_CURSO',
                     DB::raw("NULL AS SECCION"),
                     DB::raw("NULL AS SEDE"),
-                    // DB::raw("EXTRACT(YEAR FROM BA.CREATED_AT) AS ANIO_INSCRIPCION"),
                     'BA.ANIO_INSCRIPCION',
                     'BA.ESTADO',
                     DB::raw("CAST('N' AS VARCHAR2(1)) AS IMPULSATEC"),
                     DB::raw("CAST(TA.NOMBRE AS VARCHAR2(50)) AS TIPO"),
                     DB::raw("TO_CHAR(BA.CREATED_AT,'YYYY-MM-DD') AS FECHA_REGISTRO"),
+                    'U.NOMBRE AS USUARIO'
                 )
                 ->where('BA.ANIO_INSCRIPCION',$year)
                 ->when(!empty($programa_id),function($query) use ($programa_id){
@@ -368,6 +380,11 @@ class ProgramasController extends Controller
                 ->join('PROGRAMAS P','M.PROGRAMA_ID','=','P.ID')
                 ->leftJoin('ESCUELAS E','P.ESCUELA_ID','=','E.ID')
                 ->join('DEPENDENCIAS D','P.DEPENDENCIA_ID','=','D.ID')
+                ->leftJoin('BITACORA BI', function(JoinClause $join){
+                    $join->on('BM.ID', '=', 'BI.IDENTIFICADOR')
+                        ->where('BI.ACCION', '=', 'INSCRIPCION BENEFICIARIO A MODULO');
+                })
+                ->leftJoin('USUARIOS U','BI.USUARIO_ID','=','U.ID')
                 ->select(
                     'BM.ID AS INSCRIPCION_ID',
                     'B.CUI',
@@ -389,6 +406,7 @@ class ProgramasController extends Controller
                     DB::raw("CAST('N' AS VARCHAR2(1)) AS IMPULSATEC"),
                     DB::raw("CAST('MODULO' AS VARCHAR2(50)) AS TIPO"),
                     DB::raw("TO_CHAR(BM.CREATED_AT,'YYYY-MM-DD') AS FECHA_REGISTRO"),
+                    'U.NOMBRE AS USUARIO'
                 )
                 ->where('BM.ANIO_INSCRIPCION',$year)
                 ->when(!empty($programa_id),function($query) use ($programa_id){

@@ -26,6 +26,7 @@ export const useBeneficiariosProgramaStore = defineStore('beneficiarios-programa
         { title : 'becado', key : 'becado', width :'10px', align : 'center' },
         { title : 'estado', key : 'estado', width :'10px', align : 'center' },
         { title : 'fecha registro', key : 'fecha_registro'},
+        { title : 'usuario', key : 'usuario'},
         { title : '', key : 'actions', width :'10px', align : 'center' },
     ]
 
