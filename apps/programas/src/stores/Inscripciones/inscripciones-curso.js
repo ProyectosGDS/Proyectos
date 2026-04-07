@@ -128,7 +128,10 @@ export const useInscripcionesCursoStore = defineStore('inscripciones-curso', () 
     const assingBeca = async () => {
         loading.value.beca = true
         try {
-            const response = await axios.put('inscripciones-curso/asignar-beca/' + inscripcion.value.id, inscripcion.value)
+            const response = await axios.put('inscripciones-curso/asignar-beca/' + inscripcion.value.id, {
+                becado : inscripcion.value.becado
+            })
+            
             global.setAlert(response.data.message, 'success')
             fetch(beneficiario_curso.curso.id)
             resetData()
@@ -141,6 +144,7 @@ export const useInscripcionesCursoStore = defineStore('inscripciones-curso', () 
             loading.value.beca = false
         }
     }
+
     const changeStatusInscripcion = async () => {
         loading.value.update = true
         inscripcion.value.estado = inscripcion.value.estado == 'A' ? 'I' : 'A'

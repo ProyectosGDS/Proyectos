@@ -142,7 +142,7 @@ class CargosController extends Controller
     }
 
     private function esBeneficiarioValido($beneficiario,$anioPago) {
-        return !$beneficiario->pivot->becado && 
+        return (!$beneficiario->pivot->becado || $beneficiario->pivot->becado == 2) &&
             isset($beneficiario->interlocutor) && 
             $beneficiario->pivot->anio_inscripcion == $anioPago;
     }
@@ -157,7 +157,7 @@ class CargosController extends Controller
             'OP_PRINCIPAL' => $programa->escuela->op_principal,
             'OP_PARCIAL' => $programa->escuela->op_parcial,
             'OBJETO_CONTRATO' => $programa->escuela->objeto_contrato,
-            'VALOR' => strval($tarifa),
+            'VALOR' => strval($beneficiario->pivot->becado == 2 ? ($tarifa / 2) : $tarifa),
             'PERIODO' => date('my', strtotime($periodo . '-01')),
             'FECHA_VENCIMIENTO' => $fechaVencimiento,
             'DESCRIPCION' => 'PAGO CUOTA ' . mb_strtoupper($nombre_modulo_curso),
