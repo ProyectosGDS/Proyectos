@@ -28,6 +28,7 @@ export const useInscripcionesCursoStore = defineStore('inscripciones-curso', () 
     const programa_id  = ref(null)
     const curso_id  = ref(null)
     const year = ref(0)
+    const month = ref(0)
     const beneficiarios = ref([])
     const inscripcion = ref({})
     const loading = ref({
@@ -72,6 +73,7 @@ export const useInscripcionesCursoStore = defineStore('inscripciones-curso', () 
             const response = await axios.post('inscripciones-curso/store-beneficiarios', {
                 beneficiarios: beneficiarios.value,
                 year : year.value,
+                month : month.value,
             })
             global.setAlert(response.data, 'success')
             fetch(beneficiario_curso.curso.id)
@@ -241,6 +243,7 @@ export const useInscripcionesCursoStore = defineStore('inscripciones-curso', () 
     return {
         headers,
         year,
+        month,
         cupo,
         programa_id,
         curso_id,

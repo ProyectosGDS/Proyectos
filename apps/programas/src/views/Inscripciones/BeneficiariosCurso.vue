@@ -120,6 +120,23 @@ import ValidateErrors from '@/components/ValidateErrors.vue'
       return yearsList
     })
 
+    const months = computed(() => {
+        return [
+            { id: 1, nombre: 'Enero' },
+            { id: 2, nombre: 'Febrero' },
+            { id: 3, nombre: 'Marzo' },
+            { id: 4, nombre: 'Abril' },
+            { id: 5, nombre: 'Mayo' },
+            { id: 6, nombre: 'Junio' },
+            { id: 7, nombre: 'Julio' },
+            { id: 8, nombre: 'Agosto' },
+            { id: 9, nombre: 'Septiembre' },
+            { id: 10, nombre: 'Octubre' },
+            { id: 11, nombre: 'Noviembre' },
+            { id: 12, nombre: 'Diciembre' }
+        ]
+    })
+
     const searchables = []
 
     inscripciones.headers.map(el => {
@@ -145,6 +162,7 @@ import ValidateErrors from '@/components/ValidateErrors.vue'
         }
 
         inscripciones.year = JSON.parse(localStorage.getItem('anio_electivo')) ?? null
+        inscripciones.month = new Date().getMonth() + 1
         catalogos.getCatalogoBeneficiario()
     })
 
@@ -155,8 +173,11 @@ import ValidateErrors from '@/components/ValidateErrors.vue'
         <div class="grid xl:grid-cols-2 xl:divide-x-2">
             <div class="space-y-4 xl:pr-8">
                 <div class="flex gap-3">
-                    <Input v-model="inscripciones.year" option="select" title="*seleccione año inscripción" :error="store.errors.hasOwnProperty('year')">
+                    <Input v-model="inscripciones.year" option="select" title="*año inscripción" :error="store.errors.hasOwnProperty('year')">
                         <option v-for="year in years" :value="year">{{ year }}</option>
+                    </Input>
+                    <Input v-model="inscripciones.month" option="select" title="*mes de inscripción" :error="store.errors.hasOwnProperty('month')">
+                        <option v-for="month in months" :value="month.id">{{ month.nombre }}</option>
                     </Input>
                     <Input v-if="['5','8'].includes(auth.user.dependencia_id)" @change="programas.getProgramasFromEscuelas(JSON.parse(store.escuela).id)" v-model="store.escuela" option="select" title="*Seleccione una escuela" :error="store.errorsDetails.hasOwnProperty('escuela')">
                         <option selected></option>

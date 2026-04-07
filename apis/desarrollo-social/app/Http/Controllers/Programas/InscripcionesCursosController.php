@@ -73,8 +73,10 @@ class InscripcionesCursosController extends Controller
     }
 
     public function store_beneficiarios(Request $request) {
+
         $request->validate([
             'year' => 'required|numeric|digits:4',
+            'month' => 'required|numeric|between:1,12',
             'beneficiarios' => 'required|array',
             'beneficiarios.*.beneficiario_id' => 'required|integer|exists:beneficiarios,id',
             'beneficiarios.*.detalle_curso_id' => 'required|integer|exists:detalles_cursos,id',
@@ -85,14 +87,14 @@ class InscripcionesCursosController extends Controller
             'beneficiarios.*.tarifas.tarifa_menor' => 'required_if:paga,S',
             'beneficiarios.*.tarifas.tarifa_mayor' => 'required_if:paga,S',
             'beneficiarios.*.tarifas.no_cuotas' => 'required_if:paga,S|integer',
-            'beneficiarios.*.tarifas.mes_inicial' => 'required_if:paga,S|date|date_format:Y-m',
-            // 'beneficiarios.*.tarifas.mes_final' => 'required_if:paga,S|date|date_format:Y-m|after_or_equal:tarifas.mes_inicial',
             'beneficiarios.*.objeto_contrato' => 'required_if:beneficiarios.*.paga,S',
             'beneficiarios.*.op_principal' => 'required_if:beneficiarios.*.paga,S',
             'beneficiarios.*.op_parcial' => 'required_if:beneficiarios.*.paga,S',
         ]);
 
         try {
+
+            $anio_mes = date('Y-m',strtotime($request['year'].'-'.$request['month']));
 
             $count_beneficiarios = 0;
             
@@ -150,8 +152,8 @@ class InscripcionesCursosController extends Controller
                                             'OP_PARCIAL' => $row['sede_op_parcial'] ?? $row['op_parcial'],
                                             'OBJETO_CONTRATO' => $row['sede_oc'] ?? $row['objeto_contrato'],
                                             'VALOR' => strval(floatval($row['tarifas']['inscripcion'])),
-                                            'PERIODO' => date('my',strtotime($this->sumMonth($row['tarifas']['mes_inicial'],0))),
-                                            'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($row['tarifas']['mes_inicial'],0)),
+                                            'PERIODO' => date('my',strtotime($this->sumMonth($anio_mes,0))),
+                                            'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($anio_mes,0)),
                                             'DESCRIPCION' => 'INSCRIPCION '.mb_strtoupper($row['nombre_curso']),
                                             'LLAVE_RECONCILIACION' => date('ymd')
                                         ];
@@ -168,8 +170,8 @@ class InscripcionesCursosController extends Controller
                                     //     'OP_PARCIAL' => $row['sede_op_parcial'] ?? $row['op_parcial'],
                                     //     'OBJETO_CONTRATO' => $row['sede_oc'] ?? $row['objeto_contrato'],
                                     //     'VALOR' => $row['edad'] > 18 ? strval(floatval($row['tarifas']['tarifa_mayor'])) : strval(floatval($row['tarifas']['tarifa_mayor'])),
-                                    //     'PERIODO' => date('my',strtotime($this->sumMonth($row['tarifas']['mes_inicial'],$i))),
-                                    //     'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($row['tarifas']['mes_inicial'],$i)),
+                                    //     'PERIODO' => date('my',strtotime($this->sumMonth($anio_mes,$i))),
+                                    //     'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($anio_mes,$i)),
                                     //     'DESCRIPCION' => 'PAGO CUOTA '. mb_strtoupper($row['nombre_curso']),
                                     //     'LLAVE_RECONCILIACION' => 'OCT2025'
                                     // ];
@@ -180,8 +182,8 @@ class InscripcionesCursosController extends Controller
                                         'OP_PARCIAL' => $row['sede_op_parcial'] ?? $row['op_parcial'],
                                         'OBJETO_CONTRATO' => $row['sede_oc'] ?? $row['objeto_contrato'],
                                         'VALOR' => $row['edad'] >= 18 ? strval(floatval($row['tarifas']['tarifa_mayor'])) : strval(floatval($row['tarifas']['tarifa_menor'])),
-                                        'PERIODO' => date('my',strtotime($this->sumMonth($row['tarifas']['mes_inicial'],0))),
-                                        'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($row['tarifas']['mes_inicial'],0)),
+                                        'PERIODO' => date('my',strtotime($this->sumMonth($anio_mes,0))),
+                                        'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($anio_mes,0)),
                                         'DESCRIPCION' => 'PAGO CUOTA '. mb_strtoupper($row['nombre_curso']),
                                         'LLAVE_RECONCILIACION' => date('ymd')
                                     ];

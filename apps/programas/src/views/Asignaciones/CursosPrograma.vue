@@ -162,8 +162,8 @@
                             <option v-for="tempo in catalogos.tempo_tarifas">{{ tempo }}</option>
                         </Input>
                     </div>
-                    <Input option="label" title="Cantidad de cuotas" type="number" min="1" max="12" v-model="store.curso.no_cuotas" :error="store.errors.hasOwnProperty('no_cuotas')" />
-                    <Input option="label" title="Mes inicial" type="month" v-model="store.curso.mes_inicial" :error="store.errors.hasOwnProperty('mes_inicial')" />
+                    <!-- <Input option="label" title="Cantidad de cuotas" type="number" min="1" max="12" v-model="store.curso.no_cuotas" :error="store.errors.hasOwnProperty('no_cuotas')" /> -->
+                    <!-- <Input option="label" title="Mes inicial" type="month" v-model="store.curso.mes_inicial" :error="store.errors.hasOwnProperty('mes_inicial')" /> -->
                     <!-- <Input option="label" title="Mes final" type="month" v-model="store.curso.mes_final" :error="store.errors.hasOwnProperty('mes_final')" disabled /> -->
                 </div>
                 <Validate-Errors :errors="store.errorsDetails" v-if="store.errorsDetails != 0" />
