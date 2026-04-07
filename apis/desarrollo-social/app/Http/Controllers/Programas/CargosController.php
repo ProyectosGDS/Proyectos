@@ -142,7 +142,7 @@ class CargosController extends Controller
     }
 
     private function esBeneficiarioValido($beneficiario,$anioPago) {
-        return (!$beneficiario->pivot->becado || $beneficiario->pivot->becado == 2) &&
+        return (!$beneficiario->pivot->becado || $beneficiario->pivot->becado == 2 || $beneficiario->pivot->becado == 3) &&
             isset($beneficiario->interlocutor) && 
             $beneficiario->pivot->anio_inscripcion == $anioPago;
     }

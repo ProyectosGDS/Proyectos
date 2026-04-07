@@ -129,7 +129,9 @@ export const useInscripcionesModuloStore = defineStore('inscripciones-modulo', (
     const assignBeca = async () => {
         loading.value.update = true
         try {
-            const response = await axios.put('inscripciones-modulo/asignar-beca/' + inscripcion.value.id)
+            const response = await axios.put('inscripciones-modulo/asignar-beca/' + inscripcion.value.id, {
+                becado : inscripcion.value.becado
+            })
             global.setAlert(response.data.message, 'success')
             fetch()
             resetData()
@@ -142,8 +144,6 @@ export const useInscripcionesModuloStore = defineStore('inscripciones-modulo', (
             loading.value.update = false
         }
     }
-
-
 
     const exportExcel = async () => {
 

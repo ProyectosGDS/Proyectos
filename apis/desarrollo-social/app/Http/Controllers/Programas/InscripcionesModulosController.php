@@ -249,9 +249,17 @@ class InscripcionesModulosController extends Controller
         return date("Ym", $timestamp) . $ultimoDia;
     }
 
-    public function asignar_beca(beneficiarios_modulos $inscripcion) {
+    public function asignar_beca(beneficiarios_modulos $inscripcion, Request $request) {
+        
+        $request->validate([
+            'becado' => 'required|in:1,2,3'
+        ],[
+            'becado.in' => 'El valor de becado debe ser 1 para beca completa o 2 para media beca o 3 para beca rechazada',
+            'becado.required' => 'Seleccione una opción de beca'
+        ]);
+
         try {
-            $inscripcion->becado = 1;
+            $inscripcion->becado = $request->becado;
             $inscripcion->save();
 
             return response([

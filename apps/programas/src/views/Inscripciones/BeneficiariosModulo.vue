@@ -294,7 +294,10 @@
                                             <span class="flex items-center gap-1">
                                                 <Icon icon="fas fa-medal" />
                                                 BECADO: 
-                                                <span class="font-medium">{{ inscripcion.becado ? 'SI':'NO' }}</span>
+                                                <span v-if="inscripcion.becado == 1" class="font-medium">Beca completa</span>
+                                                <span v-else-if="inscripcion.becado == 2" class="font-medium">Media beca</span>
+                                                <span v-else-if="inscripcion.becado == 3" class="font-medium">Beca rechazada</span>
+                                                <span v-else class="font-medium">No becado</span>
                                             </span>
                                         </span>
                                     </div>
@@ -350,6 +353,20 @@
             <div>
                 <p class="text-center text-lg">¿Estás seguro de asignar la beca a:?</p>
                 <h1 class="text-center font-semibold">{{ inscripciones.inscripcion?.beneficiario?.nombre_completo }}</h1>
+                <div class="flex justify-center gap-4 p-3 rounded-lg" :class="{'border border-red-500 text-red-500' : inscripciones.errors.hasOwnProperty('becado')}">
+                    <label class="flex gap-1 cursor-pointer">
+                        <input v-model="inscripciones.inscripcion.becado" type="radio" value="1" name="tipo_beca">
+                        <span>Asignar beca completa</span>
+                    </label>
+                    <label class="flex gap-1 cursor-pointer">
+                        <input v-model="inscripciones.inscripcion.becado" type="radio" value="2" name="tipo_beca">
+                        <span>Asignar media beca</span>
+                    </label>
+                    <label class="flex gap-1 cursor-pointer">
+                        <input v-model="inscripciones.inscripcion.becado" type="radio" value="3" name="tipo_beca">
+                        <span>Beca rechazada</span>
+                    </label>
+                </div>
             </div>
         </div>
         <template #footer>
