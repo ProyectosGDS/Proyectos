@@ -124,6 +124,13 @@
         }
     })
 
+    const texto = (text) => {
+        const texto = text ?? '';
+        const indice = texto.indexOf(':');
+        const resultado = indice !== -1 ? texto.substring(0, indice) : texto;
+        return resultado;
+    }
+
 </script>
 
 <template>
@@ -248,8 +255,13 @@
             <summary class="text-lg font-semibold text-color-4 px-3">Bitacora de inscripciones</summary>
             <Data-Table :headers="bitacora.headersInscripciones" :data="bitacora.bitacoras.inscripciones" :loading="bitacora.loading.fetch" :filterAdvance="false" :excel="false">
                 <template #estado="{item}">
-                    <span class="text-xs" :class="item.estado == 'A' ? 'text-green-500' : 'text-red-500'">
-                        {{ item.estado == 'A' ? 'ACTIVO' : 'INACTIVO' }}
+                    <span class="text-xs" :class="item.estado == 'A' ? 'text-green-500' : (item.estado == 'P' ? 'text-yellow-500' : 'text-red-500')">
+                        {{ item.estado == 'A' ? 'ACTIVO' : (item.estado == 'P' ? 'PENDIENTE' : 'INACTIVO') }}
+                    </span>
+                </template>
+                <template #detalle="{item}">
+                    <span class="text-xs">
+                        {{ texto(item.descripcion) }}
                     </span>
                 </template>
             </Data-Table>
