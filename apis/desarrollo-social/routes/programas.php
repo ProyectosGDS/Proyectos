@@ -32,7 +32,7 @@ Route::get('programas/get-actividades/{programa_id}',[ProgramasController::class
 Route::get('programas/get-cursos/{programa}/{all}',[ProgramasController::class,'get_cursos']);
 Route::get('programas/get-modulos/{programa}',[ProgramasController::class,'get_modulos']);
 Route::get('programas/get-beneficiarios/{programa_id}/{year}',[ProgramasController::class,'get_beneficiarios']);
-Route::get('programas/programas_escuela/{escuela_id}',[ProgramasController::class,'programas_escuela']);
+Route::get('programas/programas_escuela/{escuela_id}/{anio_pago}',[ProgramasController::class,'programas_escuela']);
 Route::post('programas/store-cursos',[ProgramasController::class,'store_cursos']);
 Route::post('programas/store-actividades',[ProgramasController::class,'store_actividades']);
 Route::post('programas/generar-reporte',[ProgramasController::class,'generar_reporte']);

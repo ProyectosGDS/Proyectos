@@ -54,20 +54,34 @@
                         <option v-if="escuela.objeto_contrato" :value="escuela.id">{{ escuela.nombre }}</option>
                     </template>
                 </Input>
-                <ul class="grid gap-5">
-                    <li v-for="programa in store.programasEscuela" class="flex justify-between gap-4 px-4 items-center hover:bg-gray-200">
-                        <span>
-                            {{ programa.nombre }}
-                        </span>
-                        <Button 
-                            @click="store.generarCargosPrograma(programa.id)" 
-                            text="Generar partidas" 
-                            class="btn-primary" 
-                            :disabled="store.programasGenerados.includes(programa.id)" 
-                            :loading="store.programasGenerados.includes(programa.id) ? store.loading.cargosPrograma : false"
-                        />
-                    </li>
-                </ul>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>PROGRAMA</th>
+                            <th>BENEFICIARIOS VALIDOS INSCRITOS</th>
+                            <th></th>
+                            <th>PARTIDAS GENERADAS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="programa in store.programasEscuela" :key="programa.id">
+                            <td>{{ programa.nombre }}</td>
+                            <td align="center">{{ programa.count_beneficiarios }}</td>
+                            <td>
+                                <Button 
+                                    @click="store.generarCargosPrograma(programa.id)" 
+                                    text="Generar partidas" 
+                                    class="btn-primary" 
+                                    :disabled="store.programasGenerados.includes(programa.id)" 
+                                    :loading="store.programasGenerados.includes(programa.id) ? store.loading.cargosPrograma : false"
+                                />
+                            </td>
+                            <td align="center">
+                                {{ programa.partidas_generadas ?? null }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </Card>

@@ -35,13 +35,15 @@ class CargosController extends Controller
 
             $modulos = $programa->modulos()
                 ->where('paga', 'S')
-                ->with(['tarifas', 'beneficiarios'])
+                ->where('estado','A')
+                ->with(['tarifas', 'beneficiarios','sede'])
                 ->get();
 
                 
             $cursos = $programa->cursos()
                 ->where('paga', 'S')
-                ->with(['tarifas', 'beneficiarios','curso'])
+                ->where('estado','A')
+                ->with(['tarifas', 'beneficiarios','curso','sede'])
                 ->get();
 
             $partidasGeneradas = $this->procesarModulos($modulos, $mesPago,$anioPago, $anio_mes, $programa);
@@ -154,9 +156,9 @@ class CargosController extends Controller
 
         $params = [
             'INTERLOCUTOR' => $beneficiario->interlocutor,
-            'OP_PRINCIPAL' => $programa->escuela->op_principal,
-            'OP_PARCIAL' => $programa->escuela->op_parcial,
-            'OBJETO_CONTRATO' => $programa->escuela->objeto_contrato,
+            'OP_PRINCIPAL' => $modulo->sede->op_principal ?? $programa->escuela->op_principal, //revisar primero sede y despues escuela
+            'OP_PARCIAL' => $modulo->sede->op_parcial ?? $programa->escuela->op_parcial, //revisar primero sede y despues escuela
+            'OBJETO_CONTRATO' => $modulo->sede->objeto_contrato ?? $programa->escuela->objeto_contrato, //revisar primero sede y despues escuela
             'VALOR' => strval($beneficiario->pivot->becado == 2 ? ($tarifa / 2) : $tarifa),
             'PERIODO' => date('my', strtotime($periodo . '-01')),
             'FECHA_VENCIMIENTO' => $fechaVencimiento,

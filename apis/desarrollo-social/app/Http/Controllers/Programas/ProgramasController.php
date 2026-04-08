@@ -635,13 +635,39 @@ class ProgramasController extends Controller
         }
     }
 
-    public function programas_escuela(int $escuela_id) {
+    public function programas_escuela(int $escuela_id, $anio_pago) {
+
         try {
 
-            $programas_escuela = programas::with(['modulos'])
+            $programas_escuela = programas::with(['modulos.beneficiarios','cursos.beneficiarios'])
                 ->where('estado','A')
                 ->where('escuela_id',$escuela_id)
                 ->get();
+
+            foreach($programas_escuela as &$programa) {
+                $programa->count_beneficiarios = 0;
+                foreach($programa->modulos as $modulo) {
+                    if($modulo->estado == 'A' && $modulo->paga == 'S') {
+                        foreach($modulo->beneficiarios as $beneficiario) {
+                            if($this->esBeneficiarioValido($beneficiario,$anio_pago)) {
+                                $programa->count_beneficiarios++;
+                            }
+                        }
+                    }
+                }
+
+                foreach($programa->cursos as $curso) {
+                    if($curso->estado == 'A' && $curso->paga == 'S') {
+                        foreach($curso->beneficiarios as $beneficiario) {
+                            if($this->esBeneficiarioValido($beneficiario,$anio_pago)) {
+                                $programa->count_beneficiarios++;
+                            }
+                        }
+                    }
+                }
+
+                unset($programa->modulos,$programa->cursos);
+            }
 
             return response([
                 'message' => 'Se obtuvieron los programas exitosamente',
@@ -654,6 +680,12 @@ class ProgramasController extends Controller
                 'message' => $th->getMessage(),
             ]);
         }
+    }
+
+    private function esBeneficiarioValido($beneficiario,$anioPago) {
+        return (!$beneficiario->pivot->becado || $beneficiario->pivot->becado == 2 || $beneficiario->pivot->becado == 3) &&
+            isset($beneficiario->interlocutor) && 
+            $beneficiario->pivot->anio_inscripcion === $anioPago;
     }
 
     public function generar_reporte(Request $request) { 

@@ -18,6 +18,9 @@ class sedes extends Model
         'distrito_id',
         'estado',
         'responsable',
+        'objeto_contrato',
+        'op_principal',
+        'op_parcial'
     ];
 
     // RELACIONES INVERSAS

@@ -25,7 +25,7 @@ export const useCargosStore = defineStore('cargos', () => {
         loading.value.programasEscuela = true
         programasEscuela.value = []
         try {
-            const response = await axios.get('programas/programas_escuela/' + escuela_id.value)
+            const response = await axios.get('programas/programas_escuela/' + escuela_id.value + '/' + anio.value)
             programasEscuela.value = response.data.programas_escuela
         } catch (error) {
             global.manejarError(error)
@@ -42,6 +42,17 @@ export const useCargosStore = defineStore('cargos', () => {
                 anio : anio.value,
                 mes : mes.value
             })
+            
+            programasEscuela.value = programasEscuela.value.map(programa => {
+                if(programa.id === programa_id) {
+                    return {
+                        ...programa,
+                        partidas_generadas : response.data.partidas_generadas
+                    }
+                }
+                return programa
+            })
+
             global.setAlert(response.data.message,'success')
         } catch (error) {
             if(error.response.status === 422) {
