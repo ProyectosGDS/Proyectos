@@ -36,7 +36,7 @@
             <Input @change="store.fetch(store.programa_id)" v-model="store.programa_id" option="select" title="*seleccione programa">
                 <option value=""></option>
                 <template v-for="programa in programas.programas">
-                    <option v-if="programa.estado == 'A'" :value="programa.id">{{ programa.nombre }}</option>
+                    <option v-if="programa.estado == 'A'" :value="programa.id">{{ programa.id + ' - '+programa.nombre }}</option>
                 </template>
                 <option value="0">TODOS</option>
             </Input>
@@ -55,20 +55,11 @@
                 <Badge  :color="item.estado == 'A' ? 'green' : 'red'" :text="item.estado == 'A' ? 'Activo' : 'Inactivo'" />
             </template>
             <template #becado="{ item }">
-                <small>
-                    {{ item.becado ? 'Sí' : 'No' }}
-                </small>
+                <span v-if="item.becado == 1" class="text-xs">BC</span>
+                <span v-else-if="item.becado == 2" class="text-xs">BP</span>
+                <span v-else-if="item.becado == 3" class="text-xs">BR</span>
+                <span v-else class="text-xs">NB</span>
             </template>
-            <!-- <template #actions="{ item }">
-                <Drop-Down-Button icon="fas fa-ellipsis-v">
-                    <ul>
-                        <li @click="store.edit(item)" class="text-color-4">Editar</li>
-                        <template v-if="item.estado == 'A'">
-                            <li @click="store.remove(item)" class="text-red-400">Desactivar</li>
-                        </template>
-                    </ul>
-                </Drop-Down-Button>
-            </template> -->
         </Data-Table>
     </Card>
 </template>

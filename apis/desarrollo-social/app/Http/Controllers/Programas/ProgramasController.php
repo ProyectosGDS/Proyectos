@@ -25,7 +25,7 @@ class ProgramasController extends Controller
 
             if ($perfil) {
                 $programas = programas::with(['dependencia','modulos','escuela'])
-                    ->latest('id')
+                    ->orderBy('nombre','ASC')
                     ->get();
                 return response($programas);
             }
@@ -34,7 +34,7 @@ class ProgramasController extends Controller
                     $query->where('dependencia_id',auth()->user()->dependencia_id);
                 })
                 ->with(['dependencia','modulos','escuela'])
-                ->latest('id')
+                ->orderBy('nombre','ASC')
                 ->get();
             return response($programas);  
 
@@ -314,6 +314,7 @@ class ProgramasController extends Controller
                     'S.NOMBRE AS SEDE',
                     'BC.ANIO_INSCRIPCION AS ANIO_INSCRIPCION',
                     'BC.ESTADO',
+                    'BC.BECADO',
                     DB::raw("CAST(C.IMPULSATEC AS VARCHAR2(1)) AS IMPULSATEC"),
                     DB::raw("CAST('CURSO' AS VARCHAR2(50)) AS TIPO"),
                     DB::raw("TO_CHAR(BC.CREATED_AT,'YYYY-MM-DD') AS FECHA_REGISTRO"),
@@ -359,6 +360,7 @@ class ProgramasController extends Controller
                     DB::raw("NULL AS SEDE"),
                     'BA.ANIO_INSCRIPCION',
                     'BA.ESTADO',
+                    DB::raw("NULL AS BECADO"),
                     DB::raw("CAST('N' AS VARCHAR2(1)) AS IMPULSATEC"),
                     DB::raw("CAST(TA.NOMBRE AS VARCHAR2(50)) AS TIPO"),
                     DB::raw("TO_CHAR(BA.CREATED_AT,'YYYY-MM-DD') AS FECHA_REGISTRO"),
@@ -403,6 +405,7 @@ class ProgramasController extends Controller
                     'S.NOMBRE AS SEDE',
                     'BM.ANIO_INSCRIPCION AS ANIO_INSCRIPCION',
                     'BM.ESTADO',
+                    'BM.BECADO',
                     DB::raw("CAST('N' AS VARCHAR2(1)) AS IMPULSATEC"),
                     DB::raw("CAST('MODULO' AS VARCHAR2(50)) AS TIPO"),
                     DB::raw("TO_CHAR(BM.CREATED_AT,'YYYY-MM-DD') AS FECHA_REGISTRO"),
