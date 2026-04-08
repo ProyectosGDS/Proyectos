@@ -17,44 +17,44 @@ export const useGenerarReporteStore = defineStore('generar-reporte', () => {
 
     const reporte_excel = async () => {
 
-    loading.value = true
+        loading.value = true
 
-    try {
+        try {
 
-        const response = await axios.post('programas/generar-reporte',
-            {
-                anio_inscripcion : anio_inscripcion.value,
-                programas :  programas.value
-            },
-            {
-                responseType: 'blob'
-            })
+            const response = await axios.post('programas/generar-reporte',
+                {
+                    anio_inscripcion : anio_inscripcion.value,
+                    programas :  programas.value
+                },
+                {
+                    responseType: 'blob'
+                })
 
-        const url = window.URL.createObjectURL(new Blob([response.data]));
+            const url = window.URL.createObjectURL(new Blob([response.data]));
 
-        const link = document.createElement('a')
-        link.href = url
-        link.setAttribute('download', 'reporte_generado.xlsx')
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', 'reporte_generado.xlsx')
 
-        document.body.appendChild(link)
-        link.click();
+            document.body.appendChild(link)
+            link.click();
 
-        window.URL.revokeObjectURL(url)
-        document.body.removeChild(link)
+            window.URL.revokeObjectURL(url)
+            document.body.removeChild(link)
 
 
-    } catch (error) {
-        if(error.response.status == 422) {
-            errors.value = error.response.data.errors
-        } else {
-            global.manejarError(error);
+        } catch (error) {
+            if(error.response.status == 422) {
+                errors.value = error.response.data.errors
+            } else {
+                global.manejarError(error);
+            }
+
+        } finally {
+
+            loading.value = false
         }
-
-    } finally {
-
-        loading.value = false
     }
-}
     
     return {
         anio_inscripcion,

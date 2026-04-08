@@ -3,11 +3,13 @@ import { useGlobalStore } from '@/stores/global'
 import { ref } from 'vue'
 import axios from 'axios'
 import { useAuthStore } from '../auth'
+import { useGenerarReporteStore } from '../Inscripciones/generar-reporte'
 
 export const useProgramasStore = defineStore('programas', () => {
     
     const global = useGlobalStore()
     const auth = useAuthStore()
+    const generarReporteStore = useGenerarReporteStore()
     
     const headers = [
         { title : 'id', key : 'id', type : 'numeric' },
@@ -51,9 +53,9 @@ export const useProgramasStore = defineStore('programas', () => {
     }
 
     const getProgramasFromEscuelas = async (escuela) => {
+        generarReporteStore.programas = []
         programas.value = []
         loading.value.fetch = true
-        console.log(escuela);
         
         try {
             if(!escuela){

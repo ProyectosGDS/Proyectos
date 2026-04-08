@@ -318,107 +318,107 @@ class BeneficiariosController extends Controller
 
             $query = "
                 SELECT
-                    m.id AS asignacion_id,
-                    p.nombre AS programa,
-                    m.nombre AS modulo_curso,
-                    bm.created_at AS fecha_inscripcion,
-                    bm.estado,
-                    bi_top.identificador,
-                    CASE WHEN bm.estado = 'I' THEN bi_top.descripcion ELSE NULL END descripcion,
-                    CASE WHEN bm.estado = 'I' THEN bi_top.created_at ELSE NULL END ultima_modificacion,
-                    'MODULO' AS tipo
-                FROM ADM_GDS.beneficiarios_modulos bm
-                INNER JOIN ADM_GDS.beneficiarios b
-                    ON bm.beneficiario_id = b.id
-                INNER JOIN ADM_GDS.modulos m
-                    ON bm.modulo_id = m.id
-                INNER JOIN ADM_GDS.programas p
-                    ON m.programa_id = p.id
+                    M.ID AS ASIGNACION_ID,
+                    P.NOMBRE AS PROGRAMA,
+                    M.NOMBRE AS MODULO_CURSO,
+                    BM.CREATED_AT AS FECHA_INSCRIPCION,
+                    BM.ESTADO,
+                    BI_TOP.IDENTIFICADOR,
+                    CASE WHEN BM.ESTADO = 'I' THEN BI_TOP.DESCRIPCION ELSE NULL END DESCRIPCION,
+                    CASE WHEN BM.ESTADO = 'I' THEN BI_TOP.CREATED_AT ELSE NULL END ULTIMA_MODIFICACION,
+                    'MODULO' AS TIPO
+                FROM ADM_GDS.BENEFICIARIOS_MODULOS BM
+                INNER JOIN ADM_GDS.BENEFICIARIOS B
+                    ON BM.BENEFICIARIO_ID = B.ID
+                INNER JOIN ADM_GDS.MODULOS M
+                    ON BM.MODULO_ID = M.ID
+                INNER JOIN ADM_GDS.PROGRAMAS P
+                    ON M.PROGRAMA_ID = P.ID
                 OUTER APPLY (
                     SELECT *
                     FROM (
-                        SELECT bi.identificador, bi.descripcion, bi.created_at
-                        FROM ADM_GDS.BITACORA bi
-                        WHERE bi.identificador = bm.id 
-                        AND bi.tabla = 'BENEFICIARIOS_MODULOS'
-                        AND bi.accion = 'DESHABILITAR INSCRIPCION MODULO'
-                        ORDER BY bi.id DESC -- O bi.created_at DESC
+                        SELECT BI.IDENTIFICADOR, BI.DESCRIPCION, BI.CREATED_AT
+                        FROM ADM_GDS.BITACORA BI
+                        WHERE BI.IDENTIFICADOR = BM.ID 
+                        AND BI.TABLA = 'BENEFICIARIOS_MODULOS'
+                        AND BI.ACCION = 'DESHABILITAR INSCRIPCION MODULO'
+                        ORDER BY BI.ID DESC -- O BI.CREATED_AT DESC
                     )
                     WHERE ROWNUM = 1
-                ) bi_top
-                WHERE bm.beneficiario_id = ?
+                ) BI_TOP
+                WHERE BM.BENEFICIARIO_ID = ?
 
                 UNION ALL
                         
                 SELECT
-                    dc.id asignacion_id,
-                    p.nombre programa,
-                    c.nombre modulo_curso,
-                    bc.created_at fecha_inscripcion,
-                    bc.estado,
-                    bi_top.identificador,
-                    CASE WHEN bc.estado = 'I' THEN bi_top.descripcion ELSE NULL END descripcion,
-                    CASE WHEN bc.estado = 'I' THEN bi_top.created_at ELSE NULL END ultima_modificacion,
-                    'CURSO' tipo
-                FROM ADM_GDS.beneficiarios_cursos bc
-                INNER JOIN ADM_GDS.beneficiarios b
-                    ON bc.beneficiario_id = b.id
-                INNER JOIN ADM_GDS.detalles_cursos dc
-                    ON bc.detalle_curso_id = dc.id
-                INNER JOIN ADM_GDS.cursos c
-                    ON dc.curso_id = c.id
-                INNER JOIN ADM_GDS.programas p
-                    ON dc.programa_id = p.id
+                    DC.ID ASIGNACION_ID,
+                    P.NOMBRE PROGRAMA,
+                    C.NOMBRE MODULO_CURSO,
+                    BC.CREATED_AT FECHA_INSCRIPCION,
+                    BC.ESTADO,
+                    BI_TOP.IDENTIFICADOR,
+                    CASE WHEN BC.ESTADO = 'I' THEN BI_TOP.DESCRIPCION ELSE NULL END DESCRIPCION,
+                    CASE WHEN BC.ESTADO = 'I' THEN BI_TOP.CREATED_AT ELSE NULL END ULTIMA_MODIFICACION,
+                    'CURSO' TIPO
+                FROM ADM_GDS.BENEFICIARIOS_CURSOS BC
+                INNER JOIN ADM_GDS.BENEFICIARIOS B
+                    ON BC.BENEFICIARIO_ID = B.ID
+                INNER JOIN ADM_GDS.DETALLES_CURSOS DC
+                    ON BC.DETALLE_CURSO_ID = DC.ID
+                INNER JOIN ADM_GDS.CURSOS C
+                    ON DC.CURSO_ID = C.ID
+                INNER JOIN ADM_GDS.PROGRAMAS P
+                    ON DC.PROGRAMA_ID = P.ID
                 OUTER APPLY (
                     SELECT *
                     FROM (
-                        SELECT bi.identificador, bi.descripcion, bi.created_at
-                        FROM ADM_GDS.BITACORA bi
-                        WHERE bi.identificador = bc.id 
-                        AND bi.tabla = 'BENEFICIARIOS_CURSOS'
-                        AND bi.accion = 'DESHABILITAR INSCRIPCION CURSO'
-                        ORDER BY bi.id DESC -- O bi.created_at DESC
+                        SELECT BI.IDENTIFICADOR, BI.DESCRIPCION, BI.CREATED_AT
+                        FROM ADM_GDS.BITACORA BI
+                        WHERE BI.IDENTIFICADOR = BC.ID 
+                        AND BI.TABLA = 'BENEFICIARIOS_CURSOS'
+                        AND BI.ACCION = 'DESHABILITAR INSCRIPCION CURSO'
+                        ORDER BY BI.ID DESC -- O BI.CREATED_AT DESC
                     )
                     WHERE ROWNUM = 1
-                ) bi_top
-                WHERE bc.beneficiario_id = ?
+                ) BI_TOP
+                WHERE BC.BENEFICIARIO_ID = ?
 
                 UNION ALL
 
                 SELECT
-                    da.id asignacion_id,
-                    p.nombre programa,
-                    a.nombre modulo_curso,
-                    ba.created_at fecha_inscripcion,
-                    ba.estado,
-                    bi_top.identificador,
-                    CASE WHEN ba.estado = 'I' THEN bi_top.descripcion ELSE NULL END descripcion,
-                    CASE WHEN ba.estado = 'I' THEN bi_top.created_at ELSE NULL END ultima_modificacion,
-                    ta.nombre tipo
-                FROM ADM_GDS.beneficiarios_actividades ba
-                INNER JOIN ADM_GDS.beneficiarios b
-                    ON ba.beneficiario_id = b.id
-                INNER JOIN ADM_GDS.detalles_actividades da
-                    ON ba.detalle_actividad_id = da.id
-                INNER JOIN ADM_GDS.tipos_actividades ta
-                    ON da.tipo_actividad_id = ta.id
-                INNER JOIN ADM_GDS.actividades a
-                    ON da.actividad_id = a.id
-                INNER JOIN ADM_GDS.programas p
-                    ON da.programa_id = p.id
+                    DA.ID ASIGNACION_ID,
+                    P.NOMBRE PROGRAMA,
+                    A.NOMBRE MODULO_CURSO,
+                    BA.CREATED_AT FECHA_INSCRIPCION,
+                    BA.ESTADO,
+                    BI_TOP.IDENTIFICADOR,
+                    CASE WHEN BA.ESTADO = 'I' THEN BI_TOP.DESCRIPCION ELSE NULL END DESCRIPCION,
+                    CASE WHEN BA.ESTADO = 'I' THEN BI_TOP.CREATED_AT ELSE NULL END ULTIMA_MODIFICACION,
+                    TA.NOMBRE TIPO
+                FROM ADM_GDS.BENEFICIARIOS_ACTIVIDADES BA
+                INNER JOIN ADM_GDS.BENEFICIARIOS B
+                    ON BA.BENEFICIARIO_ID = B.ID
+                INNER JOIN ADM_GDS.DETALLES_ACTIVIDADES DA
+                    ON BA.DETALLE_ACTIVIDAD_ID = DA.ID
+                INNER JOIN ADM_GDS.TIPOS_ACTIVIDADES TA
+                    ON DA.TIPO_ACTIVIDAD_ID = TA.ID
+                INNER JOIN ADM_GDS.ACTIVIDADES A
+                    ON DA.ACTIVIDAD_ID = A.ID
+                INNER JOIN ADM_GDS.PROGRAMAS P
+                    ON DA.PROGRAMA_ID = P.ID
                 OUTER APPLY (
                     SELECT *
                     FROM (
-                        SELECT bi.identificador, bi.descripcion, bi.created_at
-                        FROM ADM_GDS.BITACORA bi
-                        WHERE bi.identificador = ba.id 
-                        AND bi.tabla = 'BENEFICIARIOS_ACTIVIDADES'
-                        AND bi.accion = 'DESHABILITAR INSCRIPCION ACTIVIDAD'
-                        ORDER BY bi.id DESC -- O bi.created_at DESC
+                        SELECT BI.IDENTIFICADOR, BI.DESCRIPCION, BI.CREATED_AT
+                        FROM ADM_GDS.BITACORA BI
+                        WHERE BI.IDENTIFICADOR = BA.ID 
+                        AND BI.TABLA = 'BENEFICIARIOS_ACTIVIDADES'
+                        AND BI.ACCION = 'DESHABILITAR INSCRIPCION ACTIVIDAD'
+                        ORDER BY BI.ID DESC -- O BI.CREATED_AT DESC
                     )
                     WHERE ROWNUM = 1
-                ) bi_top
-                WHERE ba.beneficiario_id = ?
+                ) BI_TOP
+                WHERE BA.BENEFICIARIO_ID = ?
             ";
 
             $inscripciones = DB::connection('gds')->select($query,[$beneficiario->id,$beneficiario->id,$beneficiario->id]);

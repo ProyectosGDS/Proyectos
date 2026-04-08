@@ -656,7 +656,7 @@ class ProgramasController extends Controller
         }
     }
 
-    public function generar_reporte(Request $request) {
+    public function generar_reporte(Request $request) { 
         $request->validate([
             'anio_inscripcion' => 'required|digits:4',
             'programas' => 'required|array'
@@ -721,6 +721,7 @@ class ProgramasController extends Controller
                     BA.ID ID_INSCRIPCION,
                     TO_CHAR(BA.CREATED_AT,'YYYY-MM-DD') FECHA_ASIGNACION,
                     BA.ESTADO ESTADO_INSCRIPCION,
+                    '' DETALLE_ESTADO_INSCRIPCION,
                     DEPEN.NOMBRE DEPENDENCIA,
                     '' ESCUELA,
                     PROG.NOMBRE PROGRAMA,
@@ -734,7 +735,8 @@ class ProgramasController extends Controller
                     DA.DIRECCION ACTIVIDAD_DIRECCION,
                     DA.ZONA_ID ACTIVIDAD_ZONA,
                     '' PUBLICO,
-                    '' PAGA
+                    '' PAGA,
+                    '' BECADO
                 FROM ADM_GDS.BENEFICIARIOS_ACTIVIDADES BA
                     INNER JOIN ADM_GDS.BENEFICIARIOS B
                         ON BENEFICIARIO_ID = B.ID
@@ -851,6 +853,10 @@ class ProgramasController extends Controller
                     BC.ID ID_INSCRIPCION,
                     TO_CHAR(BC.CREATED_AT,'YYYY-MM-DD') FECHA_ASIGNACION,
                     BC.ESTADO ESTADO_INSCRIPCION,
+                    CASE BC.ESTADO 
+                        WHEN 'I' THEN SUBSTR(BI_TOP.DESCRIPCION, 1, INSTR(BI_TOP.DESCRIPCION, ':') - 1) 
+                        ELSE NULL 
+                    END DETALLE_ESTADO_INSCRIPCION,
                     DEPEN.NOMBRE DEPENDENCIA,
                     ESC.NOMBRE ESCUELA,
                     PROG.NOMBRE PROGRAMA,
@@ -864,7 +870,13 @@ class ProgramasController extends Controller
                     S.DIRECCION SEDE_DIRECCION,
                     S.ZONA_ID SEDE_ZONA,
                     DC.PUBLICO,
-                    DC.PAGA
+                    DC.PAGA,
+                    CASE BC.BECADO 
+                        WHEN 1 THEN 'BC' 
+                        WHEN 2 THEN 'BP' 
+                        WHEN 3 THEN 'BR' 
+                        ELSE 'NB'
+                    END BECADO
                 FROM ADM_GDS.BENEFICIARIOS_CURSOS BC
                     INNER JOIN ADM_GDS.BENEFICIARIOS B
                         ON BENEFICIARIO_ID = B.ID
@@ -929,6 +941,18 @@ class ProgramasController extends Controller
                         ON PROG.ESCUELA_ID = ESC.ID
                     INNER JOIN ADM_GDS.DEPENDENCIAS DEPEN
                         ON PROG.DEPENDENCIA_ID = DEPEN.ID
+                    OUTER APPLY (
+                        SELECT *
+                        FROM (
+                            SELECT BI.IDENTIFICADOR, BI.DESCRIPCION, BI.CREATED_AT
+                            FROM ADM_GDS.BITACORA BI
+                            WHERE BI.IDENTIFICADOR = BC.ID 
+                            AND BI.TABLA = 'BENEFICIARIOS_MODULOS'
+                            AND BI.ACCION = 'DESHABILITAR INSCRIPCION MODULO'
+                            ORDER BY BI.ID DESC
+                        )
+                        WHERE ROWNUM = 1
+                    ) BI_TOP
                 WHERE BC.ANIO_INSCRIPCION = $anio_inscripcion
                 AND PROG.ID IN($programas)
 
@@ -987,6 +1011,10 @@ class ProgramasController extends Controller
                     BM.ID ID_INSCRIPCION,
                     TO_CHAR(BM.CREATED_AT,'YYYY-MM-DD') FECHA_ASIGNACION,
                     BM.ESTADO ESTADO_INSCRIPCION,
+                    CASE BM.ESTADO 
+                        WHEN 'I' THEN SUBSTR(BI_TOP.DESCRIPCION, 1, INSTR(BI_TOP.DESCRIPCION, ':') - 1) 
+                        ELSE NULL 
+                    END DETALLE_ESTADO_INSCRIPCION,
                     DEPEN.NOMBRE DEPENDENCIA,
                     ESC.NOMBRE ESCUELA,
                     PROG.NOMBRE PROGRAMA,
@@ -1000,7 +1028,13 @@ class ProgramasController extends Controller
                     S.DIRECCION SEDE_DIRECCION,
                     S.ZONA_ID SEDE_ZONA,
                     MOD.PUBLICO,
-                    MOD.PAGA
+                    MOD.PAGA,
+                    CASE BM.BECADO 
+                        WHEN 1 THEN 'BC' 
+                        WHEN 2 THEN 'BP' 
+                        WHEN 3 THEN 'BR' 
+                        ELSE 'NB'
+                    END BECADO
                 FROM ADM_GDS.BENEFICIARIOS_MODULOS BM
                     INNER JOIN ADM_GDS.BENEFICIARIOS B
                         ON BENEFICIARIO_ID = B.ID
@@ -1063,6 +1097,18 @@ class ProgramasController extends Controller
                         ON PROG.ESCUELA_ID = ESC.ID
                     INNER JOIN ADM_GDS.DEPENDENCIAS DEPEN
                         ON PROG.DEPENDENCIA_ID = DEPEN.ID
+                    OUTER APPLY (
+                        SELECT *
+                        FROM (
+                            SELECT BI.IDENTIFICADOR, BI.DESCRIPCION, BI.CREATED_AT
+                            FROM ADM_GDS.BITACORA BI
+                            WHERE BI.IDENTIFICADOR = BM.ID 
+                            AND BI.TABLA = 'BENEFICIARIOS_MODULOS'
+                            AND BI.ACCION = 'DESHABILITAR INSCRIPCION MODULO'
+                            ORDER BY BI.ID DESC
+                        )
+                        WHERE ROWNUM = 1
+                    ) BI_TOP
                 WHERE BM.ANIO_INSCRIPCION = $anio_inscripcion
                 AND PROG.ID IN($programas)
             ";
