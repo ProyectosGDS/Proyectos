@@ -110,8 +110,7 @@
                 <br>
                 <Data-Table
                     :headers="[
-                        { title : 'id', key: 'id', type : 'numeric' },
-                        { title : 'cui', key: 'beneficiario.cui' },
+                        { title : 'dpi', key: 'beneficiario.cui' },
                         { title : 'nombre', key: 'beneficiario.nombre_completo' },
                     ]"
                     :data="catalogos.beneficiarios" 

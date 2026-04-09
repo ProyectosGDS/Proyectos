@@ -17,7 +17,7 @@
     
     header{
         position: fixed;
-        top:-160px;
+        top:-180px;
         width: 100%;
         text-align: center;
     }
@@ -68,13 +68,22 @@
                 <td class="title">ID CURSO</td>
                 <td><strong>{{ $curso->id }}</strong></td>
                 <td class="title">INSTRUCTOR:</td>
-                <td>{{ strtoupper($curso->instructor->nombre) }}</td>
+                <td>
+                    {{-- {{ strtoupper($curso->instructor->nombre) }} --}}
+                    @foreach ($curso->instructores as $instructor)
+                    <small>
+                        {{ $instructor->nombre.', ' }}
+                    </small>
+                    @endforeach
+                </td>
             </tr>
             <tr>
                 <td class="title">HORARIOS:</td>
                 <td>
                     @foreach ($curso->horarios as $horario)
+                    <small>
                         {{ $horario->nombre_completo.', ' }}
+                    </small>
                     @endforeach
                 </td>
                 <td class="title">SEDE:</td>
@@ -95,7 +104,7 @@
             <thead>
                 <tr>
                     <th>NO</th>
-                    <th>ID</th>
+                    <th>DPI</th>
                     <th>NOMBRE COMPLETO</th>
                     <th width="100px" align="center" style="text-align: center;">
                         ASISTENCIA DEL {{ date('d-M-Y',strtotime($fecha)) }}
@@ -106,7 +115,7 @@
                 @foreach ($beneficiarios_inscritos as $beneficiario)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
-                        <td>{{ $beneficiario->beneficiario->id }}</td>
+                        <td>{{ $beneficiario->beneficiario->cui }}</td>
                         <td>{{ mb_strtoupper($beneficiario->beneficiario->nombre_completo) }}</td>
                         <td></td>
                     </tr>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Programas;
 
 use App\Http\Controllers\Controller;
+use App\Models\adm_gds\beneficiarios;
 use App\Models\adm_gds\beneficiarios_cursos;
 use App\Models\adm_gds\beneficiarios_modulos;
 use App\Models\adm_gds\control_asistencia;
@@ -25,7 +26,7 @@ class ControlAsistenciaController extends Controller
             $beneficiarios_inscritos = beneficiarios_cursos::has('beneficiario')
                 ->with([
                     'beneficiario' => function($query) {
-                        $query->where('estado','V')->orderBy('primer_apellido');
+                        $query->where('estado','V');
                     },
                     'beneficiario.control_asistencia' => function($query) use ($request) {
                         $query->where('tipo','curso')
@@ -35,6 +36,12 @@ class ControlAsistenciaController extends Controller
                 ])->where('detalle_curso_id',$request->detalle_curso_id)
                 ->where('estado','A')
                 ->whereYear('created_at',$request->year)
+                ->orderBy(
+                    beneficiarios::select('primer_nombre')
+                        ->whereColumn('id', 'beneficiarios_cursos.beneficiario_id')
+                        ->limit(1),
+                    'asc'
+                )
                 ->get();
 
             return response($beneficiarios_inscritos);
@@ -56,7 +63,7 @@ class ControlAsistenciaController extends Controller
             $beneficiarios_inscritos = beneficiarios_modulos::has('beneficiario')
                 ->with([
                     'beneficiario' => function($query) {
-                        $query->where('estado','V')->orderBy('primer_apellido');
+                        $query->where('estado','V');
                     },
                     'beneficiario.control_asistencia' => function($query) use ($request) {
                         $query->where('tipo','modulo')
@@ -66,6 +73,12 @@ class ControlAsistenciaController extends Controller
                 ])->where('modulo_id',$request->modulo_id)
                 ->where('estado','A')
                 ->whereYear('created_at',$request->year)
+                ->orderBy(
+                        beneficiarios::select('primer_nombre')
+                            ->whereColumn('id', 'beneficiarios_modulos.beneficiario_id')
+                            ->limit(1),
+                        'asc'
+                    )
                 ->get();
 
             return response($beneficiarios_inscritos);
@@ -147,15 +160,21 @@ class ControlAsistenciaController extends Controller
                 $beneficiarios_inscritos = beneficiarios_cursos::has('beneficiario')
                     ->with([
                         'beneficiario' => function($query) {
-                            $query->where('estado','V')->orderBy('primer_apellido');
+                            $query->where('estado','V');
                         }
                     ])->where('detalle_curso_id',$request->detalle_curso_id)
                     ->where('estado','A')
                     ->whereYear('created_at',$request->year)
+                    ->orderBy(
+                        beneficiarios::select('primer_nombre')
+                            ->whereColumn('id', 'beneficiarios_cursos.beneficiario_id')
+                            ->limit(1),
+                        'asc'
+                    )
                     ->get();
                 
                 $fecha = $request->fecha;
-                $curso = $beneficiarios_inscritos->first()->curso->load(['curso','modulo','programa.dependencia','sede','horarios','instructor','temporalidad']) ?? null;
+                $curso = $beneficiarios_inscritos->first()->curso->load(['curso','modulo','programa.dependencia','sede','horarios','instructores','temporalidad']) ?? null;
                 $pdf = Pdf::loadView('Reports.PdfControlAsistenciaCurso',compact('beneficiarios_inscritos','fecha','curso'));
                 
             } else if($request->tipo == 'modulo') {
@@ -163,11 +182,17 @@ class ControlAsistenciaController extends Controller
                 $beneficiarios_inscritos = beneficiarios_modulos::has('beneficiario')
                     ->with([
                         'beneficiario' => function($query) {
-                            $query->where('estado','V')->orderBy('primer_apellido');
+                            $query->where('estado','V');
                         }
                     ])->where('modulo_id',$request->detalle_curso_id)
                     ->where('estado','A')
                     ->whereYear('created_at',$request->year)
+                    ->orderBy(
+                        beneficiarios::select('primer_nombre')
+                            ->whereColumn('id', 'beneficiarios_modulos.beneficiario_id')
+                            ->limit(1),
+                        'asc'
+                    )
                     ->get();
                 
                 $fecha = $request->fecha;
