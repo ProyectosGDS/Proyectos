@@ -30,7 +30,7 @@ class ControlAsistenciaController extends Controller
                     'beneficiario.control_asistencia' => function($query) use ($request) {
                         $query->where('tipo','curso')
                             ->where('curso_modulo_id',$request->detalle_curso_id)
-                            ->where('fecha',$request->fecha);
+                            ->whereDate('fecha',$request->fecha);
                     }
                 ])->where('detalle_curso_id',$request->detalle_curso_id)
                 ->where('estado','A')

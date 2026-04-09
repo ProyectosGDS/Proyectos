@@ -1,5 +1,5 @@
 <script setup>
-    import { ref, onBeforeMount } from 'vue'
+    import { onMounted } from 'vue'
     import { useCatalogosStore } from '@/stores/catalogos'
 
     const headers = [
@@ -21,7 +21,7 @@
         catalogos.cursos = items
     }
 
-    onBeforeMount(() => {
+    onMounted(() => {
         catalogos.getCursosPrograma()
     })
 </script>

@@ -20,6 +20,7 @@ export const useCursoStore = defineStore('curso', () => {
 
     const label_curso = ref('')
 
+
     const loading = ref({
         store : false,
         download : false,
@@ -42,7 +43,7 @@ export const useCursoStore = defineStore('curso', () => {
     
     const errors = ref([])
 
-    const selectCurso = () => {
+    const selectCurso = async () => {
         
         if(catalogos.cursos.length > 1) {
             catalogos.errors = { curso: ['Debe seleccionar solo un curso'] }
@@ -51,13 +52,14 @@ export const useCursoStore = defineStore('curso', () => {
 
         catalogos.curso = catalogos.cursos[0]
         label_curso.value = catalogos.curso.curso.nombre
-        getBeneficiariosCurso()
+        await getBeneficiariosCurso()
         modal.value.cursos = false
         catalogos.errors = []
     }
 
     const getBeneficiariosCurso = async () => {
         catalogos.loading.beneficiarios = true
+        asistencia.value = []
         try {
             if(catalogos.programa != null && catalogos.curso.hasOwnProperty('id') && date.value) {
                 const response = await axios.get('control-asistencia/beneficiarios-curso', {
@@ -67,10 +69,8 @@ export const useCursoStore = defineStore('curso', () => {
                         fecha : date.value,
                     }
                 })
-                catalogos.beneficiarios = response.data
-                asistencia.value = response.data
-                    .filter(beneficiario => beneficiario.beneficiario.control_asistencia)
-                    .map(beneficiario => beneficiario.beneficiario.id)
+                catalogos.beneficiarios = await response.data
+                syncAsistencia()
             }
 
             return
@@ -84,12 +84,20 @@ export const useCursoStore = defineStore('curso', () => {
         }
     }
 
+    const syncAsistencia = () => {
+        asistencia.value = []
+        if(catalogos.beneficiarios) {
+            asistencia.value = catalogos.beneficiarios
+                    .filter(beneficiario => beneficiario?.beneficiario?.control_asistencia)
+        }
+    }
+
     const store = async () => {
         loading.value.store = true
         try {
             
             const response = await axios.post('control-asistencia/registrar/' + catalogos.curso.id, {
-                asistencia : asistencia.value,
+                asistencia : asistencia.value.map(beneficiario => beneficiario.beneficiario_id),
                 tipo : 'curso',
                 fecha : date.value,
             })
@@ -141,8 +149,8 @@ export const useCursoStore = defineStore('curso', () => {
             loading.value.download = false
         }
     }
-    
 
+    
     return {
 
         asistencia,

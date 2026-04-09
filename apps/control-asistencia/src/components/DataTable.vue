@@ -48,7 +48,16 @@ const props = defineProps({
         type: Boolean,
         default: true
     },
-    multiSelect: false,
+
+    multiSelect: {
+        type: Boolean,
+        default: false
+    },
+
+    allSelected: {
+        type: Boolean,
+        default: false
+    },
 
     itemsSelected: {
         type: Array,
@@ -330,6 +339,10 @@ const removeFilter = (index) => {
 
 onClickOutside(target, (event) => openFilterOptions.value = false)
 
+watchEffect(() => {
+    selectItems.value = props.itemsSelected
+})
+
 onMounted(() => {
     
     selectItems.value = props.itemsSelected
@@ -353,6 +366,7 @@ onMounted(() => {
                     <option>25</option>
                     <option>50</option>
                     <option>100</option>
+                    <option>1000</option>
                 </select>
                 <span>registros</span>
             </div>
@@ -431,8 +445,16 @@ onMounted(() => {
         <Tabla class="hidden lg:block">
             <template #thead>
                 <tr>
-                    <th v-if="props.multiSelect">
-                        <!-- <input type="checkbox" ref="selectAll" @change="selectAllItems"> -->
+                    <th v-if="props.allSelected && data.length > 0">
+                        <input 
+                            type="checkbox" 
+                            ref="selectAll" 
+                            @change="selectAllItems"
+                            class="size-5 cursor-pointer"
+                            title="Seleccionar todo"
+                        >
+                    </th>
+                    <th v-if="props.multiSelect && !props.allSelected"> 
                     </th>
                     <th v-for="(head, index) in props.headers" :key="index" @click="sort(head.key, head.type)" scope="col" class="px-4 py-3.5 text-color-4 text-xs cursor-pointer select-none" :width="head.width" :align="head.align ?? 'left'" :hidden="head.hidden">
                         <div class="flex gap-1">
@@ -448,7 +470,13 @@ onMounted(() => {
                 <slot name="tbody" :items="paginatedData">
                     <tr v-for="item in paginatedData" :key="item.id" class="hover:bg-violet-50 text-gray-800 select-none">
                         <td v-if="props.multiSelect" align="center"> 
-                            <input type="checkbox" @change="selectdAll" v-model="selectItems" :value="item"> 
+                            <input 
+                                type="checkbox" 
+                                @change="selectdAll" 
+                                v-model="selectItems" 
+                                :value="item"
+                                class="size-5 cursor-pointer"
+                            > 
                         </td>
                         <td v-for="(head, index) in props.headers" class="px-4" :align="head.align ?? 'left'" :width="head.width" :key="index" :hidden="head.hidden">
                             <slot :name="head.key" :item="item">
@@ -503,10 +531,10 @@ onMounted(() => {
                         resultados
                     </p>
                 </div>
-                <div v-if="itemsSelected.length > 0">
+                <div v-if="props.itemsSelected.length > 0">
                     <p class="text-xs text-color-4">
                         Seleccionados
-                        <span class="font-medium">{{ itemsSelected.length }}</span>
+                        <span class="font-medium">{{ props.itemsSelected.length }}</span>
                         de
                         <span class="font-medium">{{ filteredData.length }}</span>
                     </p>

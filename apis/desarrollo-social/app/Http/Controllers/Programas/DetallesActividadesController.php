@@ -76,7 +76,7 @@ class DetallesActividadesController extends Controller
     public function store (Request $request) {
         $request->validate([
             'responsable' => 'nullable|string|max:100',
-            'direccion' => 'nullable|string|max:100',
+            'direccion' => 'nullable|string|max:300',
             'hora_inicio' => 'nullable|required_with:hora_final|date_format:H:i',
             'hora_final' => 'nullable|required_with:hora_inicio|date_format:H:i|after_or_equal:hora_inicio',
             'fecha_inicial' => 'nullable|required_with:fecha_final|date|date_format:Y-m-d',
