@@ -93,7 +93,7 @@
                         class="btn-secondary" 
                         :loading="store.loading.download" 
                     />
-                    <Button 
+                    <Button v-if="store.asistencia.length > 0"
                         @click="store.store" 
                         text="Guardar asistencias" 
                         icon="fas fa-list-check" 

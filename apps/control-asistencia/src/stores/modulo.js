@@ -38,7 +38,7 @@ export const useModuloStore = defineStore('modulo', () => {
     
     const errors = ref([])
 
-    const selectModulo = () => {
+    const selectModulo = async () => {
         
         if(catalogos.modulos.length > 1) {
             catalogos.errors = { modulo: ['Debe seleccionar solo un modulo'] }
@@ -46,13 +46,14 @@ export const useModuloStore = defineStore('modulo', () => {
         }
 
         catalogos.modulo = catalogos.modulos[0]
-        getBeneficiariosModulo()
+        await getBeneficiariosModulo()
         modal.value.modulos = false
         catalogos.errors = []
     }
 
     const getBeneficiariosModulo = async () => {
         catalogos.loading.beneficiarios = true
+        asistencia.value = []
         try {
             if(catalogos.programa != null && catalogos.modulo.hasOwnProperty('id') && date.value) {
                 const response = await axios.get('control-asistencia/beneficiarios-modulo', {
@@ -63,9 +64,7 @@ export const useModuloStore = defineStore('modulo', () => {
                     }
                 })
                 catalogos.beneficiarios = response.data
-                asistencia.value = response.data
-                    .filter(beneficiario => beneficiario.beneficiario.control_asistencia)
-                    .map(beneficiario => beneficiario.beneficiario.id)
+                syncAsistencia()
             }
 
             return
@@ -79,12 +78,20 @@ export const useModuloStore = defineStore('modulo', () => {
         }
     }
 
+    const syncAsistencia = () => {
+        asistencia.value = []
+        if(catalogos.beneficiarios) {
+            asistencia.value = catalogos.beneficiarios
+                    .filter(beneficiario => beneficiario?.beneficiario?.control_asistencia)
+        }
+    }
+
     const store = async () => {
         loading.value.store = true
         try {
             
             const response = await axios.post('control-asistencia/registrar/' + catalogos.modulo.id, {
-                asistencia : asistencia.value,
+                asistencia : asistencia.value.map(beneficiario => beneficiario.beneficiario_id),
                 tipo : 'modulo',
                 fecha : date.value,
             })
