@@ -27,6 +27,23 @@ const years = computed(() => {
     return yearsList
 })
 
+const months = () => {
+    return [
+        { value: 1, label: 'Enero' },
+        { value: 2, label: 'Febrero' },
+        { value: 3, label: 'Marzo' },
+        { value: 4, label: 'Abril' },
+        { value: 5, label: 'Mayo' },
+        { value: 6, label: 'Junio' },
+        { value: 7, label: 'Julio' },
+        { value: 8, label: 'Agosto' },
+        { value: 9, label: 'Septiembre' },
+        { value: 10, label: 'Octubre' },
+        { value: 11, label: 'Noviembre' },
+        { value: 12, label: 'Diciembre' }
+    ]
+}
+
 onMounted(() => {
 
     catalogos.getCatalogoBeneficiario()
@@ -48,15 +65,44 @@ watchEffect(() => {
         <div class="flex justify-center">
             <div class="w-full max-w-4xl space-y-4 border-2 p-4 xl:p-8 rounded-lg">
                 <div class="grid grid-cols-2 gap-4">
-                    <Input v-model="store.inscripcion.year" option="select" title="*seleccione año inscripción" :error="store.errors.hasOwnProperty('year')" required>
-                        <option v-for="year in years" :value="year">{{ year }}</option>
-                    </Input>
-                    <Input v-model="store.inscripcion.tipo" option="select" title="*Seleccione tipo de asignación" :error="store.errors.hasOwnProperty('tipo')" required>
+                    <div class="xl:flex gap-4">
+                        <Input 
+                            v-model="store.inscripcion.year" 
+                            option="select" 
+                            title="*año inscripción" 
+                            :error="store.errors.hasOwnProperty('year')" 
+                            required >
+    
+                            <option v-for="year in years" :value="year">{{ year }}</option>
+                        </Input>
+                        <Input 
+                            v-model="store.inscripcion.month" 
+                            option="select" 
+                            title="*mes de inscripción" 
+                            :error="store.errors.hasOwnProperty('month')" 
+                            required >
+    
+                            <option v-for="month in months()" :value="month.value">{{ month.label }}</option>
+                        </Input>
+                    </div>
+                    <Input v-model="store.inscripcion.tipo" 
+                        option="select" 
+                        title="*Seleccione tipo de asignación" 
+                        :error="store.errors.hasOwnProperty('tipo')" 
+                        required >
+
                         <option value="modulo">módulo</option>
                         <option value="curso">curso</option>
                         <option value="actividad">actividad</option>
                     </Input>
-                    <Input v-model="store.inscripcion.codigo" option="label" title="*Código de asignación" type="number" :error="store.errors.hasOwnProperty('codigo')" required />
+                    <Input 
+                        v-model="store.inscripcion.codigo" 
+                        option="label" 
+                        title="*Código de asignación" 
+                        type="number" 
+                        :error="store.errors.hasOwnProperty('codigo')" 
+                        required 
+                    />
                     <div class="relative">
                         <Input 
                             @keypress.enter="extranjeros.searchExtranjero" 
@@ -67,15 +113,30 @@ watchEffect(() => {
                             type="search"
                             :error="extranjeros.errors.hasOwnProperty('pasaporte')"
                         />
-                        <Icon v-if="extranjeros.loading.searchExtranjero" icon="fas fa-spinner" class="animate-spin absolute top-3 right-3 text-gray-400" />
+                        <Icon v-if="extranjeros.loading.searchExtranjero" 
+                            icon="fas fa-spinner" 
+                            class="animate-spin absolute top-3 right-3 text-gray-400" 
+                        />
                     </div>
                 </div>
-                <div v-if="extranjeros.messageResponse" class="col-span-2 flex justify-center items-center">
-                    <span class="text-center text-sm font-medium" :class="{'text-red-400' : extranjeros.codeResponse == 3, 'text-green-400' : [1,2].includes(extranjeros.codeResponse)}">
+                <div v-if="extranjeros.messageResponse" 
+                    class="col-span-2 flex justify-center items-center" >
+                    <span 
+                        class="text-center text-sm font-medium" 
+                        :class="{
+                            'text-red-400' : extranjeros.codeResponse == 3, 
+                            'text-green-400' : [1,2].includes(extranjeros.codeResponse)
+                        }" >
+
                         {{ extranjeros.messageResponse }}
                     </span>
                 </div>
-                <Input v-if="[null,1,'error'].includes(extranjeros.codeResponse)" v-model="extranjeros.extranjero.nombre_completo" option="label" title="Beneficiario extrangero" readonly />
+                <Input v-if="[null,1,'error'].includes(extranjeros.codeResponse)" 
+                    v-model="extranjeros.extranjero.nombre_completo" 
+                    option="label" 
+                    title="Beneficiario extrangero" 
+                    readonly 
+                />
                 <div v-else >
                     <DatosPersonales />
                     <Domicilio />
@@ -85,8 +146,20 @@ watchEffect(() => {
                     <Emergencia />
                 </div>
                 <div class="fixed top-14 left-[50%] -translate-x-1/2 -translate-y-1/2">
-                    <Button v-if="extranjeros.codeResponse == 1" @click="store.inscripcionExtranjero()" text="Asignar extrangero" class="btn-primary" icon="fas fa-save" :loading="store.loading.inscripcion" />
-                    <Button v-else @click="store.inscripcionExtranjero()" text="Guardar y asignar extrangero" class="btn-primary" icon="fas fa-save" :loading="store.loading.inscripcion" />
+                    <Button v-if="extranjeros.codeResponse == 1"
+                         @click="store.inscripcionExtranjero()" 
+                         text="Asignar extrangero" 
+                         class="btn-primary" 
+                         icon="fas fa-save" 
+                         :loading="store.loading.inscripcion" 
+                    />
+                    <Button v-else 
+                        @click="store.inscripcionExtranjero()" 
+                        text="Guardar y asignar extrangero" 
+                        class="btn-primary" 
+                        icon="fas fa-save" 
+                        :loading="store.loading.inscripcion" 
+                    />
                 </div>
             </div>
         </div>

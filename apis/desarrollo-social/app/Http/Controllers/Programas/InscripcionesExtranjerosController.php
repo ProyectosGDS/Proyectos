@@ -21,6 +21,7 @@ class InscripcionesExtranjerosController extends Controller
     public function inscripcion(Request $request) {
         $request->validate([
             'year' => 'required|digits:4',
+            'month' => 'required|digits_between:1,2|between:1,12',
             'tipo' => 'required|string|in:modulo,curso,actividad',
             'codigo' => 'required|integer',
             'extranjero_id' => 'required|integer|exists:beneficiarios,id'
@@ -29,6 +30,9 @@ class InscripcionesExtranjerosController extends Controller
         DB::connection('gds')->beginTransaction();
 
         try {
+
+            $anio_mes = date('Y-m',strtotime($request['year'].'-'.$request['month']));
+
             $recurso = $this->buscarRecurso($request->tipo, $request->codigo);
 
             if (!$recurso) {
@@ -47,7 +51,7 @@ class InscripcionesExtranjerosController extends Controller
                 if (isset($recurso->paga) && $recurso->paga === 'S') {
                     $interlocutor = $this->consultaCreacionInterlocutorSap($recurso, $request->extranjero_id);
 
-                    $partida = $this->crearPartidasSap($interlocutor, $recurso, $request->extranjero_id, $request->tipo);
+                    $partida = $this->crearPartidasSap($interlocutor, $recurso, $request->extranjero_id, $request->tipo, $anio_mes);
 
                     if (!$partida) {
                         throw new Exception('No se crearon las partidas', 500);
@@ -181,9 +185,10 @@ class InscripcionesExtranjerosController extends Controller
      * @param string $tipo
      * @return bool
      */
-    public function crearPartidasSap(array $interlocutor, $recurso, int $extranjero_id, string $tipo) {
+    public function crearPartidasSap(array $interlocutor, $recurso, int $extranjero_id, string $tipo, string $anio_mes) {
         try {
             $ic = null;
+
             if (!empty($interlocutor['IC_ENCARGADO'] ?? null) && trim($interlocutor['IC_ENCARGADO']) !== '') {
                 $ic = trim($interlocutor['IC_ENCARGADO']);
             } elseif (!empty($interlocutor['IC_ALUMNO'] ?? null)) {
@@ -191,6 +196,7 @@ class InscripcionesExtranjerosController extends Controller
             }
 
             $nombre_recurso = null;
+            
             switch ($tipo) {
                 case 'modulo':
                     $nombre_recurso = $recurso->nombre ?? null;
@@ -226,8 +232,8 @@ class InscripcionesExtranjerosController extends Controller
                     'OP_PARCIAL' => optional($recurso->sede)->sede_op_parcial ?? optional($recurso->programa->escuela)->op_parcial,
                     'OBJETO_CONTRATO' => optional($recurso->sede)->sede_oc ?? optional($recurso->programa->escuela)->objeto_contrato,
                     'VALOR' => strval(floatval($tarifas->inscripcion)),
-                    'PERIODO' => date('my', strtotime($this->sumMonth($tarifas->mes_inicial, 0))),
-                    'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($tarifas->mes_inicial, 0)),
+                    'PERIODO' => date('my', strtotime($this->sumMonth($anio_mes, 0))),
+                    'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($anio_mes, 0)),
                     'DESCRIPCION' => 'INSCRIPCION ' . mb_strtoupper($nombre_recurso ?? ''),
                     'LLAVE_RECONCILIACION' => date('ymd')
                 ];
@@ -244,8 +250,8 @@ class InscripcionesExtranjerosController extends Controller
                 'OP_PARCIAL' => optional($recurso->sede)->sede_op_parcial ?? optional($recurso->programa->escuela)->op_parcial,
                 'OBJETO_CONTRATO' => optional($recurso->sede)->sede_oc ?? optional($recurso->programa->escuela)->objeto_contrato,
                 'VALOR' => strval(floatval($valorTarifa)),
-                'PERIODO' => date('my', strtotime($this->sumMonth($tarifas->mes_inicial ?? date('Y-m'), 0))),
-                'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($tarifas->mes_inicial ?? date('Y-m'), 0)),
+                'PERIODO' => date('my', strtotime($this->sumMonth($anio_mes ?? date('Y-m'), 0))),
+                'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($anio_mes ?? date('Y-m'), 0)),
                 'DESCRIPCION' => 'PAGO CUOTA ' . mb_strtoupper($nombre_recurso ?? ''),
                 'LLAVE_RECONCILIACION' => date('ymd')
             ];

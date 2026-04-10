@@ -11,6 +11,7 @@ export const useInscripcionesStore = defineStore('inscripciones', () => {
 
     const inscripcion = ref({
         year : null,
+        month : new Date().getMonth() + 1,
         tipo : null,
         codigo : null,
         extranjero_id : null
