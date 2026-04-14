@@ -92,8 +92,8 @@ class DetallesCursosController extends Controller
             'tarifas.tarifa_menor' => 'nullable|required_if:paga,S|numeric',
             'tarifas.tarifa_mayor' => 'nullable|required_if:paga,S|numeric',
             'tarifas.temporalidad' => 'nullable|required_if:paga,S',
-            'tarifas.no_cuotas' => 'nullable|required_if:paga,S|integer|min:1',
-            'tarifas.mes_inicial' => 'nullable|required_if:paga,S|date|date_format:Y-m',
+            // 'tarifas.no_cuotas' => 'nullable|required_if:paga,S|integer|min:1',
+            // 'tarifas.mes_inicial' => 'nullable|required_if:paga,S|date|date_format:Y-m',
         ]);
 
         try {
@@ -124,8 +124,8 @@ class DetallesCursosController extends Controller
                         'tarifa_menor' => $request->tarifas['tarifa_menor'],
                         'tarifa_mayor' => $request->tarifas['tarifa_mayor'],
                         'temporalidad' => $request->tarifas['temporalidad'],
-                        'no_cuotas' => $request->tarifas['no_cuotas'],
-                        'mes_inicial' => $request->tarifas['mes_inicial'],
+                        // 'no_cuotas' => $request->tarifas['no_cuotas'],
+                        // 'mes_inicial' => $request->tarifas['mes_inicial'],
                     ]);
                 }
             }
@@ -171,8 +171,8 @@ class DetallesCursosController extends Controller
             'tarifas.tarifa_menor' => 'nullable|required_if:paga,S|numeric',
             'tarifas.tarifa_mayor' => 'nullable|required_if:paga,S|numeric',
             'tarifas.temporalidad' => 'nullable|required_if:paga,S',
-            'tarifas.no_cuotas' => 'nullable|required_if:paga,S|integer|min:1',
-            'tarifas.mes_inicial' => 'nullable|required_if:paga,S|date|date_format:Y-m',
+            // 'tarifas.no_cuotas' => 'nullable|required_if:paga,S|integer|min:1',
+            // 'tarifas.mes_inicial' => 'nullable|required_if:paga,S|date|date_format:Y-m',
             // 'tarifas.mes_final' => 'nullable|required_if:paga,S|date|date_format:Y-m|after_or_equal:mes_inicial',
         ]);
 
@@ -197,8 +197,8 @@ class DetallesCursosController extends Controller
                         $curso->tarifas->tarifa_menor = $request->tarifas['tarifa_menor'];
                         $curso->tarifas->tarifa_mayor = $request->tarifas['tarifa_mayor'];
                         $curso->tarifas->temporalidad = $request->tarifas['temporalidad'];
-                        $curso->tarifas->no_cuotas = $request->tarifas['no_cuotas'];
-                        $curso->tarifas->mes_inicial = $request->tarifas['mes_inicial'];
+                        // $curso->tarifas->no_cuotas = $request->tarifas['no_cuotas'];
+                        // $curso->tarifas->mes_inicial = $request->tarifas['mes_inicial'];
                         // $curso->tarifas->mes_final = $request->tarifas['mes_final'];
                         $curso->tarifas->save();
                     } else {
@@ -207,8 +207,8 @@ class DetallesCursosController extends Controller
                             'tarifa_menor' => $request->tarifas['tarifa_menor'],
                             'tarifa_mayor' => $request->tarifas['tarifa_mayor'],
                             'temporalidad' => $request->tarifas['temporalidad'],
-                            'no_cuotas' => $request->tarifas['no_cuotas'],
-                            'mes_inicial' => $request->tarifas['mes_inicial'],
+                            // 'no_cuotas' => $request->tarifas['no_cuotas'],
+                            // 'mes_inicial' => $request->tarifas['mes_inicial'],
                             // 'mes_final' => $request->tarifas['mes_final'],
                             'tipo' => 'CURSO'
                         ]);

@@ -454,31 +454,33 @@ onMounted(() => {
         <div class="grid gap-4 lg:hidden py-4">
             <Card v-for="item in paginatedData" :key="item.id" class="bg-violet-50 p-2">
                 <table class="w-full">
-                    <tr>
-                        <td v-if="props.multiSelect" 
-                            align="center"
-                            colspan="2"> 
-                            <input 
-                                type="checkbox" 
-                                @change="selectdAll" 
-                                v-model="selectItems" 
-                                :value="item"
-                                class="size-5 cursor-pointer"
-                            > 
-                        </td>
-                    </tr>
-                    <tr v-for="head in props.headers" class="hover:bg-violet-200">
-                        <td class="px-4 font-semibold uppercase text-sm select-none" :width="head.width" align="left" :hidden="head.hidden">
-                            <p class="text-color-4">{{ head.title }}</p>
-                        </td>
-                        <td :align="head.align ?? 'center'" :width="head.width" :hidden="head.hidden">
-                            <slot :name="head.key" :item="item">
-                                <p :class="head.class ?? 'text-sm'">
-                                    {{ typeValue(getObjectValue(item, head.key), head.type) }}
-                                </p>
-                            </slot>
-                        </td>
-                    </tr>
+                    <tbody>
+                        <tr>
+                            <td v-if="props.multiSelect" 
+                                align="center"
+                                colspan="2"> 
+                                <input 
+                                    type="checkbox" 
+                                    @change="selectdAll" 
+                                    v-model="selectItems" 
+                                    :value="item"
+                                    class="size-5 cursor-pointer"
+                                > 
+                            </td>
+                        </tr>
+                        <tr v-for="head in props.headers" class="hover:bg-violet-200">
+                            <td class="px-4 font-semibold uppercase text-sm select-none" :width="head.width" align="left" :hidden="head.hidden">
+                                <p class="text-color-4">{{ head.title }}</p>
+                            </td>
+                            <td :align="head.align ?? 'center'" :width="head.width" :hidden="head.hidden">
+                                <slot :name="head.key" :item="item">
+                                    <p :class="head.class ?? 'text-sm'">
+                                        {{ typeValue(getObjectValue(item, head.key), head.type) }}
+                                    </p>
+                                </slot>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </Card>
         </div>

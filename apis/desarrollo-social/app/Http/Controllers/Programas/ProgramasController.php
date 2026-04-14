@@ -209,8 +209,8 @@ class ProgramasController extends Controller
                             'tarifa_menor' => 'required|numeric|min:0',
                             'tarifa_mayor' => 'required|numeric|min:0',
                             'temporalidad_tarifa' => 'required|string',
-                            'no_cuotas' => 'required|integer|min:1',
-                            'mes_inicial' => 'required|date|date_format:Y-m',
+                            // 'no_cuotas' => 'required|integer|min:1',
+                            // 'mes_inicial' => 'required|date|date_format:Y-m',
                             // 'mes_final' => 'required|date|date_format:Y-m|after_or_equal:mes_inicial',
                         ]);
                     }
@@ -255,8 +255,8 @@ class ProgramasController extends Controller
                                 'tarifa_menor' => $curso['tarifa_menor'],
                                 'tarifa_mayor' => $curso['tarifa_mayor'],
                                 'temporalidad' => $curso['temporalidad_tarifa'],
-                                'no_cuotas' => $curso['no_cuotas'],
-                                'mes_inicial' => $curso['mes_inicial'],
+                                // 'no_cuotas' => $curso['no_cuotas'],
+                                // 'mes_inicial' => $curso['mes_inicial'],
                                 // 'mes_final' => $curso['mes_final'],
                             ]);
                         }
@@ -274,6 +274,9 @@ class ProgramasController extends Controller
     }
 
     public function get_beneficiarios (string $programa_id, int $year) {
+
+        ini_set('memory_limit', '256M');
+        set_time_limit(300);
 
         $perfil = strtolower(auth()->user()->perfil->nombre) == 'sysadmin' ? true : false;
 
