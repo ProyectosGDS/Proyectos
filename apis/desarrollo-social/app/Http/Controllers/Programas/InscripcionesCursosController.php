@@ -86,10 +86,15 @@ class InscripcionesCursosController extends Controller
             'beneficiarios.*.dependencia' => 'required_without:beneficiarios.*.id|integer',
             'beneficiarios.*.tarifas.tarifa_menor' => 'required_if:paga,S',
             'beneficiarios.*.tarifas.tarifa_mayor' => 'required_if:paga,S',
-            'beneficiarios.*.tarifas.no_cuotas' => 'required_if:paga,S|integer',
-            'beneficiarios.*.objeto_contrato' => 'required_if:beneficiarios.*.paga,S',
-            'beneficiarios.*.op_principal' => 'required_if:beneficiarios.*.paga,S',
-            'beneficiarios.*.op_parcial' => 'required_if:beneficiarios.*.paga,S',
+            // 'beneficiarios.*.tarifas.no_cuotas' => 'required_if:paga,S|integer',
+            
+            'beneficiarios.*.sede_oc' => 'nullable',
+            'beneficiarios.*.sede_op_principal' => 'nullable',
+            'beneficiarios.*.sede_op_parcial' => 'nullable',
+
+            'beneficiarios.*.objeto_contrato' => 'exclude_unless:beneficiarios.*.sede_oc,null|required_if:beneficiarios.*.paga,S',
+            'beneficiarios.*.op_principal' => 'exclude_unless:beneficiarios.*.sede_op_principal,null|required_if:beneficiarios.*.paga,S',
+            'beneficiarios.*.op_parcial' => 'exclude_unless:beneficiarios.*.sede_op_parcial,null|required_if:beneficiarios.*.paga,S',
         ]);
 
         try {
@@ -99,6 +104,7 @@ class InscripcionesCursosController extends Controller
             $count_beneficiarios = 0;
             
             foreach ($request->beneficiarios as $row) {
+
                 if(!isset($row['id'])) { 
                     if(in_array($row['dependencia'],['5','8']) && $row['paga'] ==='S') {
                             
@@ -157,6 +163,7 @@ class InscripcionesCursosController extends Controller
                                             'DESCRIPCION' => 'INSCRIPCION '.mb_strtoupper($row['nombre_curso']),
                                             'LLAVE_RECONCILIACION' => date('ymd')
                                         ];
+                                        
                                         SAP::rfc_name('Z_ZFUN_PSCD_00003_005')->params($params);
     
                                     }

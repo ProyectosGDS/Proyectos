@@ -85,7 +85,7 @@ class InscripcionesModulosController extends Controller
             'beneficiarios.*.dependencia' => 'required_without:beneficiarios.*.id|integer',
             'beneficiarios.*.tarifas.tarifa_menor' => 'required_if:paga,S',
             'beneficiarios.*.tarifas.tarifa_mayor' => 'required_if:paga,S',
-            'beneficiarios.*.tarifas.no_cuotas' => 'required_if:paga,S|integer',
+            // 'beneficiarios.*.tarifas.no_cuotas' => 'required_if:paga,S|integer',
         ]);
 
         try {
@@ -151,7 +151,7 @@ class InscripcionesModulosController extends Controller
                                         'PERIODO' => date('my',strtotime($this->sumMonth($anio_mes,0))),
                                         'FECHA_VENCIMIENTO' => $this->ultimoDiaFormatoYmd($this->sumMonth($anio_mes,0)),
                                         'DESCRIPCION' => 'INSCRIPCION '.mb_strtoupper($row['nombre_modulo']),
-                                        'LLAVE_RECONCILIACION' => date('ymd')
+                                        'LLAVE_RECONCILIACION' => 'GDS'.date('ymd')
                                     ];
                                     SAP::rfc_name('Z_ZFUN_PSCD_00003_005')->params($params);
 
