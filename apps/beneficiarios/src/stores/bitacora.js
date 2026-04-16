@@ -21,6 +21,7 @@ export const useBitacoraStore = defineStore('bitacora', () => {
         { title : 'programa', key : 'programa' },
         { title : 'módulo / curso', key : 'modulo_curso' },
         { title : 'fecha inscripción', key : 'fecha_inscripcion', type : 'date', width : '10px', align : 'center' },
+        { title : 'año inscripcion', key : 'anio_inscripcion', type : 'numeric', width : '10px', align : 'center' },
         { title : 'estado', key : 'estado' },
         { title : 'detalle', key : 'detalle' },
         { title : 'ultima_modificacion', key : 'ultima_modificacion' },

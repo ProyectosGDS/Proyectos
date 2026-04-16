@@ -168,6 +168,14 @@ const router = createRouter({
 						auth : true,
 					}
 				},
+				{
+					path : 'traslados-beneficiario',
+					name : 'Traslados',
+					component : () => import('@/views/Traslados/Traslado.vue'),
+					meta : {
+						auth : true,
+					}
+				},
 			]
 		},
 		{

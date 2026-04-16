@@ -692,6 +692,10 @@ class ProgramasController extends Controller
     }
 
     public function generar_reporte(Request $request) { 
+        
+        ini_set('memory_limit', '512M');
+        set_time_limit(500);
+
         $request->validate([
             'anio_inscripcion' => 'required|digits:4',
             'programas' => 'required|array'

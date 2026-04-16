@@ -74,6 +74,10 @@ class beneficiarios extends Model
         return $this->belongsToMany(modulos::class,'beneficiarios_modulos','beneficiario_id','modulo_id');
     }
 
+    public function actividades() {
+        return $this->belongsToMany(detalles_actividades::class,'beneficiarios_actividades','beneficiario_id','detalle_actividad_id');
+    }
+
     public function control_asistencia() {
         return $this->hasOne(control_asistencia::class,'beneficiario_id');
     }

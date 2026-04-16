@@ -322,6 +322,7 @@ class BeneficiariosController extends Controller
                     P.NOMBRE AS PROGRAMA,
                     M.NOMBRE AS MODULO_CURSO,
                     BM.CREATED_AT AS FECHA_INSCRIPCION,
+                    BM.ANIO_INSCRIPCION,
                     BM.ESTADO,
                     BI_TOP.IDENTIFICADOR,
                     CASE WHEN BM.ESTADO = 'I' THEN BI_TOP.DESCRIPCION ELSE NULL END DESCRIPCION,
@@ -342,7 +343,7 @@ class BeneficiariosController extends Controller
                         WHERE BI.IDENTIFICADOR = BM.ID 
                         AND BI.TABLA = 'BENEFICIARIOS_MODULOS'
                         AND BI.ACCION = 'DESHABILITAR INSCRIPCION MODULO'
-                        ORDER BY BI.ID DESC -- O BI.CREATED_AT DESC
+                        ORDER BY BI.ID DESC
                     )
                     WHERE ROWNUM = 1
                 ) BI_TOP
@@ -355,6 +356,7 @@ class BeneficiariosController extends Controller
                     P.NOMBRE PROGRAMA,
                     C.NOMBRE MODULO_CURSO,
                     BC.CREATED_AT FECHA_INSCRIPCION,
+                    BC.ANIO_INSCRIPCION,
                     BC.ESTADO,
                     BI_TOP.IDENTIFICADOR,
                     CASE WHEN BC.ESTADO = 'I' THEN BI_TOP.DESCRIPCION ELSE NULL END DESCRIPCION,
@@ -390,6 +392,7 @@ class BeneficiariosController extends Controller
                     P.NOMBRE PROGRAMA,
                     A.NOMBRE MODULO_CURSO,
                     BA.CREATED_AT FECHA_INSCRIPCION,
+                    BA.ANIO_INSCRIPCION,
                     BA.ESTADO,
                     BI_TOP.IDENTIFICADOR,
                     CASE WHEN BA.ESTADO = 'I' THEN BI_TOP.DESCRIPCION ELSE NULL END DESCRIPCION,
