@@ -146,7 +146,7 @@ class TrasladosController extends Controller
                     $recurso = match($request->tipo_recurso_actual) {
                         'curso' => detalles_cursos::where('id',$value)->where('estado','A'),
                         'modulo' => modulos::where('id',$value)->where('estado','A'),
-                        'actividad' => detalles_cursos::where('id',$value)->where('estado_actividad_id',1),
+                        'actividad' => detalles_actividades::where('id',$value)->where('estado_actividad_id',1),
                     };
 
                     if(!$recurso->exists()) {
@@ -162,7 +162,7 @@ class TrasladosController extends Controller
                     $recurso = match($request->tipo_recurso_nuevo) {
                         'curso' => detalles_cursos::where('id',$value)->where('estado','A')->where('capacidad','>=',1),
                         'modulo' => modulos::where('id',$value)->where('estado','A')->where('capacidad','>=',1),
-                        'actividad' => detalles_cursos::where('id',$value)->where('estado_actividad_id',1),
+                        'actividad' => detalles_actividades::where('id',$value)->where('estado_actividad_id',1),
                     };
 
                     if(!$recurso->exists()) {
@@ -241,7 +241,7 @@ class TrasladosController extends Controller
                     $recurso = match($request->tipo_recurso_actual) {
                         'curso' => detalles_cursos::where('id',$value)->where('estado','A'),
                         'modulo' => modulos::where('id',$value)->where('estado','A'),
-                        'actividad' => detalles_cursos::where('id',$value)->where('estado_actividad_id',1),
+                        'actividad' => detalles_actividades::where('id',$value)->where('estado_actividad_id',1),
                     };
 
                     if(!$recurso->exists()) {
@@ -257,7 +257,7 @@ class TrasladosController extends Controller
                     $recurso = match($request->tipo_recurso_nuevo) {
                         'curso' => detalles_cursos::where('id',$value)->where('estado','A')->where('capacidad','>=',1),
                         'modulo' => modulos::where('id',$value)->where('estado','A')->where('capacidad','>=',1),
-                        'actividad' => detalles_cursos::where('id',$value)->where('estado_actividad_id',1),
+                        'actividad' => detalles_actividades::where('id',$value)->where('estado_actividad_id',1),
                     };
 
                     if(!$recurso->exists()) {

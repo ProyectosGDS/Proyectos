@@ -50,16 +50,25 @@ export const useGlobalStore = defineStore('global', () => {
     // FIN ALERTA TOAST
 
 
-    function getNestedValue(obj, key) {
+    // function getNestedValue(obj, key) {
+    //     const keys = key.split('.')
+    //     for (const innerKey of keys) {
+    //         if (obj.hasOwnProperty(innerKey)) {
+    //             obj = obj[innerKey]
+    //         } else {
+    //             return null
+    //         }
+    //     }
+    //     return obj
+    // }
+
+    const getNestedValue = (obj, key) => {
         const keys = key.split('.')
-        for (const innerKey of keys) {
-            if (obj.hasOwnProperty(innerKey)) {
-                obj = obj[innerKey]
-            } else {
-                return null
-            }
-        }
-        return obj
+
+        
+        return keys.reduce((value, currentKey) => {
+            return value && value[currentKey]
+        }, obj)
     }
 
     function hasChanged(obj1, obj2) {
