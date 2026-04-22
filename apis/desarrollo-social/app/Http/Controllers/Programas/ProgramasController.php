@@ -282,7 +282,6 @@ class ProgramasController extends Controller
 
         $dependencia_id = auth()->user()->dependencia_id;
 
-
         try {
 
             $beneficiarios_cursos = DB::connection('gds')
@@ -315,13 +314,16 @@ class ProgramasController extends Controller
                     'C.NOMBRE AS MODULO_CURSO',
                     'DC.SECCION',
                     'S.NOMBRE AS SEDE',
+                    'S.ZONA_ID AS ZONA',
                     'BC.ANIO_INSCRIPCION AS ANIO_INSCRIPCION',
                     'BC.ESTADO',
                     'BC.BECADO',
                     DB::raw("CAST(C.IMPULSATEC AS VARCHAR2(1)) AS IMPULSATEC"),
                     DB::raw("CAST('CURSO' AS VARCHAR2(50)) AS TIPO"),
                     DB::raw("TO_CHAR(BC.CREATED_AT,'YYYY-MM-DD') AS FECHA_REGISTRO"),
-                    'U.NOMBRE AS USUARIO'
+                    'U.NOMBRE AS USUARIO',
+                    'DC.FECHA_INICIAL AS FECHA_INICIAL_RECURSO',
+                    'DC.FECHA_FINAL AS FECHA_FINAL_RECURSO'
                 )
                 ->where('BC.ANIO_INSCRIPCION',$year)
                 ->when(!empty($programa_id),function($query) use ($programa_id){
@@ -361,13 +363,16 @@ class ProgramasController extends Controller
                     'A.NOMBRE AS MODULO_CURSO',
                     DB::raw("NULL AS SECCION"),
                     DB::raw("NULL AS SEDE"),
+                    'DA.ZONA_ID AS ZONA_SEDE',
                     'BA.ANIO_INSCRIPCION',
                     'BA.ESTADO',
                     DB::raw("NULL AS BECADO"),
                     DB::raw("CAST('N' AS VARCHAR2(1)) AS IMPULSATEC"),
                     DB::raw("CAST(TA.NOMBRE AS VARCHAR2(50)) AS TIPO"),
                     DB::raw("TO_CHAR(BA.CREATED_AT,'YYYY-MM-DD') AS FECHA_REGISTRO"),
-                    'U.NOMBRE AS USUARIO'
+                    'U.NOMBRE AS USUARIO',
+                    'DA.FECHA_INICIAL AS FECHA_INICIAL_RECURSO',
+                    'DA.FECHA_FINAL AS FECHA_FINAL_RECURSO'
                 )
                 ->where('BA.ANIO_INSCRIPCION',$year)
                 ->when(!empty($programa_id),function($query) use ($programa_id){
@@ -406,13 +411,16 @@ class ProgramasController extends Controller
                     'M.NOMBRE AS MODULO_CURSO',
                     'M.SECCION',
                     'S.NOMBRE AS SEDE',
+                    'S.ZONA_ID AS ZONA_SEDE',
                     'BM.ANIO_INSCRIPCION AS ANIO_INSCRIPCION',
                     'BM.ESTADO',
                     'BM.BECADO',
                     DB::raw("CAST('N' AS VARCHAR2(1)) AS IMPULSATEC"),
                     DB::raw("CAST('MODULO' AS VARCHAR2(50)) AS TIPO"),
                     DB::raw("TO_CHAR(BM.CREATED_AT,'YYYY-MM-DD') AS FECHA_REGISTRO"),
-                    'U.NOMBRE AS USUARIO'
+                    'U.NOMBRE AS USUARIO',
+                    'M.FECHA_INICIAL AS FECHA_INICIAL_RECURSO',
+                    'M.FECHA_FINAL AS FECHA_FINAL_RECURSO'
                 )
                 ->where('BM.ANIO_INSCRIPCION',$year)
                 ->when(!empty($programa_id),function($query) use ($programa_id){
