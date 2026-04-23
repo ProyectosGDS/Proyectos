@@ -1,5 +1,5 @@
 <script setup>
-    import { computed, onBeforeMount, onMounted } from 'vue'
+    import { computed, onMounted } from 'vue'
     import { useBeneficiariosModuloStore } from '@/stores/Inscripciones/beneficiarios-modulo'
     import { useProgramasStore } from '@/stores/Catalogos/programas'
     import { useModulosStore } from '@/stores/Catalogos/modulos'
@@ -246,8 +246,11 @@
             </div>
             <div class="xl:pl-8">
                 <h1 v-if="inscripciones.modulo" class="text-center text-2xl font-medium text-gray-500">
+                     Inscritos : {{inscripciones.beneficiarios.length ?? 0 }} /
+                     Capacidad : {{ typeof(inscripciones.modulo) == 'string' ? JSON.parse(inscripciones.modulo).capacidad : 0 }} /
                      Cupo : {{ inscripciones.cupo }}
                 </h1>
+                
                 <div class="flex items-center gap-4">
                     <Input v-model="store.search" icon="fas fa-search" type="search" placeholder="Buscar beneficiario .. " class="h-11" />
                     <Tool-Tip message="Excel" class="-mt-7 text-color-4">
@@ -262,11 +265,19 @@
                     <Loading-Bar class="bg-color-4 h-1"/>
                     <h1 class="text-center text-gray-400 text-xs animate-pulse">Cargando data ...</h1>
                 </div>
+                <Validate-Errors :errors="inscripciones.errors" v-if="inscripciones.errors != 0" />
                 <div class="h-[40rem] overflow-y-auto">
                     <div class="grid gap-4 xl:pr-4">
                         <template v-for="(inscripcion,index) in beneficiarios_curso">
                             <div class="flex gap-2">
-                                <Card class="p-4 w-full" :class="{'bg-green-200 text-green-700' : inscripcion.id && inscripcion.estado == 'A', 'bg-red-200 text-red-700' : inscripcion.id && inscripcion.estado == 'I', 'bg-gray-200' : !inscripcion.hasOwnProperty('id') }">
+                                <Card 
+                                    class="p-4 w-full" 
+                                    :class="{
+                                        'bg-green-200 text-green-700' : inscripcion.id && inscripcion.estado == 'A', 
+                                        'bg-red-200 text-red-700' : inscripcion.id && inscripcion.estado == 'I', 
+                                        'bg-orange-200 text-orange-700' : inscripcion.id && inscripcion.estado == 'P', 
+                                        'bg-gray-200' : !inscripcion.hasOwnProperty('id') 
+                                    }" >
                                     <div class="grid xl:grid-cols-2 gap-2 text-xs uppercase">
                                         <span>
                                             <span class="flex items-center gap-1">
@@ -319,6 +330,16 @@
                                                 <span v-else-if="inscripcion.becado == 2" class="font-medium">Media beca</span>
                                                 <span v-else-if="inscripcion.becado == 3" class="font-medium">Beca rechazada</span>
                                                 <span v-else class="font-medium">No becado</span>
+                                            </span>
+                                        </span>
+                                        <span>
+                                            <span class="flex items-center gap-1">
+                                                <Icon icon="fas fa-school" />
+                                                ESTADO INSCRIPCIÓN: 
+                                                <strong v-if="inscripcion.estado == 'A'">Activo</strong>
+                                                <strong v-else-if="inscripcion.estado == 'I'">Inhabilitado</strong>
+                                                <strong v-else-if="inscripcion.estado == 'P'">Pendiente</strong>
+                                                <strong v-else>Sin Guardar</strong>
                                             </span>
                                         </span>
                                     </div>

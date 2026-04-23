@@ -209,9 +209,6 @@ class ProgramasController extends Controller
                             'tarifa_menor' => 'required|numeric|min:0',
                             'tarifa_mayor' => 'required|numeric|min:0',
                             'temporalidad_tarifa' => 'required|string',
-                            // 'no_cuotas' => 'required|integer|min:1',
-                            // 'mes_inicial' => 'required|date|date_format:Y-m',
-                            // 'mes_final' => 'required|date|date_format:Y-m|after_or_equal:mes_inicial',
                         ]);
                     }
                 }
@@ -229,7 +226,7 @@ class ProgramasController extends Controller
 
                 if(!isset($curso['id'])) {
                     $detalle_curso = detalles_cursos::create([
-                        'seccion' => strtoupper($curso['seccion']) ?? null,
+                        'seccion' => $curso['seccion'] ?? null,
                         'capacidad' => $curso['capacidad'],
                         'modalidad' => $curso['modalidad'],
                         'curso_id' => $curso['curso_id'],
@@ -255,9 +252,6 @@ class ProgramasController extends Controller
                                 'tarifa_menor' => $curso['tarifa_menor'],
                                 'tarifa_mayor' => $curso['tarifa_mayor'],
                                 'temporalidad' => $curso['temporalidad_tarifa'],
-                                // 'no_cuotas' => $curso['no_cuotas'],
-                                // 'mes_inicial' => $curso['mes_inicial'],
-                                // 'mes_final' => $curso['mes_final'],
                             ]);
                         }
                     }
