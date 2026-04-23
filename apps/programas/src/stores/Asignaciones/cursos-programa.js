@@ -70,7 +70,11 @@ export const useCursosProgramaStore = defineStore('cursos-programa', () => {
                 return (
                     item.curso_id == curso.value.curso.id &&
                     item.seccion == curso.value.seccion &&
-                    item.sede_id == curso.value.sede.id
+                    item.sede_id == curso.value.sede.id &&
+                    item.fecha_inicial == curso.value.fecha_inicial &&
+                    item.fecha_final == curso.value.fecha_final &&
+                    item.modalidad == curso.value.modalidad &&
+                    item.temporalidad_id == temporalidad.id
                 )
             })
 

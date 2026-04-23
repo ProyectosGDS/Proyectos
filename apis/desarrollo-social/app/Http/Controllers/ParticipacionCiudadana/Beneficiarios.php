@@ -26,7 +26,12 @@ class Beneficiarios extends Controller
                 'datos_medicos',
                 'datos_academicos',
                 'responsable',
-                'emergencia'
+                'emergencia',
+                'cursos' => function($query) {
+                    $query->where('programa_id',62)
+                        ->whereDate('fecha_inicial','>=','2026-05-02')
+                        ->whereDate('fecha_final','<=','2026-07-31');
+                },
             ])->where('cui',$request->cui)
             ->first();
 

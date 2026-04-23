@@ -12,7 +12,7 @@ export const useCursosStore = defineStore('cursos', () => {
     const headers = [
         { title : 'id', key : 'id', type : 'numeric' },
         { title : 'curso', key : 'curso' },
-        { title : 'modalidad', key : 'modalidad', width : '10px', align : 'center' },
+        { title : 'descripcion', key : 'descripcion', class : 'truncate'},
 
     ]
 
@@ -32,8 +32,10 @@ export const useCursosStore = defineStore('cursos', () => {
         { title : 'sede', key: 'sede.nombre_completo' },
         { title : 'sección', key: 'seccion' },
         { title : 'horarios', key: 'horarios' },
-        { title : 'cupo / capacidad', key: 'capacidad' },
-        { title : 'temporalidad', key: 'temporalidad.nombre' },
+        { title : 'cupo disponible', key: 'capacidad' },
+        { title : 'modalidad', key: 'modalidad' },
+        { title : 'inicio', key: 'fecha_inicial' },
+        { title : 'final', key: 'fecha_final' },
     ]
 
     

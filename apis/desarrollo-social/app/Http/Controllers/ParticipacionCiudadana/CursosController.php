@@ -21,9 +21,9 @@ class CursosController extends Controller
             if($request->tipo == 'CURSO') {
                 $query = "
                     SELECT
-                        DC.MODALIDAD,
                         DC.CURSO_ID ID,
                         C.NOMBRE CURSO,
+                        C.DESCRIPCION,
                         'CURSO' TIPO
                     FROM ADM_GDS.DETALLES_CURSOS DC
                         INNER JOIN ADM_GDS.CURSOS C
@@ -31,7 +31,14 @@ class CursosController extends Controller
                     WHERE DC.MODALIDAD IS NOT NULL
                     AND DC.PUBLICO = 'S'
                     AND DC.ESTADO = 'A'
-                    GROUP BY DC.MODALIDAD, DC.CURSO_ID, C.NOMBRE
+                    AND DC.PROGRAMA_ID = 62
+                    AND DC.FECHA_INICIAL >= TO_DATE('2026-05-02', 'YYYY-MM-DD')
+                    AND DC.FECHA_FINAL <= TO_DATE('2026-07-31', 'YYYY-MM-DD')
+                    GROUP BY 
+                        DC.CURSO_ID, 
+                        C.NOMBRE,
+                        C.DESCRIPCION
+                    ORDER BY 2 ASC
                 ";
 
             }
@@ -69,12 +76,19 @@ class CursosController extends Controller
         try {
 
             return response($curso->load([
+                'detalles' => function($query) {
+                    $query->whereDate('fecha_inicial','>=','2026-05-02')
+                        ->whereDate('fecha_final','<=','2026-07-31');
+                },
                 'detalles.instructores',
                 'detalles.temporalidad',
                 'detalles.horarios',
                 'detalles.programa',
                 'detalles.sede',
                 'detalles.requisitos',
+                'detalles.beneficiariosTodos' => function($query) {
+                    $query->wherePivot('anio_inscripcion','=',2026);
+                }
             ]));
 
         } catch (\Throwable $th) {

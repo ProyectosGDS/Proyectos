@@ -35,6 +35,7 @@
             inscripcion.success = false
             inscripcion.nuevo_registro = false
             inscripcion.beneficiario.nombre_completo = ''
+            inscripcion.cnt_inscripciones = 0
             return false
         }
 
@@ -60,6 +61,7 @@
             inscripcion.success = false
             inscripcion.nuevo_registro = false
             inscripcion.beneficiario.nombre_completo = ''
+            inscripcion.cnt_inscripciones = 0
             return false
         }
 
@@ -88,6 +90,7 @@
         inscripcion.success = false
         inscripcion.nuevo_registro = false
         inscripcion.beneficiario.nombre_completo = ''
+        inscripcion.cnt_inscripciones = 0
         return false
     }
 
@@ -96,6 +99,7 @@
             inscripcion.nuevo_registro = false
             inscripcion.errors = []
             inscripcion.success = false
+            inscripcion.cnt_inscripciones = 0
             inscripcion.beneficiario = {
                 sexo : 'M',
                 domicilio : {
@@ -107,6 +111,7 @@
                 responsable : {},
                 emergencia : {},
                 estado : 'P',
+                cursos : [],
             }
         }
     }
@@ -116,7 +121,33 @@
         store.show_curso(props.curso_id);
     }
 
+    const formatDate = (date) => {
+        const newDate = new Date(date);
+
+        const dia = String(newDate.getDate()).padStart(2, '0');
+        const mes = String(newDate.getMonth()); // Los meses van de 0 a 11
+        const año = newDate.getFullYear();
+
+        const nombre_mes = [
+            'Enero',
+            'Febrero',
+            'Marzo',
+            'Abril',
+            'Mayo',
+            'Junio',
+            'Julio',
+            'Agosto',
+            'Septiembre',
+            'Octubre',
+            'Noviembre',
+            'Diciembre'
+        ]
+
+        return `${dia}-${nombre_mes[mes]}-${año}`;
+    }
+
     watchEffect(() => {
+        store.curso = {}
         store.show_curso(props.curso_id)
         store.inscripcion.curso_id = props.curso_id
     })
@@ -145,37 +176,47 @@
         <p class="text-center py-6">
             {{ store.curso.descripcion }}
         </p>
-        <Data-Table :headers="store.detalleHeaders" :data="store.curso.detalles" color="text-color-9">
+        <Data-Table 
+            :headers="store.detalleHeaders" 
+            :data="store.curso.detalles"
+            :rowsPerPage="50" 
+            color="text-color-9" >
+
             <template #tbody="{items}">
                 <tr 
                     @click="store.getCurso(item,'curso')"
                     v-for="item in items" 
                     title="Click para pre-inscribirse">
-                    <template v-if="item.cupos_disponibles > 0">
+                    <template v-if="(item.beneficiarios_todos.length < item.capacidad)">
                         <td>{{ item.id }}</td>
                         <td>{{ item.sede.zona_id }}</td>
                         <td class=" text-start">{{ item.sede.nombre_completo }}</td>
                         <td>{{ item.seccion }}</td>
                         <td>{{ item.horarios[0]?.nombre_completo }}</td>
-                        <td>{{ item.cupos_disponibles +' de ' + item.capacidad }}</td>
-                        <td>{{ item.temporalidad.nombre }}</td>
+                        <td>{{ item.capacidad - item.beneficiarios_todos.length }}</td>
+                        <td>{{ item.modalidad }}</td>
+                        <td>{{ formatDate(item.fecha_inicial) }}</td>
+                        <td>{{ formatDate(item.fecha_final) }}</td>
                     </template>
                 </tr>
             </template>
         </Data-Table>
     </div>
 
-    <Modal :open="inscripcion.modal.new" title="Pre inscripción" icon="fas fa-user-graduate" class="w-1/2"> 
+    <Modal 
+        :open="inscripcion.modal.new" 
+        title="Pre inscripción" 
+        icon="fas fa-user-graduate" 
+        class="w-1/2" >
+
         <template #close>
             <Icon @click="inscripcion.resetData()" icon="fas fa-xmark" class="text-white text-2xl cursor-pointer" />
         </template>
+        
         <div>
             <div class="grid gap-4 text-xs text-color-1">
+                <strong class="text-3xl text-center">{{ store.curso.nombre ?? null }}</strong>
                 <div class="uppercase border rounded-lg p-4">
-                    <div class="flex gap-2">
-                        <label>Curso: </label>
-                        <strong>{{ store.curso.nombre ?? null }}</strong>
-                    </div>
                     <div class="flex gap-2">
                         <label>Horario: </label>
                         <strong>{{ store.detalle.horarios[0]?.nombre_completo ?? null }}</strong>
@@ -185,8 +226,16 @@
                         <strong>{{ store.detalle.sede.nombre_completo ?? null }}</strong>
                     </div>
                     <div class="flex gap-2">
+                        <label>zona: </label>
+                        <strong>{{ store.detalle.sede.zona_id ?? null }}</strong>
+                    </div>
+                    <div v-if="store.detalle.seccion" class="flex gap-2">
                         <label>seccion: </label>
                         <strong>{{ store.detalle.seccion ?? null }}</strong>
+                    </div>
+                    <div class="flex gap-2">
+                        <label>Modalidad: </label>
+                        <strong>{{ store.detalle.modalidad ?? null }}</strong>
                     </div>
                 </div>
             </div>
@@ -195,8 +244,20 @@
             <div class="text-color-9 grid gap-4">
                 <div>
                     <div class="relative">
-                        <Input @keyup="verifyCui()" v-model="inscripcion.cui" option="label" title="*Ingresa cui/dpi" maxlength="13" type="search" :class="{'focus:border-red-400 border-red-400 focus:outline-red-400': !inscripcion.success, 'focus:border-green-500 border-green-500 focus:outline-green-400' : inscripcion.success }" required />
-                        <Icon v-if="inscripcion.loading.show" icon="fas fa-spinner" class="animate-spin absolute top-3 right-3 text-gray-500" />
+                        <Input 
+                            @keyup="verifyCui()" 
+                            v-model="inscripcion.cui" 
+                            option="label" 
+                            title="*Ingresa cui/dpi" 
+                            maxlength="13" 
+                            type="search" 
+                            :class="{'focus:border-red-400 border-red-400 focus:outline-red-400': !inscripcion.success, 'focus:border-green-500 border-green-500 focus:outline-green-400' : inscripcion.success }" 
+                            required 
+                        />
+                        <Icon v-if="inscripcion.loading.show" 
+                            icon="fas fa-spinner" 
+                            class="animate-spin absolute top-3 right-3 text-gray-500" 
+                        />
                     </div>
                     <small :class="inscripcion.success ? 'text-green-400' : 'text-red-400'">{{ inscripcion.messageCui }}</small>
                 </div>
@@ -211,11 +272,12 @@
                     <Emergencia />
                 </div>
             </div>
+            <span>CANTIDAD DE INSCRIPCIONES : {{ inscripcion.cnt_inscripciones ?? 0 }}</span>
         </div>
         <Validate-Errors v-if="inscripcion.errors != 0" :errors="inscripcion.errors" />
         <template #footer>
             <Button @click="inscripcion.resetData()" text="Cancelar" class="btn-secondary rounded-full" icon="fas fa-xmark" />
-            <Button v-if="inscripcion.success" @click="inscripcionBeneficiario" text="Pre-inscribirse" class="btn-primary rounded-full" icon="fas fa-save" :loading="store.loading.store" />
+            <Button v-if="inscripcion.success && inscripcion.cnt_inscripciones <= 3" @click="inscripcionBeneficiario" text="Pre-inscribirse" class="btn-primary rounded-full" icon="fas fa-save" :loading="store.loading.store" />
         </template>
     </Modal>
 

@@ -12,7 +12,11 @@
 
 <template>
     <div class="p-4">
-        <Data-Table :headers="store.headers" :data="store.cursos" color="text-color-9">
+        <Data-Table 
+            :headers="store.headers" 
+            :data="store.cursos" 
+            color="text-color-9" >
+
             <template #tbody="{items}">
                 <tr 
                     v-for="item in items" 
@@ -21,7 +25,7 @@
                     
                     <td>{{ item.id }}</td>
                     <td>{{ item.curso }}</td>
-                    <td>{{ item.modalidad }}</td>
+                    <td>{{ item.descripcion }}</td>
                 </tr>
             </template>
         </Data-Table>    

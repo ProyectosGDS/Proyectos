@@ -18,9 +18,11 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         responsable : {},
         emergencia : {},
         estado : 'P',
+        cursos : [],
     })
 
     const copy_beneficiario = ref({})
+    const cnt_inscripciones = ref(0)
     
     const messageCui = ref('Ingrese cui')
     const cui = ref('')
@@ -86,6 +88,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
             })
                 success.value = true
                 const beneficiario = response.data.data
+                cnt_inscripciones.value = response.data?.data?.cursos.length
 
                 if(!beneficiario.id) {
                     nuevo_registro.value = true
@@ -105,6 +108,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
             nuevo_registro.value = true
             messageCui.value = error.response.data.message
             success.value = true
+            cnt_inscripciones.value = 0
             // console.error(error)
         }finally {
             loading.value.show = false
@@ -127,6 +131,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
             responsable : {},
             emergencia : {},
             estado : 'P',
+            cursos : [],
         }
         modal.value = {
             new : false,
@@ -139,10 +144,12 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         messageCui.value = ''
         cui.value = ''
         success.value = false
+        cnt_inscripciones.value = 0
     }
 
     return {
         beneficiario,
+        cnt_inscripciones,
         messageCui,
         cui,
         reload,

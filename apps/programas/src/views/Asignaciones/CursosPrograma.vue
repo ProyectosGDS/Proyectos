@@ -1,5 +1,5 @@
 <script setup>
-    import { computed, onBeforeMount, watchEffect } from 'vue'
+    import { computed, onBeforeMount } from 'vue'
 
     import { useProgramasStore } from '@/stores/Catalogos/programas'
     import { useCursosProgramaStore } from '@/stores/Asignaciones/cursos-programa'
@@ -36,22 +36,6 @@
         searchables.push(el.key.toLowerCase().trim())
     })
 
-    // const mes_final = (mes_inicial,no_cuotas) => {
-    //     const [year, month] = mes_inicial.split("-").map(Number);
-    //     const date = new Date(year, month - 1, 1);
-    //     const cuotas = parseInt(no_cuotas)
-    //     date.setMonth(date.getMonth() + (cuotas - 1));
-    //     const newYear = date.getFullYear();
-    //     const newMonth = String(date.getMonth() + 1).padStart(2, "0");
-
-    //     return `${newYear}-${newMonth}`;
-    // }
-
-    // function calc_mes_final_edit (mes_inicial,no_cuotas) {
-    //     asignaciones.curso.tarifas.mes_final = mes_final(mes_inicial, no_cuotas)
-    // }
-
-
     const searching_cursos = computed(() => {
         
         return asignaciones.cursos.filter((item) => {
@@ -74,14 +58,6 @@
         requisitos.fetch()
         catalogos.getTemporalidadesTarifas()
     })
-
-    // watchEffect(() => {
-    //     if(store.curso.no_cuotas && store.curso.mes_inicial) {
-    //         store.curso.mes_final = mes_final(store.curso.mes_inicial,store.curso.no_cuotas)
-    //     } else { 
-    //         store.curso.mes_final = null
-    //     }
-    // })
 
 </script>
 
@@ -162,16 +138,14 @@
                             <option v-for="tempo in catalogos.tempo_tarifas">{{ tempo }}</option>
                         </Input>
                     </div>
-                    <!-- <Input option="label" title="Cantidad de cuotas" type="number" min="1" max="12" v-model="store.curso.no_cuotas" :error="store.errors.hasOwnProperty('no_cuotas')" /> -->
-                    <!-- <Input option="label" title="Mes inicial" type="month" v-model="store.curso.mes_inicial" :error="store.errors.hasOwnProperty('mes_inicial')" /> -->
-                    <!-- <Input option="label" title="Mes final" type="month" v-model="store.curso.mes_final" :error="store.errors.hasOwnProperty('mes_final')" disabled /> -->
                 </div>
                 <Validate-Errors :errors="store.errorsDetails" v-if="store.errorsDetails != 0" />
                 <div class="flex justify-center gap-4">
                     <Button @click="store.addCurso()" icon="fas fa-plus" class="btn-primary" title="Agregar al programa" :disabled="store.editDetails" />
                 </div>
             </div>
-            <div class="xl:pl-8">
+            <div class="relative xl:pl-8">
+                
                 <h1 class="text-center text-2xl font-medium text-gray-500">
                     Cantidad de cursos : {{ asignaciones.cursos.length }}
                 </h1>
@@ -181,7 +155,10 @@
                         <Icon v-if="auth.checkPermission('exportar excel cursos programa')" @click="asignaciones.exportExcel" :icon="asignaciones.loading.excel ? 'fas fa-spinner' : 'fas fa-file-excel'" class="icon-button p-2 btn-success" :class="asignaciones.loading.excel ? 'animate-spin bg-gray-300 text-gray-500' : ''" :disabled="asignaciones.loading.excel" />
                     </Tool-Tip>
                 </div>
+
+                <Validate-Errors v-if="asignaciones.errors != 0" :errors="asignaciones.errors" />
                 <br>
+
                 <div class="grid" v-if="asignaciones.loading.fetch" >
                     <Loading-Bar class="bg-color-4 h-1"/>
                     <h1 class="text-center text-gray-400 text-xs animate-pulse">Cargando data ...</h1>
@@ -194,7 +171,7 @@
                                     <div class="grid grid-cols-2 gap-2 text-xs uppercase">
                                         <span>
                                             <span class="flex gap-1 items-center">
-                                                <Icon icon="fas fa-user" />
+                                                <Icon icon="fas fa-key" />
                                                 ID ASIGNACIÓN:
                                                 <span class="font-medium">{{ asignacion.id ?? '' }}</span>
                                             </span>
@@ -203,14 +180,14 @@
                                             <span class="flex gap-1 items-center">
                                                 <Icon icon="fas fa-business-time" />
                                                 TEMPORALIDAD:
-                                                <span class="font-medium">{{ asignacion.temporalidad?.nombre }}</span>
+                                                <span class="font-medium">{{ asignacion.temporalidad?.nombre ?? asignacion.temporalidad }}</span>
                                             </span>
                                         </span>
                                         <span>
                                             <span class="flex gap-1 items-center">
                                                 <Icon icon="fas fa-book" />
                                                 CURSO:
-                                                <span class="font-medium">{{ asignacion.curso?.nombre }}</span>
+                                                <span class="font-medium">{{ asignacion.curso?.nombre ?? asignacion.curso }}</span>
                                             </span>
                                         </span>
                                         
@@ -278,7 +255,7 @@
                                                 <Icon icon="fas fa-school" />
                                                 SEDE:
                                             </span>
-                                            <span class="font-medium">{{ asignacion.sede?.nombre_completo }}</span>
+                                            <span class="font-medium">{{ asignacion.sede?.nombre_completo ?? asignacion.sede }}</span>
                                         </span>
                                     </div>
                                 </Card>
@@ -307,7 +284,7 @@
                         </template>
                     </div>
                 </div>
-                <br>
+
                 <div v-if="asignaciones.cursos.length" class="flex justify-center gap-4">
                     <Button v-if="auth.checkPermission('crear cursos programa')" @click="asignaciones.store" text="Asignar cursos nuevos al programa" icon="fas fa-plus" class="btn-primary" :loading="asignaciones.loading.store"/>
                 </div>
@@ -407,7 +384,6 @@
                 </template>
             </Input>
             <Select v-model="asignaciones.curso.curso_id" title="*seleccione curso" :items="catalogos.catalogos_curso.cursos" :fields="['id','nombre']" :error="asignaciones.errors.hasOwnProperty('curso_id')" />
-            <!-- <Select v-model="asignaciones.curso.instructor_id" title="*seleccione instructor" :items="catalogos.catalogos_curso.instructores" :fields="['id','nombre']" :error="asignaciones.errors.hasOwnProperty('instructor_id')" /> -->
             <Select v-model="asignaciones.curso.sede_id" title="*seleccione sede" :items="catalogos.catalogos_curso.sedes" :fields="['id','nombre_completo']" :error="asignaciones.errors.hasOwnProperty('sede_id')" />
             <Input v-model="asignaciones.curso.temporalidad_id" option="select" title="*seleccione temporalidad" :error="asignaciones.errors.hasOwnProperty('temporalidad_id')">
                 <option value=""></option>

@@ -30,24 +30,24 @@ const router = createRouter({
 						},
 					]
 				},
-				{
-					path: 'modulos',
-					name: 'Módulos',
-					redirect : { name : 'Programas'},
-					children : [
-						{
-							path: '',
-							name : 'Programas',
-							component: () => import('@/views/Programas/Programas.vue'),
-						},
-						{
-							path: 'detalle-programa/:programa_id',
-							name: 'Detalle del programa',
-							component: () => import('@/views/Programas/DetallePrograma.vue'),
-							props : true,
-						}
-					]
-				},
+				// {
+				// 	path: 'modulos',
+				// 	name: 'Módulos',
+				// 	redirect : { name : 'Programas'},
+				// 	children : [
+				// 		{
+				// 			path: '',
+				// 			name : 'Programas',
+				// 			component: () => import('@/views/Programas/Programas.vue'),
+				// 		},
+				// 		{
+				// 			path: 'detalle-programa/:programa_id',
+				// 			name: 'Detalle del programa',
+				// 			component: () => import('@/views/Programas/DetallePrograma.vue'),
+				// 			props : true,
+				// 		}
+				// 	]
+				// },
 				// {
 				// 	path: 'servicios',
 				// 	name: 'Servicios',

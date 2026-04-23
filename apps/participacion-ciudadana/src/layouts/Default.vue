@@ -8,7 +8,10 @@
 
 <template>
     <main class="pt-8">
-        <NavBar :index="0" />
+        <!-- <NavBar :index="0" /> -->
+        <h3 class="text-center text-4xl font-medium text-color-1">
+            CAPACITACIONES TÉCNICO PRODUCTIVO
+        </h3>
         <div class="h-screen flex flex-col">
             <section class="flex-1 container mx-auto py-8">
                 <div class="lg:flex gap-5">

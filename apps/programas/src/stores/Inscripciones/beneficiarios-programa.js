@@ -28,6 +28,8 @@ export const useBeneficiariosProgramaStore = defineStore('beneficiarios-programa
         { title : 'estado', key : 'estado', width :'10px', align : 'center' },
         { title : 'fecha registro', key : 'fecha_registro'},
         { title : 'usuario', key : 'usuario'},
+        { title : 'fecha inicio recurso', key : 'fecha_inicial_recurso', type : 'date'},
+        { title : 'fecha fin recurso', key : 'fecha_final_recurso', type : 'date'},
         { title : '', key : 'actions', width :'10px', align : 'center' },
     ]
 
