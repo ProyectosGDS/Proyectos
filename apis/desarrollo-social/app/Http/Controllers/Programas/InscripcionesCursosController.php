@@ -327,4 +327,35 @@ class InscripcionesCursosController extends Controller
         }
     }
 
+    public function actualizarEstadoCurso(Request $request) {
+        $request->validate([
+            'inscripcion_id' => 'required|integer|exists:beneficiarios_cursos,id',
+        ]);
+
+        try {
+            $inscripcion = beneficiarios_cursos::where('id',$request->inscripcion_id)
+                ->where('estado','P')
+                ->first();
+
+            if(!$inscripcion){
+                return response([
+                    'message' => 'No se encontro recurso con estado PENDIENTE'
+                ],422);
+            }
+                
+            $inscripcion->estado = 'A';
+            $inscripcion->save();
+
+            return response([
+                'message' => 'Se actualizo el estado de la inscripcion',
+                'data' => $inscripcion
+            ]);
+            
+
+        } catch (\Throwable $th) {
+            return response([
+                'message' => 'Error: '.$th->getMessage(),
+            ]);
+        }
+    }
 }

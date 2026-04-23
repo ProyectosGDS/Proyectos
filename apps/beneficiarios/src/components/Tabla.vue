@@ -5,15 +5,11 @@
             default : 'bg-gray-200',
         }
     })
-
-    defineOptions({
-        inheritAttrs: false
-    })
 </script>
 
 <template>
     <div class="my-5">
-        <table v-bind="$attrs" class="w-full table-auto">
+        <table class="w-full table-auto">
             <thead>
                 <slot name="thead"></slot>
             </thead>

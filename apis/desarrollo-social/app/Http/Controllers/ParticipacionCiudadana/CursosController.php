@@ -33,7 +33,7 @@ class CursosController extends Controller
                     AND DC.ESTADO = 'A'
                     AND DC.PROGRAMA_ID = 62
                     AND DC.FECHA_INICIAL >= TO_DATE('2026-05-02', 'YYYY-MM-DD')
-                    AND DC.FECHA_FINAL <= TO_DATE('2026-07-31', 'YYYY-MM-DD')
+                    AND DC.FECHA_FINAL <= TO_DATE('2026-08-02', 'YYYY-MM-DD')
                     GROUP BY 
                         DC.CURSO_ID, 
                         C.NOMBRE,
@@ -78,7 +78,7 @@ class CursosController extends Controller
             return response($curso->load([
                 'detalles' => function($query) {
                     $query->whereDate('fecha_inicial','>=','2026-05-02')
-                        ->whereDate('fecha_final','<=','2026-07-31');
+                        ->whereDate('fecha_final','<=','2026-08-02');
                 },
                 'detalles.instructores',
                 'detalles.temporalidad',

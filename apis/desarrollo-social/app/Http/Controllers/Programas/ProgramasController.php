@@ -605,6 +605,54 @@ class ProgramasController extends Controller
         }
     }
 
+    public function get_beneficiarios_programa_modulo_curso(Request $request) {
+
+        $year = $request->input('year',date('Y'));
+        $programa_id = $request->input('programa_id');
+        $tipo = $request->input('tipo');
+
+        try {
+
+            $inscritos = [];
+
+            if($tipo == 'modulo') {
+
+                $inscritos = beneficiarios_modulos::whereHas('beneficiario',function($query) {
+                        $query->where('estado','P');  
+                    })
+                    ->whereHas('modulo',function($query) use($programa_id) {
+                        $query->where('programa_id',$programa_id);
+                    })
+                    ->with([
+                        'beneficiario',
+                        'modulo.sede',
+                    ])
+                    ->where('anio_inscripcion',$year)
+                    ->get();
+
+            } else {
+                
+                $inscritos = beneficiarios_cursos::whereHas('curso',function($query) use($programa_id){
+                        $query->where('programa_id',$programa_id);
+                    })
+                    ->with([
+                        'beneficiario',
+                        'curso.curso',
+                        'curso.sede.distrito',
+                        'curso.horarios',
+                    ])
+                    ->where('anio_inscripcion',$year)
+                    ->where('estado','P')
+                    ->get();
+            }
+            
+            return response($inscritos);
+
+        } catch (\Throwable $th) {
+            return response($th->getMessage());
+        }
+    }
+
     public function get_beneficiarios_modulo_curso(Request $request) {
 
         $year = $request->input('year',date('Y'));

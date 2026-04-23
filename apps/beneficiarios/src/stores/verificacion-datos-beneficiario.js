@@ -16,7 +16,12 @@ export const useVerificacionDatosBeneficiarioStore = defineStore('verificacion-d
         { title : 'id', key : 'id', type : 'numeric' },
         { title : 'cui', key : 'beneficiario.cui' },
         { title : 'beneficiario', key : 'beneficiario.nombre_completo' },
-        { title : 'estado', key : 'beneficiario.estado',  align : 'center', width : '10px' },
+        { title : 'asignacion id', key : 'curso.id' },
+        { title : 'curso', key : 'curso.curso.nombre' },
+        { title : 'horarios', key : 'curso.horarios' },
+        { title : 'sede', key : 'curso.sede.nombre_completo' },
+        { title : 'zona', key : 'curso.sede.zona_id' },
+        { title : 'distrito', key : 'curso.sede.distrito.nombre' },
         { title : 'fecha inscripción', key : 'created_at', type : 'date', align : 'center', width : '10px' },
         { title : '', key : 'actions', width : '10px', align : 'center' },
 
@@ -25,6 +30,7 @@ export const useVerificacionDatosBeneficiarioStore = defineStore('verificacion-d
     const beneficiarios = ref([])
     const year = ref(0)
     const modulo_curso_id = ref(null)
+    const inscripcion_id = ref(null)
 
     const loading = ref({
         fetch : false,
@@ -41,9 +47,9 @@ export const useVerificacionDatosBeneficiarioStore = defineStore('verificacion-d
     const fetch = async () => {
         loading.value.fetch = true
         try {
-            const response = await axios.get('programas/beneficiarios-modulo-curso', {
+            const response = await axios.get('programas/beneficiarios-programa-modulo-curso', {
                 params : {
-                    modulo_curso_id : modulo_curso_id.value,
+                    programa_id : catalogos.programa_id,
                     year : year.value,
                     tipo : catalogos.tipo
                 }
@@ -63,11 +69,12 @@ export const useVerificacionDatosBeneficiarioStore = defineStore('verificacion-d
         loading.value.update = true
         beneficiario.beneficiario.estado = 'V'
         try {
-            if (global.hasChanged(beneficiario.beneficiario, beneficiario.copy_beneficiario)) {
-                const response = await axios.put('beneficiarios/'+ beneficiario.beneficiario.id, beneficiario.beneficiario)
-                global.setAlert(response.data,'success')
-                fetch()
-            }
+            
+            const response = await axios.put('beneficiarios/'+ beneficiario.beneficiario.id, beneficiario.beneficiario)
+            global.setAlert(response.data,'success')
+            await changeStatusRecurso(inscripcion_id.value)
+            fetch()
+            
             beneficiario.resetData()
         } catch (error) {
             global.manejarError(error)
@@ -76,6 +83,19 @@ export const useVerificacionDatosBeneficiarioStore = defineStore('verificacion-d
             }
         } finally {
             loading.value.update = false
+        }
+    }
+
+    const changeStatusRecurso = async (inscripcion_id) => {
+        try {
+            
+            const response = await axios.post('inscripciones-curso/actualizar-estado-inscripcion',{
+                inscripcion_id : inscripcion_id
+            })
+
+            return true;
+        } catch (error) {
+            return false;
         }
     }
 
@@ -93,6 +113,7 @@ export const useVerificacionDatosBeneficiarioStore = defineStore('verificacion-d
         beneficiarios,
         year,
         modulo_curso_id,
+        inscripcion_id,
         loading,
         modal,
         errors,

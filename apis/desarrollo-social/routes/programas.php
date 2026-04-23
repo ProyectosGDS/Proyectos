@@ -28,6 +28,7 @@ Route::get('temporalidades',function(){
 
 Route::get('programas/modulos-cursos',[ProgramasController::class,'get_modulos_cursos']);
 Route::get('programas/beneficiarios-modulo-curso',[ProgramasController::class,'get_beneficiarios_modulo_curso']);
+Route::get('programas/beneficiarios-programa-modulo-curso',[ProgramasController::class,'get_beneficiarios_programa_modulo_curso']);
 Route::get('programas/get-actividades/{programa_id}',[ProgramasController::class,'get_actividades']);
 Route::get('programas/get-cursos/{programa}/{all}',[ProgramasController::class,'get_cursos']);
 Route::get('programas/get-modulos/{programa}',[ProgramasController::class,'get_modulos']);
@@ -61,6 +62,7 @@ Route::apiResource('detalles-actividades',DetallesActividadesController::class)-
 
 Route::get('inscripciones-curso/get-beneficiarios/{detalle_curso_id}/{year}',[InscripcionesCursosController::class,'get_beneficiarios']);
 Route::post('inscripciones-curso/store-beneficiarios',[InscripcionesCursosController::class,'store_beneficiarios']);
+Route::post('inscripciones-curso/actualizar-estado-inscripcion',[InscripcionesCursosController::class,'actualizarEstadoCurso']);
 Route::post('inscripciones-curso/export-pdf',[InscripcionesCursosController::class,'exportPdf']);
 Route::put('inscripciones-curso/asignar-beca/{inscripcion}',[InscripcionesCursosController::class,'asignar_beca']);
 Route::apiResource('inscripciones-curso',InscripcionesCursosController::class)->parameters(['inscripciones-curso' => 'inscripcion']);

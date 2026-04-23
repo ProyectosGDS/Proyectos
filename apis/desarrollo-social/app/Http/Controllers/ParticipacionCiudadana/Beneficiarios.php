@@ -30,7 +30,7 @@ class Beneficiarios extends Controller
                 'cursos' => function($query) {
                     $query->where('programa_id',62)
                         ->whereDate('fecha_inicial','>=','2026-05-02')
-                        ->whereDate('fecha_final','<=','2026-07-31');
+                        ->whereDate('fecha_final','<=','2026-08-02');
                 },
             ])->where('cui',$request->cui)
             ->first();

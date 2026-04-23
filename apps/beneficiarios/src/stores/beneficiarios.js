@@ -2,10 +2,12 @@ import { defineStore } from 'pinia'
 import { useGlobalStore } from './global'
 import { ref } from 'vue'
 import axios from 'axios'
+import { useVerificacionDatosBeneficiarioStore } from './verificacion-datos-beneficiario'
 
 export const useBeneficiariosStore = defineStore('beneficiarios', () => {
 
     const global = useGlobalStore()
+    const verificacion = useVerificacionDatosBeneficiarioStore()
 
     const headers = [
         { title : 'id', key : 'id', type : 'numeric' },
@@ -68,7 +70,9 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         historial : false,
     })
 
-    const show = async (id) => {
+    const show = async (item) => {
+        const id = item.beneficiario_id
+        verificacion.inscripcion_id = item.id;
         loading.value.show = true
         try {
             const response = await axios.get('beneficiarios/' + id)
@@ -250,6 +254,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
         headers,
         headersHistorial,
         beneficiario,
+        copy_beneficiario,
         messageCui,
         codeFetchBeneficiario,
         cui,
