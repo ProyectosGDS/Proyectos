@@ -118,32 +118,12 @@
 
     const inscripcionBeneficiario = async () => {
         await inscripcion.store()
-        store.show_curso(props.curso_id);
+        // store.show_curso(props.curso_id);
+        store.router.go(-1)
     }
 
-    const formatDate = (date) => {
-        const newDate = new Date(date);
-
-        const dia = String(newDate.getDate()).padStart(2, '0');
-        const mes = String(newDate.getMonth()); // Los meses van de 0 a 11
-        const año = newDate.getFullYear();
-
-        const nombre_mes = [
-            'Enero',
-            'Febrero',
-            'Marzo',
-            'Abril',
-            'Mayo',
-            'Junio',
-            'Julio',
-            'Agosto',
-            'Septiembre',
-            'Octubre',
-            'Noviembre',
-            'Diciembre'
-        ]
-
-        return `${dia}-${nombre_mes[mes]}-${año}`;
+    const rowsEmit = (item) => {
+        store.getCurso(item,'curso')
     }
 
     watchEffect(() => {
@@ -180,25 +160,19 @@
             :headers="store.detalleHeaders" 
             :data="store.curso.detalles"
             :rowsPerPage="50" 
-            color="text-color-9" >
+            color="text-color-9" 
+            :rowSelected="true"
+            @selectRow="rowsEmit">
 
-            <template #tbody="{items}">
-                <tr 
-                    @click="store.getCurso(item,'curso')"
-                    v-for="item in items" 
-                    title="Click para pre-inscribirse">
-                    <template v-if="(item.beneficiarios_todos.length < item.capacidad)">
-                        <td>{{ item.id }}</td>
-                        <td>{{ item.sede.zona_id }}</td>
-                        <td class=" text-start">{{ item.sede.nombre_completo }}</td>
-                        <td>{{ item.seccion }}</td>
-                        <td>{{ item.horarios[0]?.nombre_completo }}</td>
-                        <td>{{ item.capacidad - item.beneficiarios_todos.length }}</td>
-                        <td>{{ item.modalidad }}</td>
-                        <td>{{ formatDate(item.fecha_inicial) }}</td>
-                        <td>{{ formatDate(item.fecha_final) }}</td>
-                    </template>
-                </tr>
+            <template #horarios="{item}">
+                <small>
+                    {{ item.horarios[0]?.nombre_completo ?? null }}
+                </small>
+            </template>
+            <template #capacidad="{item}">
+                <small>
+                    {{ item.capacidad - item.beneficiarios_todos.length }}
+                </small>
             </template>
         </Data-Table>
     </div>
@@ -272,7 +246,14 @@
                     <Emergencia />
                 </div>
             </div>
-            <span>CANTIDAD DE INSCRIPCIONES : {{ inscripcion.cnt_inscripciones ?? 0 }}</span>
+            <span>
+                LIMITE DE INSCRIPCIONES : 4
+            </span>
+            <br>
+            <span>
+                CANTIDAD DE INSCRIPCIONES : 
+                {{ inscripcion.cnt_inscripciones ?? 0 }}
+            </span>
         </div>
         <Validate-Errors v-if="inscripcion.errors != 0" :errors="inscripcion.errors" />
         <template #footer>

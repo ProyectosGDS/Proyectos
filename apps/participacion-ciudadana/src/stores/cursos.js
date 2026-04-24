@@ -12,8 +12,7 @@ export const useCursosStore = defineStore('cursos', () => {
     const headers = [
         { title : 'id', key : 'id', type : 'numeric' },
         { title : 'curso', key : 'curso' },
-        { title : 'descripcion', key : 'descripcion', class : 'truncate'},
-
+        { title : 'descripcion', key : 'descripcion'}
     ]
 
     const categorias = ref([])
@@ -25,7 +24,6 @@ export const useCursosStore = defineStore('cursos', () => {
     const loading = ref(false)
     const errors = ref([])
 
-
     const detalleHeaders = [
         { title : 'curso id', key: 'id' },
         { title : 'zona', key: 'sede.zona_id', type : 'numeric' },
@@ -34,11 +32,10 @@ export const useCursosStore = defineStore('cursos', () => {
         { title : 'horarios', key: 'horarios' },
         { title : 'cupo disponible', key: 'capacidad' },
         { title : 'modalidad', key: 'modalidad' },
-        { title : 'inicio', key: 'fecha_inicial' },
-        { title : 'final', key: 'fecha_final' },
+        { title : 'inicio', key: 'fecha_inicial', type : 'dateformat' },
+        { title : 'final', key: 'fecha_final', type : 'dateformat' },
     ]
 
-    
     async function fetch () {
         try {
             loading.value = true

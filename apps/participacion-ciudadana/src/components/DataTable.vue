@@ -28,7 +28,7 @@ const openFilterOptions = ref(false)
 const filters = ref([{ field: '', value: '', operator : '=' }])
 const target = ref(null)
 
-const emit = defineEmits(['selectdAllItems'])
+const emit = defineEmits(['selectdAllItems','selectRow'])
 
 const props = defineProps({
     headers: null,
@@ -57,6 +57,10 @@ const props = defineProps({
     rowsPerPage: {
         type: Number,
         default: 10
+    },
+    rowSelected : {
+        type : Boolean,
+        default : false,
     }
 })
 
@@ -245,6 +249,31 @@ const typeValue = (value, type) => {
                 result = value ? `${y}-${m}-${d}` : ''
 
             break;
+        case 'dateformat':
+            
+                const newDate = new Date(value)
+                const day = String(newDate.getDate()).padStart(2, '0')
+                const month = String(newDate.getMonth()) // Los meses van de 0 a 11
+                const año = newDate.getFullYear()
+
+                const nombre_mes = [
+                    'Enero',
+                    'Febrero',
+                    'Marzo',
+                    'Abril',
+                    'Mayo',
+                    'Junio',
+                    'Julio',
+                    'Agosto',
+                    'Septiembre',
+                    'Octubre',
+                    'Noviembre',
+                    'Diciembre'
+                ]
+
+                result = `${day}-${nombre_mes[month]}-${año}` ?? value
+
+            break;
         case 'datetime':
             
             const fecha = new Date(value)
@@ -407,15 +436,34 @@ onMounted(() => {
 
         <!-- MOBILE CARDS -->
         <div class="grid gap-4 lg:hidden py-4">
-            <Card v-for="item in paginatedData" :key="item.id" class="bg-violet-50 p-2">
+            <Card 
+                v-for="item in paginatedData" 
+                :key="item.id" 
+                class="bg-violet-50 p-2 cursor-pointer hover:scale-95" 
+                @click="props.rowSelected ? emit('selectRow',item) : null">
+
                 <table class="w-full">
-                    <tr v-for="head in props.headers" class="hover:bg-violet-200">
-                        <td class="px-4 font-semibold uppercase text-sm select-none" :width="head.width" align="left" :hidden="head.hidden">
-                            <p class="text-color-9">{{ head.title }}</p>
+                    <tr v-for="head in props.headers" >
+                        <td 
+                            class="px-4 font-semibold uppercase text-sm select-none" 
+                            :width="head.width" 
+                            align="left" 
+                            :hidden="head.hidden" >
+                            <p 
+                                class="text-color-9" >
+                                {{ head.title }}
+                            </p>
                         </td>
-                        <td :align="head.align ?? 'center'" :width="head.width" :hidden="head.hidden">
-                            <slot :name="head.key" :item="item">
-                                <p :class="head.class ?? 'text-sm'">
+                        <td 
+                            :align="head.align ?? 'center'" 
+                            :width="head.width" 
+                            :hidden="head.hidden" >
+                            <slot 
+                                :name="head.key" 
+                                :item="item" >
+                                <p
+                                    :class="head.class ?? 'text-sm'" >
+
                                     {{ typeValue(getObjectValue(item, head.key), head.type) }}
                                 </p>
                             </slot>
@@ -453,17 +501,34 @@ onMounted(() => {
                 </tr>
             </template>
             <template #tbody>
-                <slot name="tbody" :items="paginatedData">
-                    <tr v-for="item in paginatedData" 
+                <slot 
+                    name="tbody" 
+                    :items="paginatedData" >
+                    <tr v-for="item in paginatedData"
+                        @click="props.rowSelected ? emit('selectRow',item) : null" 
                         :key="item.id" 
-                        class="hover:bg-violet-50 text-gray-800 select-none">
+                        class="hover:bg-violet-50 text-gray-800 select-none cursor-pointer" >
 
-                        <td v-if="props.multiSelect" align="center"> 
-                            <input type="checkbox" @change="selectdAll" v-model="selectItems" :value="item"> 
+                        <td v-if="props.multiSelect" 
+                            align="center"> 
+                            <input 
+                                type="checkbox" 
+                                @change="selectdAll" 
+                                v-model="selectItems" 
+                                :value="item" 
+                            > 
                         </td>
-                        <td v-for="(head, index) in props.headers" class="px-4" :align="head.align ?? 'left'" :width="head.width" :key="index" :hidden="head.hidden">
-                            <slot :name="head.key" :item="item">
-                                <p :class="head.class ?? 'uppercase text-xs'">
+                        <td v-for="(head, index) in props.headers" 
+                            class="px-4" 
+                            :align="head.align ?? 'left'" 
+                            :width="head.width" 
+                            :key="index" 
+                            :hidden="head.hidden" >
+                            <slot 
+                                :name="head.key" 
+                                :item="item" >
+                                <p 
+                                    :class="head.class ?? 'uppercase text-xs'" >
                                     {{ typeValue(getObjectValue(item, head.key), head.type) }}
                                 </p>
                             </slot>
@@ -471,13 +536,18 @@ onMounted(() => {
                     </tr>
                 </slot>
                 <tr v-if="props.loading">
-                    <td align="center" :colspan="props.headers.length" class="px-10">
+                    <td 
+                        align="center" 
+                        :colspan="props.headers.length" 
+                        class="px-10">
                         <Loading-Bar class="h-1 bg-color-4" />
                         <span class="animate-ping">Cargando data ....</span>
                     </td>
                 </tr>
                 <tr v-if="data.length === 0 && props.loading === false">
-                    <td align="center" :colspan="props.headers.length">
+                    <td 
+                        align="center" 
+                        :colspan="props.headers.length">
                         No hay data ....
                     </td>
                 </tr>

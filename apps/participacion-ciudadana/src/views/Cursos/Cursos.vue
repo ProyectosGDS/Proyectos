@@ -5,6 +5,10 @@
 
     const store = useCursosStore()
 
+    const toggle = (item) => {
+        store.detalleCurso(item)
+    }
+
     onMounted(() => {
         store.fetch()
     })
@@ -15,19 +19,9 @@
         <Data-Table 
             :headers="store.headers" 
             :data="store.cursos" 
-            color="text-color-9" >
-
-            <template #tbody="{items}">
-                <tr 
-                    v-for="item in items" 
-                    @click="store.detalleCurso(item)" 
-                    title="Click para mas detalles">
-                    
-                    <td>{{ item.id }}</td>
-                    <td>{{ item.curso }}</td>
-                    <td>{{ item.descripcion }}</td>
-                </tr>
-            </template>
+            color="text-color-9"
+            :rowSelected="true"
+            @selectRow="toggle" >
         </Data-Table>    
         <LoadingBar v-if="store.loading" class="h-1 bg-color-4" />
     </div>
