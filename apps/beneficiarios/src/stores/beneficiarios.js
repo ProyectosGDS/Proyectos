@@ -71,7 +71,7 @@ export const useBeneficiariosStore = defineStore('beneficiarios', () => {
     })
 
     const show = async (item) => {
-        const id = item.beneficiario_id
+        const id = item.beneficiario_id ?? item.id
         verificacion.inscripcion_id = item.id;
         loading.value.show = true
         try {

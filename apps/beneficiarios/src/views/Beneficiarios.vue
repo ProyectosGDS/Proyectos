@@ -165,7 +165,7 @@
             <template #actions="{item}">
                 <Drop-Down-Button icon="fas fa-ellipsis-v" >
                     <ul class="no-export">
-                        <li v-if="auth.checkPermission('editar beneficiario')" @click="store.show(item.id)" class="text-color-4">Editar</li>
+                        <li v-if="auth.checkPermission('editar beneficiario')" @click="store.show(item)" class="text-color-4">Editar</li>
                         <li v-if="auth.checkPermission('cambio estado beneficiario')" @click="store.status(item)" class="text-color-4">Cambiar estado</li>
                         <li v-if="auth.checkPermission('observaciones beneficiario')" @click="bitacora.observacion(item)" class="text-color-4">Observación</li>
                         <li v-if="auth.checkPermission('ver bitacora beneficiario')" @click="bitacora.show(item.id)" class="text-color-4">Historial</li>

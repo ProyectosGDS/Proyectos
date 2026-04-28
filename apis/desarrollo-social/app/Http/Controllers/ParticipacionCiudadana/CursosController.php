@@ -74,8 +74,7 @@ class CursosController extends Controller
 
     public function getCurso (cursos $curso) {
         try {
-
-            return response($curso->load([
+            $filter_curso = $curso->load([
                 'detalles' => function($query) {
                     $query->whereDate('fecha_inicial','>=','2026-05-02')
                         ->whereDate('fecha_final','<=','2026-08-02');
@@ -89,7 +88,18 @@ class CursosController extends Controller
                 'detalles.beneficiariosTodos' => function($query) {
                     $query->wherePivot('anio_inscripcion','=',2026);
                 }
-            ]));
+            ]);
+
+            $detalles = $filter_curso->detalles->filter(function($detalle){
+                if($detalle->cupos_disponibles > 0) {
+                    return $detalle;
+                }
+            });
+
+            unset($filter_curso->detalles);
+            $filter_curso->detalles = $detalles->values();
+
+            return response($filter_curso);
 
         } catch (\Throwable $th) {
             return response($th->getMessage(),422);

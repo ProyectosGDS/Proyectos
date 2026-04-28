@@ -258,7 +258,14 @@
         <Validate-Errors v-if="inscripcion.errors != 0" :errors="inscripcion.errors" />
         <template #footer>
             <Button @click="inscripcion.resetData()" text="Cancelar" class="btn-secondary rounded-full" icon="fas fa-xmark" />
-            <Button v-if="inscripcion.success && inscripcion.cnt_inscripciones < 4" @click="inscripcionBeneficiario" text="Pre-inscribirse" class="btn-primary rounded-full" icon="fas fa-save" :loading="store.loading.store" />
+            <Button 
+                v-if="inscripcion.success && inscripcion.cnt_inscripciones < 4" 
+                @click="inscripcionBeneficiario" 
+                text="Pre-inscribirse" 
+                class="btn-primary rounded-full" 
+                icon="fas fa-save" 
+                :loading="store.loading.store" 
+            />
         </template>
     </Modal>
 
