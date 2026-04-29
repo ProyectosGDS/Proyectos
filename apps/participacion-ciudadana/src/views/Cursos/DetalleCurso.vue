@@ -13,7 +13,7 @@
     import Emergencia from './Inscripcion/Emergencia.vue'
 
 
-    const props = defineProps(['curso_id'])
+    const props = defineProps(['zona'])
 
     const store = useCursosStore()
     const inscripcion = useBeneficiariosStore()
@@ -127,9 +127,9 @@
     }
 
     watchEffect(() => {
-        store.curso = {}
-        store.show_curso(props.curso_id)
-        store.inscripcion.curso_id = props.curso_id
+        store.cursos = {}
+        store.show_curso(props.zona)
+        // store.inscripcion.curso_id = props.curso_id
     })
 
     onMounted(() => {
@@ -140,7 +140,7 @@
 
 <template>
     
-    <div class="p-2 md:p-4 lg:p-8" v-if="store.curso?.hasOwnProperty('detalles')">
+    <div class="p-2 md:p-4 lg:p-8" v-if="store.cursos.length > 0">
         <div class="flex">
             <div @click="store.router.go(-1)" class="flex items-center justify-center gap-2 text-color-9 cursor-pointer">
                 <Icon icon="fas fa-arrow-left" class="text-xl" />
@@ -150,15 +150,13 @@
         <br>
         <header class="w-full flex items-center justify-center h-48 bg-color-9 rounded-lg overflow-hidden relative">
             <h1 class="text-white text-3xl lg:text-7xl uppercase text-center drop-shadow-xl">
-                {{ store.curso?.nombre }}
+                ZONA {{ props.zona }}
             </h1>
         </header>
-        <p class="text-center py-6">
-            {{ store.curso.descripcion }}
-        </p>
+        <br>
         <Data-Table 
             :headers="store.detalleHeaders" 
-            :data="store.curso.detalles"
+            :data="store.cursos"
             :rowsPerPage="50" 
             color="text-color-9" 
             :rowSelected="true"
@@ -179,7 +177,7 @@
 
     <Modal 
         :open="inscripcion.modal.new" 
-        title="Pre inscripción" 
+        :title="`Pre inscripción a curso: ${store.detalle.curso?.nombre ?? null}`" 
         icon="fas fa-user-graduate" 
         class="w-1/2" >
 
@@ -211,6 +209,10 @@
                         <label>Modalidad: </label>
                         <strong>{{ store.detalle.modalidad ?? null }}</strong>
                     </div>
+                    <br>
+                    <span class="text-gray-400">
+                        {{ store.detalle.curso.descripcion ?? null}}
+                    </span>
                 </div>
             </div>
             <br>

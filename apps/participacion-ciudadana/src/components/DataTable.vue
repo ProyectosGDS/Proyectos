@@ -392,9 +392,9 @@ onMounted(() => {
                 <div class="flex gap-1">
                     <!-- FILTER ADVANCE -->
                     <div class="relative" ref="target">
-                        <Tool-Tip message="Filtro avanzado" class="-mt-7 text-color-9" v-if="props.filterAdvance">
+                        <!-- <Tool-Tip message="Filtro avanzado" class="-mt-7 text-color-9" v-if="props.filterAdvance">
                             <Icon @click="openFilterOptions = !openFilterOptions" icon="fas fa-filter" class="icon-button p-2" :class="filters.length > 0 && filters[0].value != '' ? 'bg-green-500' : 'bg-gray-400'" />
-                        </Tool-Tip>
+                        </Tool-Tip> -->
                         <div v-show="openFilterOptions" class="bg-white border rounded absolute mt-2 right-0 p-2 z-10">
                             <div class="flex justify-center py-1">
                                 <button @click="addFilter"

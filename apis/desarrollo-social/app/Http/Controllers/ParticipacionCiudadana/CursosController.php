@@ -4,6 +4,7 @@ namespace App\Http\Controllers\ParticipacionCiudadana;
 
 use App\Http\Controllers\Controller;
 use App\Models\adm_gds\cursos;
+use App\Models\adm_gds\detalles_cursos;
 use App\Models\adm_gds\modulos;
 use App\Models\adm_gds\programas;
 use Illuminate\Http\Request;
@@ -130,6 +131,105 @@ class CursosController extends Controller
                 'modulos.sede',
                 'modulos.temporalidad'
             ]));
+        } catch (\Throwable $th) {
+            return response($th->getMessage(),422);
+        }
+    }
+
+    public function getCursosZona(int $zona) {
+        try {
+            $cursos = detalles_cursos::whereIn('id',[
+                3749,    
+                3747, 
+                3753,
+                3756,
+                3757,
+                3755,
+                3761,
+                3766,
+                3775,
+                3782,
+                3770,
+                3771,
+                3769,
+                3772,
+                3777,
+                3780,
+                3781,
+                3787,
+                3789,
+                3790,
+                3791,
+                3792,
+                3801,
+                3805,
+                3806,
+                3804,
+                3810,
+                3811,
+                3814,
+                3813,
+                3816,
+                3820,
+                3823,
+                3830,
+                3826,
+                3827,
+                3828,
+                3835,
+                3834,
+                3840,
+                3841,
+                3842,
+                3843,
+                3846,
+                3849,
+                3850,
+                3851,
+                3852,
+                3857,
+                3853,
+                3862,
+                3864,
+                3865,
+                3872,
+                3868,
+                3870,
+                3871,
+                3873,
+                3874,
+                3876,
+                3879,
+                3880,
+                3882,
+                3884,
+                3890,
+                3887,
+                3888
+            ])->whereHas('sede', function($query) use ($zona) {
+                    $query->where('zona_id',$zona);
+                })
+                ->with([
+                    'curso',
+                    'sede',
+                    'temporalidad',
+                    'horarios',
+                    'programa',
+                    'requisitos',
+                    'beneficiariosTodos' => function($query) {
+                        $query->wherePivot('anio_inscripcion','=',2026);
+                    }
+                ])
+                ->get();
+
+            $new_cursos = $cursos->filter(function($curso){
+                if($curso->cupos_disponibles > 0) {
+                    return $curso;
+                }
+            })->values();
+
+            return response($new_cursos);
+
         } catch (\Throwable $th) {
             return response($th->getMessage(),422);
         }

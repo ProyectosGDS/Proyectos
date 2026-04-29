@@ -25,10 +25,12 @@ export const useCursosStore = defineStore('cursos', () => {
     const errors = ref([])
 
     const detalleHeaders = [
+        // { title : 'programa', key: 'programa.nombre' },
         { title : 'curso id', key: 'id' },
-        { title : 'zona', key: 'sede.zona_id', type : 'numeric' },
-        { title : 'sede', key: 'sede.nombre_completo' },
+        { title : 'curso', key: 'curso.nombre' },
+        // { title : 'zona', key: 'sede.zona_id', type : 'numeric' },
         { title : 'sección', key: 'seccion' },
+        { title : 'sede', key: 'sede.nombre_completo' },
         { title : 'horarios', key: 'horarios' },
         { title : 'cupo disponible', key: 'capacidad' },
         { title : 'modalidad', key: 'modalidad' },
@@ -53,11 +55,11 @@ export const useCursosStore = defineStore('cursos', () => {
         }
     }
 
-    async function show_curso(curso_id) {
+    async function show_curso(zona) {
         try {
             loading.value = true
-            const response = await axios.get('participacion-ciudadana/curso/' + curso_id )
-            curso.value = response.data
+            const response = await axios.get('participacion-ciudadana/zona/' + zona )
+            cursos.value = response.data
         } catch (error) {
             console.error(error)
             errors.value = error
@@ -66,8 +68,12 @@ export const useCursosStore = defineStore('cursos', () => {
         }
     }    
 
-    function detalleCurso (item) {
-        router.push({ name : 'Detalle del curso', params : { curso_id : item.id } } )
+    // function detalleCurso (item) {
+    //     router.push({ name : 'Detalle del curso', params : { curso_id : item.id } } )
+    // }
+
+    function detalleCurso (zona) {
+        router.push({ name : 'Detalle del curso', params : { zona : zona } } )
     }
 
     function fetchCategorias () {

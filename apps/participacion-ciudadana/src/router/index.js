@@ -23,7 +23,7 @@ const router = createRouter({
 							component: () => import('@/views/Cursos/Cursos.vue'),
 						},
 						{
-							path: 'detalle-curso/:curso_id',
+							path: 'zona/:zona',
 							name: 'Detalle del curso',
 							component: () => import('@/views/Cursos/DetalleCurso.vue'),
 							props : true,
