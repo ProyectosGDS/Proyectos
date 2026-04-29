@@ -66,14 +66,14 @@ class InscripcionController extends Controller
                         $this->storeEmergencia($request, $beneficiario->id);
                     }
                     
-                    // bitacora::create([
-                    //     'accion' => bitacora::$acciones[16],
-                    //     'tabla' => 'BENEFICIARIOS',
-                    //     'descripcion' => 'INSCRIPCION EN LINEA PARTICIPACION CIUDADANA',
-                    //     'created_at' => now(),
-                    //     'usuario_id' => null,
-                    //     'beneficiario_id' => $beneficiario->id,
-                    // ]);
+                    bitacora::create([
+                        'accion' => bitacora::$acciones[16],
+                        'tabla' => 'BENEFICIARIOS',
+                        'descripcion' => 'INSCRIPCION EN LINEA PARTICIPACION CIUDADANA',
+                        'created_at' => now(),
+                        'usuario_id' => null,
+                        'beneficiario_id' => $beneficiario->id,
+                    ]);
                 }
 
                 if(!empty($this->bagValidations)){

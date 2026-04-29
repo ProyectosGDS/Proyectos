@@ -10,7 +10,12 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class ExportController extends Controller
 {
+    
     public function exportExcel(Request $request) {
+        
+        ini_set('memory_limit', '256M');
+        set_time_limit(300);
+
         $request->validate([
             'columns' => 'required',
             'data' => 'required',

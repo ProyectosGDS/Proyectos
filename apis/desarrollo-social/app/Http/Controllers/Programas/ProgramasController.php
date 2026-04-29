@@ -269,7 +269,7 @@ class ProgramasController extends Controller
 
     public function get_beneficiarios (string $programa_id, int $year) {
 
-        ini_set('memory_limit', '256M');
+        ini_set('memory_limit', '512M');
         set_time_limit(300);
 
         $perfil = strtolower(auth()->user()->perfil->nombre) == 'sysadmin' ? true : false;
